@@ -12,39 +12,39 @@
 
 #include "type_alias.h"
 
-// inline DOUBLE &CORR(DOUBLE *data, int x, int y, int z, int spacelength)
+// inline DOUBLE &CORR(DOUBLE *data, int x, int y, int z, int n_xyz)
 // {
-//   x = (x + spacelength) % spacelength;
-//   y = (y + spacelength) % spacelength;
-//   z = (z + spacelength) % spacelength;
-//   DOUBLE &corr_r = data[x + spacelength * (y + spacelength * z)];
+//   x = (x + n_xyz) % n_xyz;
+//   y = (y + n_xyz) % n_xyz;
+//   z = (z + n_xyz) % n_xyz;
+//   DOUBLE &corr_r = data[x + n_xyz * (y + n_xyz * z)];
 //   return corr_r;
 // }
 
-inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int spacelength)
+inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int n_xyz)
 {
-  x = (x + spacelength) % spacelength;
-  y = (y + spacelength) % spacelength;
-  z = (z + spacelength) % spacelength;
-  COMPLX &corr_r = data[x + spacelength * (y + spacelength * z)];
+  x = (x + n_xyz) % n_xyz;
+  y = (y + n_xyz) % n_xyz;
+  z = (z + n_xyz) % n_xyz;
+  COMPLX &corr_r = data[x + n_xyz * (y + n_xyz * z)];
   return corr_r;
 }
 
-// inline DOUBLE &CORR(DVARRAY &data, int x, int y, int z, int spacelength)
+// inline DOUBLE &CORR(DVARRAY &data, int x, int y, int z, int n_xyz)
 // {
-//   x = (x + spacelength) % spacelength;
-//   y = (y + spacelength) % spacelength;
-//   z = (z + spacelength) % spacelength;
-//   DOUBLE &corr_r = data[x + spacelength * (y + spacelength * z)];
+//   x = (x + n_xyz) % n_xyz;
+//   y = (y + n_xyz) % n_xyz;
+//   z = (z + n_xyz) % n_xyz;
+//   DOUBLE &corr_r = data[x + n_xyz * (y + n_xyz * z)];
 //   return corr_r;
 // }
 
-// inline COMPLX &CORR(CVARRAY &data, int x, int y, int z, int spacelength)
+// inline COMPLX &CORR(CVARRAY &data, int x, int y, int z, int n_xyz)
 // {
-//   x = (x + spacelength) % spacelength;
-//   y = (y + spacelength) % spacelength;
-//   z = (z + spacelength) % spacelength;
-//   COMPLX &corr_r = data[x + spacelength * (y + spacelength * z)];
+//   x = (x + n_xyz) % n_xyz;
+//   y = (y + n_xyz) % n_xyz;
+//   z = (z + n_xyz) % n_xyz;
+//   COMPLX &corr_r = data[x + n_xyz * (y + n_xyz * z)];
 //   return corr_r;
 // }
 

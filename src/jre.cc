@@ -22,7 +22,7 @@ void usage(char *name)
                   "    %s [OPTIONS] ifname1 ifname2 [ifname3 ...]\n",
           name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -l <LENGTH>:      Array length\n"
+                  "    -l <LENGTH>:      Length of data arrays\n"
                   "    -d <OFDIR>:       Directory of output files\n"
                   "    [-p] <PREFIX>:    Prefix for output files\n"
                   "    [-v]:             Calculate variance for each sample\n"
@@ -142,8 +142,8 @@ int main(int argc, char *argv[])
   // Initialization
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Jackknife resampling! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Array length:        %d\n", array_length);
+  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Array length:         %d\n", array_length);
 
   // Create an arrary to store ofnames
   char *jre_dlist[N_df];

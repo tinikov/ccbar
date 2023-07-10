@@ -22,7 +22,7 @@ void usage(char *name)
                   "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
           name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -l <TSITES>:      Temporal length\n"
+                  "    -n <TSIZE>:       Temporal size of lattice\n"
                   "    -d <OFDIR>:       Directory of output files\n"
                   "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
                   "    [-h, --help]:     Print help\n");
@@ -33,16 +33,16 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int T_length, int N_df);
-void csh_mass(char *rawdlist[], char *cshlist[], int T_length, int N_df);
+void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df);
+void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int T_length = 0;
-static const char *ofdir = NULL;
+int n_t = 0;
+static const char *of_dir = NULL;
 bool is_save_txt = false;
 // __________________________________
 //     .________|______|________.
@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -l: T_length
-    if (strcmp(argv[0], "-l") == 0)
+    // -n: n_t
+    if (strcmp(argv[0], "-n") == 0)
     {
-      T_length = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!T_length)
+      n_t = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      if (!n_t)
       {
         usage(program_name);
         exit(1);
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0)
     {
-      ofdir = argv[1];
+      of_dir = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (T_length == 0 || ofdir == NULL)
+  if (n_t == 0 || of_dir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Effective mass! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Temporal length:     %d\n", T_length);
+  fprintf(stderr, "##  Temporal length:     %d\n", n_t);
 
   // Create an arrary to store ofnames
   char *exp_dlist[N_df], *csh_dlist[N_df];
@@ -130,16 +130,16 @@ int main(int argc, char *argv[])
 
     exp_dlist[i] = (char *)malloc(2048 * sizeof(char));
     add_prefix(argv[i], "exp", stmp);
-    change_path(stmp, ofdir, exp_dlist[i]);
+    change_path(stmp, of_dir, exp_dlist[i]);
 
     csh_dlist[i] = (char *)malloc(2048 * sizeof(char));
     add_prefix(argv[i], "csh", stmp);
-    change_path(stmp, ofdir, csh_dlist[i]);
+    change_path(stmp, of_dir, csh_dlist[i]);
   }
 
   // Main part for calculation
-  exp_mass(argv, exp_dlist, T_length, N_df);
-  csh_mass(argv, csh_dlist, T_length, N_df);
+  exp_mass(argv, exp_dlist, n_t, N_df);
+  csh_mass(argv, csh_dlist, n_t, N_df);
 
   if (is_save_txt)
   {
@@ -148,10 +148,10 @@ int main(int argc, char *argv[])
       char txttmp[2048];
 
       add_prefix(exp_dlist[i], "txt", txttmp);
-      bin2txt(exp_dlist[i], txttmp, T_length);
+      bin2txt(exp_dlist[i], txttmp, n_t);
 
       add_prefix(csh_dlist[i], "txt", txttmp);
-      bin2txt(csh_dlist[i], txttmp, T_length);
+      bin2txt(csh_dlist[i], txttmp, n_t);
     }
   }
 
@@ -170,37 +170,37 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int T_length, int N_df)
+void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df)
 {
 #pragma omp parallel for
   for (int i = 0; i < N_df; i++)
   {
-    COMPLX raw[T_length], effmass[T_length];
+    COMPLX raw[n_t], effmass[n_t];
 #pragma omp parallel for
-    for (int j = 0; j < T_length; j++)
+    for (int j = 0; j < n_t; j++)
     {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    read_bin(rawdlist[i], T_length, raw);
+    read_bin(rawdlist[i], n_t, raw);
 
 #pragma omp parallel for
-    for (int j = 0; j < T_length; j++)
+    for (int j = 0; j < n_t; j++)
     {
-      effmass[j].real(log(raw[j].real() / raw[(j + 1) % T_length].real()));
+      effmass[j].real(log(raw[j].real() / raw[(j + 1) % n_t].real()));
     }
 
-    write_bin(explist[i], T_length, effmass);
+    write_bin(explist[i], n_t, effmass);
   }
 }
 
-DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int T_length)
+DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t)
 {
 #define JMAX 100
 #define M0 0.001
 #define M1 10.0
 #define MACC 1.0e-12
-#define coshtype(m) (corr1 / corr2 - cosh((m) * (T_length / 2.0 - t1)) / cosh((m) * (T_length / 2.0 - t2)))
+#define coshtype(m) (corr1 / corr2 - cosh((m) * (n_t / 2.0 - t1)) / cosh((m) * (n_t / 2.0 - t2)))
 
   DOUBLE dm, f, fmid, mmid, mass;
 
@@ -225,28 +225,28 @@ DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int T_length)
   return 0.0;
 }
 
-void csh_mass(char *rawdlist[], char *cshlist[], int T_length, int N_df)
+void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df)
 {
 #pragma omp parallel for
   for (int i = 0; i < N_df; i++)
   {
-    COMPLX raw[T_length], effmass[T_length];
+    COMPLX raw[n_t], effmass[n_t];
 #pragma omp parallel for
-    for (int j = 0; j < T_length; j++)
+    for (int j = 0; j < n_t; j++)
     {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    read_bin(rawdlist[i], T_length, raw);
+    read_bin(rawdlist[i], n_t, raw);
 
 #pragma omp parallel for
-    for (int j = 0; j < T_length; j++)
+    for (int j = 0; j < n_t; j++)
     {
       int t1 = j;
-      int t2 = (j + 1) % T_length;
-      effmass[j].real(coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), T_length));
+      int t2 = (j + 1) % n_t;
+      effmass[j].real(coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), n_t));
     }
 
-    write_bin(cshlist[i], T_length, effmass);
+    write_bin(cshlist[i], n_t, effmass);
   }
 }

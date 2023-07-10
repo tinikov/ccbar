@@ -40,7 +40,7 @@ void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df);
 //     |    Global Variables    |
 //     |________________________|
 
-int space_length = 0;
+int n_xyz = 0;
 static const char *ofdir = NULL;
 static const char *of_prefix = NULL;
 bool is_add_prefix = false;
@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -s: space_length
+    // -s: n_xyz
     if (strcmp(argv[0], "-s") == 0)
     {
-      space_length = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!space_length)
+      n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      if (!n_xyz)
       {
         usage(program_name);
         exit(1);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (space_length == 0 || ofdir == NULL)
+  if (n_xyz == 0 || ofdir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  A1+ projection! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", space_length);
+  fprintf(stderr, "##  Space length:        %d\n", n_xyz);
 
   // Create an arrary to store ofnames
   char *a1_dlist[N_df];
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   }
 
   // Main part for calculation
-  a1_plus(argv, a1_dlist, space_length, N_df);
+  a1_plus(argv, a1_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
   for (int i = 0; i < N_df; i++)

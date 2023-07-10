@@ -33,14 +33,14 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void pre_potential(char *rawdlist[], char *ppotlist[], int spacelength, int N_df);
+void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int space_length = 0;
+int n_xyz = 0;
 static const char *ofdir = NULL;
 static const char *of_prefix = NULL;
 bool is_add_prefix = false;
@@ -71,11 +71,11 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -s: space_length
+    // -s: n_xyz
     if (strcmp(argv[0], "-s") == 0)
     {
-      space_length = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!space_length)
+      n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      if (!n_xyz)
       {
         usage(program_name);
         exit(1);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (space_length == 0 || ofdir == NULL)
+  if (n_xyz == 0 || ofdir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Pre-potential! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", space_length);
+  fprintf(stderr, "##  Space length:        %d\n", n_xyz);
 
   // Create an arrary to store ofnames
   char *ppot_dlist[N_df];
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   }
 
   // Main part for calculation
-  pre_potential(argv, ppot_dlist, space_length, N_df);
+  pre_potential(argv, ppot_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
   for (int i = 0; i < N_df; i++)
@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void pre_potential(char *rawdlist[], char *ppotlist[], int spacelength, int N_df)
+void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df)
 {
-  int array_length = int(pow(spacelength, 3));
+  int array_length = int(pow(n_xyz, 3));
 
 #pragma omp parallel for
   for (int i = 0; i < N_df; i++)
@@ -178,13 +178,13 @@ void pre_potential(char *rawdlist[], char *ppotlist[], int spacelength, int N_df
     read_bin(rawdlist[i], array_length, tmp);
 
 #pragma omp parallel for
-    for (int ix = 0; ix < spacelength; ix++)
+    for (int ix = 0; ix < n_xyz; ix++)
 #pragma omp parallel for
-      for (int iy = 0; iy < spacelength; iy++)
+      for (int iy = 0; iy < n_xyz; iy++)
 #pragma omp parallel for
-        for (int iz = 0; iz < spacelength; iz++)
+        for (int iz = 0; iz < n_xyz; iz++)
         {
-          CORR(result, ix, iy, iz, spacelength) = (CORR(tmp, ix + 1, iy, iz, spacelength) + CORR(tmp, ix - 1, iy, iz, spacelength) + CORR(tmp, ix, iy + 1, iz, spacelength) + CORR(tmp, ix, iy - 1, iz, spacelength) + CORR(tmp, ix, iy, iz + 1, spacelength) + CORR(tmp, ix, iy, iz - 1, spacelength) - 6.0 * CORR(tmp, ix, iy, iz, spacelength)) / CORR(tmp, ix, iy, iz, spacelength);
+          CORR(result, ix, iy, iz, n_xyz) = (CORR(tmp, ix + 1, iy, iz, n_xyz) + CORR(tmp, ix - 1, iy, iz, n_xyz) + CORR(tmp, ix, iy + 1, iz, n_xyz) + CORR(tmp, ix, iy - 1, iz, n_xyz) + CORR(tmp, ix, iy, iz + 1, n_xyz) + CORR(tmp, ix, iy, iz - 1, n_xyz) - 6.0 * CORR(tmp, ix, iy, iz, n_xyz)) / CORR(tmp, ix, iy, iz, n_xyz);
         }
 
     write_bin(ppotlist[i], array_length, result);

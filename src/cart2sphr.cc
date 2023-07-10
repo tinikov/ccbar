@@ -34,15 +34,15 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int space_length, int N_df);
+void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz, int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int space_length = 0;
-static const char *ofdir = NULL;
+int n_xyz = 0;
+static const char *of_dir = NULL;
 static const char *of_prefix = NULL;
 bool is_add_prefix = false;
 // __________________________________
@@ -72,11 +72,11 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -l: space_length
+    // -l: n_xyz
     if (strcmp(argv[0], "-s") == 0)
     {
-      space_length = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!space_length)
+      n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      if (!n_xyz)
       {
         usage(program_name);
         exit(1);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0)
     {
-      ofdir = argv[1];
+      of_dir = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (space_length == 0 || ofdir == NULL)
+  if (n_xyz == 0 || of_dir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Cartesian to Spherical! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", space_length);
+  fprintf(stderr, "##  Space length:        %d\n", n_xyz);
 
   // Create an arrary to store ofnames
   char *sphr_dlist[N_df];
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
       char stmp[2048];
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, ofdir, sphr_dlist[i]);
+      change_path(stmp, of_dir, sphr_dlist[i]);
     }
   }
   else
@@ -141,12 +141,12 @@ int main(int argc, char *argv[])
     for (int i = 0; i < N_df; i++)
     {
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], ofdir, sphr_dlist[i]);
+      change_path(argv[i], of_dir, sphr_dlist[i]);
     }
   }
 
   // Main part for calculation
-  cartesian_to_spherical(argv, sphr_dlist, space_length, N_df);
+  cartesian_to_spherical(argv, sphr_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
   for (int i = 0; i < N_df; i++)
@@ -162,9 +162,9 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int space_length, int N_df)
+void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz, int N_df)
 {
-  int array_length = pow(space_length, 3);
+  int array_length = pow(n_xyz, 3);
 
   for (int i = 0; i < N_df; i++)
   {
@@ -184,17 +184,17 @@ void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int space_lengt
       exit(1);
     }
 #pragma omp parallel for
-    for (int i = 0; i < space_length / 2 + 1; i++)
+    for (int i = 0; i < n_xyz / 2 + 1; i++)
 #pragma omp parallel for
-      for (int j = i; j < space_length / 2 + 1; j++)
+      for (int j = i; j < n_xyz / 2 + 1; j++)
 #pragma omp parallel for
-        for (int k = j; k < space_length / 2 + 1; k++)
+        for (int k = j; k < n_xyz / 2 + 1; k++)
         { 
           DOUBLE re, im, distance = 0.0;
 
           distance = sqrt(pow(DOUBLE(i), 2) + pow(DOUBLE(j), 2) + pow(DOUBLE(k), 2));
-          re = CORR(tmp, i, j, k, space_length).real();
-          im = CORR(tmp, i, j, k, space_length).imag();
+          re = CORR(tmp, i, j, k, n_xyz).real();
+          im = CORR(tmp, i, j, k, n_xyz).imag();
 
           fprintf(fp, "%1.16e %1.16e %1.16e\n", distance, re, im);
         }

@@ -32,6 +32,8 @@
 *.app
 
 # Custom
-data
-fig
-result
+/data
+/fig
+/fig.bak
+/result
+/blog

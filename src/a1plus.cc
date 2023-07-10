@@ -20,9 +20,10 @@ void usage(char *name)
 {
   fprintf(stderr, "A1+ projection for 4-point correlators\n");
   fprintf(stderr, "USAGE: \n"
-                  "    %s [OPTIONS] ifname1 ifname2 [ifname3 ...]\n", name);
+                  "    %s [OPTIONS] ifname1 ifname2 [ifname3 ...]\n",
+          name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -s <SPACE>:       Space length\n"
+                  "    -n <XYZSIZE>:     Spacial size of lattice\n"
                   "    -d <OFDIR>:       Directory of output files\n"
                   "    [-p] <PREFIX>:    Prefix for output files\n"
                   "    [-h, --help]:     Print help\n");
@@ -33,15 +34,15 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df);
+void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int space_length = 0;
-static const char *ofdir = NULL;
+int n_xyz = 0;
+static const char *of_dir = NULL;
 static const char *of_prefix = NULL;
 bool is_add_prefix = false;
 // __________________________________
@@ -71,11 +72,11 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -s: space_length
-    if (strcmp(argv[0], "-s") == 0)
+    // -n: n_xyz
+    if (strcmp(argv[0], "-n") == 0)
     {
-      space_length = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!space_length)
+      n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      if (!n_xyz)
       {
         usage(program_name);
         exit(1);
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0)
     {
-      ofdir = argv[1];
+      of_dir = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (space_length == 0 || ofdir == NULL)
+  if (n_xyz == 0 || of_dir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -119,8 +120,8 @@ int main(int argc, char *argv[])
   // Initialization
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  A1+ projection! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", space_length);
+  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Space length:         %d\n", n_xyz);
 
   // Create an arrary to store ofnames
   char *a1_dlist[N_df];
@@ -132,7 +133,7 @@ int main(int argc, char *argv[])
       char stmp[2048];
       a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
       add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, ofdir, a1_dlist[i]);
+      change_path(stmp, of_dir, a1_dlist[i]);
     }
   }
   else
@@ -140,12 +141,12 @@ int main(int argc, char *argv[])
     for (int i = 0; i < N_df; i++)
     {
       a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], ofdir, a1_dlist[i]);
+      change_path(argv[i], of_dir, a1_dlist[i]);
     }
   }
 
   // Main part for calculation
-  a1_plus(argv, a1_dlist, space_length, N_df);
+  a1_plus(argv, a1_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
   for (int i = 0; i < N_df; i++)
@@ -161,19 +162,19 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-inline COMPLX sphere_sym(COMPLX *data, int x, int y, int z, int spacelength)
+inline COMPLX sphere_sym(COMPLX *data, int x, int y, int z, int n_xyz)
 {
-  return (CORR(data, x, y, z, spacelength) + CORR(data, y, z, x, spacelength) + CORR(data, z, x, y, spacelength) + CORR(data, x, z, y, spacelength) + CORR(data, z, y, x, spacelength) + CORR(data, y, x, z, spacelength)) / 6.0;
+  return (CORR(data, x, y, z, n_xyz) + CORR(data, y, z, x, n_xyz) + CORR(data, z, x, y, n_xyz) + CORR(data, x, z, y, n_xyz) + CORR(data, z, y, x, n_xyz) + CORR(data, y, x, z, n_xyz)) / 6.0;
 }
 
-inline COMPLX a1_sym(COMPLX *data, int x, int y, int z, int spacelength)
+inline COMPLX a1_sym(COMPLX *data, int x, int y, int z, int n_xyz)
 {
-  return (sphere_sym(data, x, y, z, spacelength) + sphere_sym(data, x, y, spacelength - z, spacelength) + sphere_sym(data, x, spacelength - y, z, spacelength) + sphere_sym(data, x, spacelength - y, spacelength - z, spacelength) + sphere_sym(data, spacelength - x, y, z, spacelength) + sphere_sym(data, spacelength - x, y, spacelength - z, spacelength) + sphere_sym(data, spacelength - x, spacelength - y, z, spacelength) + sphere_sym(data, spacelength - x, spacelength - y, spacelength - z, spacelength)) / 8.0;
+  return (sphere_sym(data, x, y, z, n_xyz) + sphere_sym(data, x, y, n_xyz - z, n_xyz) + sphere_sym(data, x, n_xyz - y, z, n_xyz) + sphere_sym(data, x, n_xyz - y, n_xyz - z, n_xyz) + sphere_sym(data, n_xyz - x, y, z, n_xyz) + sphere_sym(data, n_xyz - x, y, n_xyz - z, n_xyz) + sphere_sym(data, n_xyz - x, n_xyz - y, z, n_xyz) + sphere_sym(data, n_xyz - x, n_xyz - y, n_xyz - z, n_xyz)) / 8.0;
 }
 
-void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df)
+void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int N_df)
 {
-  int array_length = int(pow(spacelength, 3));
+  int array_length = int(pow(n_xyz, 3));
 
   for (int i = 0; i < N_df; i++)
   {
@@ -187,13 +188,13 @@ void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df)
     read_bin(rawdlist[i], array_length, tmp);
 
 #pragma omp parallel for
-    for (int ix = 0; ix < spacelength; ix++)
+    for (int ix = 0; ix < n_xyz; ix++)
 #pragma omp parallel for
-      for (int iy = 0; iy < spacelength; iy++)
+      for (int iy = 0; iy < n_xyz; iy++)
 #pragma omp parallel for
-        for (int iz = 0; iz < spacelength; iz++)
+        for (int iz = 0; iz < n_xyz; iz++)
         {
-          CORR(result, ix, iy, iz, spacelength) = a1_sym(tmp, ix, iy, iz, spacelength);
+          CORR(result, ix, iy, iz, n_xyz) = a1_sym(tmp, ix, iy, iz, n_xyz);
         }
 
     write_bin(a1list[i], array_length, result);

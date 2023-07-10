@@ -1,127 +1,127 @@
 #!/usr/bin/env python3
-##
-# @file
-# @brief  Single Exponential(cosh) Fit by iMinuit
-#         for two point temporal correlation functions
-# @author Noriyoshi Ishii
-# @since  Mon Aug  3 17:03:19 JST 2020
-#
-# usage：
-# ./fit.py -Tsites 32 -type cosh -range 5 10 -ifname pion.txt
-#
-# required options：
-#   -Tsites
-#   -range
-#   -ifname
-#
 
 import argparse
 import numpy as np
-from iminuit import Minuit
+import matplotlib.pyplot as plt
+from matplotlib import ticker
+from scipy.optimize import curve_fit
 
-parser = argparse.ArgumentParser(description="potential generator")
-
+parser = argparse.ArgumentParser(prog="M-fit", description="Fit hadron masses")
 parser.add_argument(
-    "--Tsites",
-    "-Tsites",
+    "-t", "--tsize", type=int, required=True, help="temporal size of lattice"
+)
+parser.add_argument(
+    "-c", "--cutoff", type=np.float64, required=True, help="lattice cutoff"
+)
+parser.add_argument("ifname", nargs="+", type=str, help="file list for fit")
+parser.add_argument(
+    "-r",
+    "--range",
     type=int,
+    nargs=2,
     required=True,
-    help="Number of sites along the temporal direction",
+    metavar=("MIN", "MAX"),
+    help="fit range: [nt_min, nt_max]",
 )
 parser.add_argument(
-    "--ifname", "-ifname", type=str, required=True, help="input file name"
-)
-parser.add_argument(
-    "--range", "-range", type=int, nargs=2, required=True, help="fit range: t0, t1"
-)
-parser.add_argument(
-    "--initial_values",
-    "-initial_values",
+    "--init_val",
     type=float,
     nargs=2,
-    default=[1.0, 1.0],
-    help="initial values [a, m]",
+    metavar=("A", "M"),
+    default=(1.0, 1.0),
+    help="initial values (A, M); (1.0, 1.0) by default",
 )
-parser.add_argument(
-    "--type",
-    "-type",
-    type=str,
-    choices=["exp", "cosh"],
-    default="exp",
-    help="single exponential fit or single cosh fit",
-)
-
 args = parser.parse_args()
 
-##
-# chi^2 function for the single exponential fit
-#
-class ChiSquareSingleExp:
-    def __init__(self, ifname, t0, t1):
-        self.corr = np.loadtxt(ifname, dtype=np.float64)
-        self.Tsites = len(self.corr)
-        self.t0 = t0
-        self.t1 = t1
-        self.corr = self.corr[t0:t1].transpose()
+tmin = args.range[0]
+tmax = args.range[1]
+n_t = args.tsize
+if tmin >= tmax or tmin <= 0 or tmax >= n_t:
+    print("Please check the range for fit! ")
+    exit(1)
+tsites = np.arange(0, n_t, 1)
+fitsites = np.arange(tmin, tmax, 1)
 
-    def __call__(self, a, m):
-        Ndf = 2
-        f = a * np.exp(-m * self.corr[0])
-        chisq = np.sum(np.square((self.corr[1] - f) / self.corr[2]))
-
-        return chisq
+N_df = len(args.ifname)
 
 
-##
-# chi^2 function for the single cosh fit
-#
-class ChiSquareSingleCosh:
-    def __init__(self, ifname, t0, t1):
-        self.corr = np.loadtxt(ifname)
-        self.Tsites = len(self.corr)
-        self.t0 = t0
-        self.t1 = t1
-        self.corr = self.corr[t0:t1].transpose()
-
-    def __call__(self, a, m):
-        Ndf = 2
-        f = a * np.cosh(-m * (self.corr[0] - args.Tsites / 2.0))
-        chisq = np.sum(np.square((self.corr[1] - f) / self.corr[2]))
-
-        return chisq
+def single_exp(n, A, M):
+    return A * np.exp(-M * n)
 
 
-#
-# main part
-#
+if N_df == 1:
+    print("\n#################################################")
+    print("##  TEST FIT (for the fit interval) (lattice unit)")
+    print("##  Fit range:  [{}, {}]".format(tmin, tmax))
+    print("##  Fit func:   exp\n")
 
-if args.type == "exp":
-    chiSquare = ChiSquareSingleExp(args.ifname, args.range[0], args.range[1])
+    rawdata = np.loadtxt(args.ifname[0], dtype=np.float64)[0:n_t]
+    corr = rawdata[:, 1]
+    err = rawdata[:, 2]
+
+    fitdata = rawdata[tmin:tmax]
+    fitcorr = fitdata[:, 1]
+    fiterr = fitdata[:, 2]
+
+    popt, pcov, infodict, errmsg, ier = curve_fit(
+        single_exp, fitsites, fitcorr, sigma=fiterr, full_output=True
+    )
+
+    df = tmax - tmin - 2 - 1  # degree of freedom: (# of data) - (# of parameters) - 1
+    chisq = np.sum(np.square(infodict["fvec"]))
+
+    print("##  A      = {}".format(popt[0]))
+    print("##  M      = {} (lattice unit)".format(popt[1]))
+    print("##  χ^2/df = {}".format(chisq / df))
 else:
-    chiSquare = ChiSquareSingleCosh(args.ifname, args.range[0], args.range[1])
+    print("\n#################################################")
+    print("##  FITTING HADRON MASS (lattice unit)")
+    print("##  Total of data files:  {}".format(N_df))
+    print("##  Fit range:            [{}, {}]".format(tmin, tmax))
+    print("##  Fit func:             exp")
 
-print("fit.py attempts to fit '{}'".format(args.ifname))
+    A_arr, M_arr, chisq_arr = [], [], []
+    file_index = 0
 
-m = Minuit(
-    chiSquare,
-    a=args.initial_values[0],
-    error_a=0.1,
-    m=args.initial_values[1],
-    error_m=0.1,
-    errordef=1,
-)
+    for ifname in args.ifname:
+        file_index += 1
 
-m.migrad()
+        rawdata = np.loadtxt(ifname, dtype=np.float64)[0:n_t]
+        corr = rawdata[:, 1]
+        err = rawdata[:, 2]
 
-#
-# Ndf: (Number of data) - (Number of parameters) - 1
-#
-#
-Ndf = args.range[1] - args.range[0] - 2 - 1
+        fitdata = rawdata[tmin:tmax]
+        fitcorr = fitdata[:, 1]
+        fiterr = fitdata[:, 2]
 
-print("chi^2/Ndf = {}".format(m.fval / Ndf))
-print("a         = {}".format(m.values["a"]))
-print("m         = {}".format(m.values["m"]))
-print("")
-# print("# ncalls  = {}".format(m.ncalls))
-print("# range   = {} {}".format(args.range[0], args.range[1]))
+        print("##  Progress: ({}/{})".format(file_index, N_df), end="\r")
+        popt, pcov, infodict, errmsg, ier = curve_fit(
+            single_exp, fitsites, fitcorr, sigma=fiterr, full_output=True
+        )
+
+        A_arr.append(popt[0])
+        M_arr.append(popt[1])
+        chisq_arr.append(np.sum(np.square(infodict["fvec"])))
+
+    print("##  Progress: ({}/{})\n".format(N_df, N_df))
+
+    df = tmax - tmin - 2 - 1  # degree of freedom: (# of data) - (# of parameters) - 1
+
+    A_arr = np.array(A_arr)
+    M_arr = np.array(M_arr)
+    chisq_arr = np.array(chisq_arr) / df
+
+    A_mean = np.mean(A_arr)
+    M_mean = np.mean(M_arr)
+    chisq_mean = np.mean(chisq_arr)
+
+    A_var = np.sqrt(np.var(A_arr) * (N_df - 1) / N_df)
+    M_var = np.sqrt(np.var(M_arr) * (N_df - 1) / N_df)
+    chisq_var = np.sqrt(np.var(chisq_arr) * (N_df - 1) / N_df)
+
+    cutoff = args.cutoff * 1000
+
+    print("##  A      = {} ± {}".format(A_mean, A_var))
+    print("##  M(LU)  = {} ± {}".format(M_mean, M_var))
+    print("##  M      = {} ± {}".format(M_mean * cutoff, M_var * cutoff))
+    print("##  χ^2/df = {} ± {}".format(chisq_mean, chisq_var))

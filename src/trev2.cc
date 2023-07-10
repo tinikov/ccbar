@@ -21,7 +21,7 @@ void usage(char *name)
   fprintf(stderr, "USAGE: \n"
                   "    %s [OPTIONS] ifname1 [ifname2 ...]\n", name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -l <TSITES>:      Temporal length\n"
+                  "    -n <TSIZE>:       Temporal size of lattice\n"
                   "    -d <OFDIR>:       Directory of output files\n"
                   "    [-p] <PREFIX>:    Prefix for output files\n"
                   "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
@@ -33,15 +33,15 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int T_length, int N_df);
+void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int T_length = 0;
-static const char *ofdir = NULL;
+int n_t = 0;
+static const char *of_dir = NULL;
 static const char *of_prefix = NULL;
 bool is_add_prefix = false;
 bool is_save_txt = false;
@@ -72,11 +72,11 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -l: T_length
-    if (strcmp(argv[0], "-l") == 0)
+    // -n: n_t
+    if (strcmp(argv[0], "-n") == 0)
     {
-      T_length = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!T_length)
+      n_t = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      if (!n_t)
       {
         usage(program_name);
         exit(1);
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0)
     {
-      ofdir = argv[1];
+      of_dir = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (T_length == 0 || ofdir == NULL)
+  if (n_t == 0 || of_dir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -129,8 +129,8 @@ int main(int argc, char *argv[])
   // Initialization
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Time reversal! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Temporal length:     %d\n", T_length);
+  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Temporal size:        %d\n", n_t);
 
   // Create an arrary to store ofnames
   char *tr_dlist[N_df];
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
       char stmp[2048];
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, ofdir, tr_dlist[i]);
+      change_path(stmp, of_dir, tr_dlist[i]);
     }
   }
   else
@@ -150,12 +150,12 @@ int main(int argc, char *argv[])
     for (int i = 0; i < N_df; i++)
     {
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], ofdir, tr_dlist[i]);
+      change_path(argv[i], of_dir, tr_dlist[i]);
     }
   }
 
   // Main part for calculation
-  time_reverse_2pt(argv, tr_dlist, T_length, N_df);
+  time_reverse_2pt(argv, tr_dlist, n_t, N_df);
 
   if (is_save_txt)
   {
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     {
       char txttmp[2048];
       add_prefix(tr_dlist[i], "txt", txttmp);
-      bin2txt(tr_dlist[i], txttmp, T_length);
+      bin2txt(tr_dlist[i], txttmp, n_t);
     }
   }
 
@@ -181,20 +181,20 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int T_length, int N_df)
+void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df)
 {
 #pragma omp parallel for
   for (int i = 0; i < N_df; i++)
   {
-    COMPLX raw[T_length], data[T_length];
-    for (int j = 0; j < T_length; j++)
+    COMPLX raw[n_t], data[n_t];
+    for (int j = 0; j < n_t; j++)
       raw[j] = data[j] = 0.0;
 
-    read_bin(rawdlist[i], T_length, raw);
+    read_bin(rawdlist[i], n_t, raw);
 
-    for (int j = 0; j < T_length; j++)
-      data[j] = (raw[j] + raw[(T_length - j) % T_length]) * 0.5;
+    for (int j = 0; j < n_t; j++)
+      data[j] = (raw[j] + raw[(n_t - j) % n_t]) * 0.5;
 
-    write_bin(trdlist[i], T_length, data);
+    write_bin(trdlist[i], n_t, data);
   }
 }

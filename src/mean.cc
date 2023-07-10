@@ -22,7 +22,7 @@ void usage(char *name)
                   "    %s [OPTIONS] ifname1 ifname2 [ifname3 ...]\n",
           name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -l <LENGTH>:      Array length\n"
+                  "    -l <LENGTH>:      Length of data arrays\n"
                   "    -o <OFNAME>:      Name of output file\n"
                   "    [-j]:             Calculate jackknife variance\n"
                   "    [-t]:             Also save a txt file\n"
@@ -130,9 +130,9 @@ int main(int argc, char *argv[])
   {
     // Initialization
     const int N_df = argc; // # of data files
-    fprintf(stderr, "##  Mean with jackknife variance! \n");
-    fprintf(stderr, "##  Total of data files: %d\n", N_df);
-    fprintf(stderr, "##  Array length:        %d\n", array_length);
+    fprintf(stderr, "##  Mean with JK-var! \n");
+    fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+    fprintf(stderr, "##  Array length:         %d\n", array_length);
 
     jackknife_mean(argv, ofname, array_length, N_df);
 
@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
     // Initialization
     const int N_df = argc; // # of data files
     fprintf(stderr, "##  Naive mean! \n");
-    fprintf(stderr, "##  Total of data files: %d\n", N_df);
-    fprintf(stderr, "##  Array length:        %d\n", array_length);
+    fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+    fprintf(stderr, "##  Array length:         %d\n", array_length);
 
     arithmetic_mean(argv, ofname, array_length, N_df);
 

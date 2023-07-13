@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
   fprintf(stderr, "##  Space length:        %d\n", n_xyz);
 
-  // Create an arrary to store ofnames
+  // Create an array to store ofnames
   char *ppot_dlist[N_df];
 
   if (is_add_prefix)

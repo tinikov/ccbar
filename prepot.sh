@@ -2,13 +2,13 @@
 # version: 1.0
 
 if [ $# != 3 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [SPACESITES] [TIMESITES] [XXPT]"
+  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [XXPT]"
   exit 1
 fi
 
 ulimit -n 1024
-SPACESITES=$1
-TIMESITES=$2
+XYZSIZE=$1
+TSIZE=$2
 XXPT=$3
 
 ROOT=.
@@ -16,8 +16,8 @@ BIN_DIR=$ROOT/bin
 DATA_DIR=$ROOT/data
 SAMPLE_DIR=$DATA_DIR/$XXPT/jsample
 
-ARRAY_LENGTH=$(($SPACESITES * $SPACESITES * $SPACESITES))
-T_HALF=$(($TIMESITES / 2))
+ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
+T_HALF=$(($TSIZE / 2))
 
 O_DIR=result/$XXPT/prepot
 LAP_DIR=$DATA_DIR/$XXPT/lap
@@ -31,8 +31,7 @@ for type in $(ls $SAMPLE_DIR); do
   for T in {00..$T_HALF}; do
     echo -e "For \033[1;35m$T\033[0m ..."
     mkdir -p $LAP_DIR/$type/$T
-    # $BIN_DIR/ppot -s $SPACESITES -d $LAP_DIR/$type/$T -p LAP $SAMPLE_DIR/$type/$T/*
-    $BIN_DIR/ppot -s $SPACESITES -d $LAP_DIR/$type/$T $SAMPLE_DIR/$type/$T/*
+    $BIN_DIR/ppot -s $XYZSIZE -d $LAP_DIR/$type/$T $SAMPLE_DIR/$type/$T/*
     echo " "
   done
 done
@@ -45,5 +44,5 @@ for type in $(ls $LAP_DIR); do
     $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/$T $LAP_DIR/$type/$T/4pt.*
     echo " "
   done
-  $BIN_DIR/cart2sphr -s $SPACESITES -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/*
+  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/*
 done

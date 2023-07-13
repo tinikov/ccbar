@@ -121,9 +121,9 @@ int main(int argc, char *argv[])
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Cartesian to Spherical! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", n_xyz);
+  fprintf(stderr, "##  Spacial size:        %d\n", n_xyz);
 
-  // Create an arrary to store ofnames
+  // Create an array to store ofnames
   char *sphr_dlist[N_df];
 
   if (is_add_prefix)

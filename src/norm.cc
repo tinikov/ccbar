@@ -1,9 +1,9 @@
 /**
- * @file a1plus.cc
+ * @file norm.cc
  * @author TC (reeft137@gmail.com)
- * @brief A1+ projection for 4-point correlators
+ * @brief Normalizaion for 4-point correlators
  * @version 1.0
- * @date 2023-05-03
+ * @date 2023-07-10
  *
  */
 
@@ -18,13 +18,12 @@
 
 void usage(char *name)
 {
-  fprintf(stderr, "A1+ projection for 4-point correlators\n");
+  fprintf(stderr, "Normalizaion for 4-point correlators\n");
   fprintf(stderr, "USAGE: \n"
                   "    %s [OPTIONS] ifname1 ifname2 [ifname3 ...]\n", name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -s <SPACE>:       Space length\n"
+                  "    -n <XYZSIZE>:     Spacial size of lattice\n"
                   "    -d <OFDIR>:       Directory of output files\n"
-                  "    [-p] <PREFIX>:    Prefix for output files\n"
                   "    [-h, --help]:     Print help\n");
 }
 // __________________________________
@@ -33,7 +32,8 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df);
+void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int N_df);
+void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -41,8 +41,7 @@ void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df);
 //     |________________________|
 
 int n_xyz = 0;
-static const char *ofdir = NULL;
-static const char *of_prefix = NULL;
+static const char *of_dir = NULL;
 bool is_add_prefix = false;
 // __________________________________
 //     .________|______|________.
@@ -71,8 +70,8 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -s: n_xyz
-    if (strcmp(argv[0], "-s") == 0)
+    // -n: n_xyz
+    if (strcmp(argv[0], "-n") == 0)
     {
       n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!n_xyz)
@@ -88,17 +87,7 @@ int main(int argc, char *argv[])
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0)
     {
-      ofdir = argv[1];
-      argc -= 2;
-      argv += 2;
-      continue;
-    }
-
-    // -p: prefix for output file
-    if (strcmp(argv[0], "-p") == 0)
-    {
-      of_prefix = argv[1];
-      is_add_prefix = true;
+      of_dir = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -110,7 +99,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (n_xyz == 0 || ofdir == NULL)
+  if (n_xyz == 0 || of_dir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -118,39 +107,34 @@ int main(int argc, char *argv[])
 
   // Initialization
   const int N_df = argc; // # of data files
-  fprintf(stderr, "##  A1+ projection! \n");
+  fprintf(stderr, "##  Normalization! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", n_xyz);
+  fprintf(stderr, "##  Spacial size:        %d\n", n_xyz);
 
-  // Create an arrary to store ofnames
-  char *a1_dlist[N_df];
+  // Create arrays to store ofnames
+  char *nn_dlist[N_df], *l2_dlist[N_df];
 
-  if (is_add_prefix)
+  for (int i = 0; i < N_df; i++)
   {
-    for (int i = 0; i < N_df; i++)
-    {
-      char stmp[2048];
-      a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, ofdir, a1_dlist[i]);
-    }
-  }
-  else
-  {
-    for (int i = 0; i < N_df; i++)
-    {
-      a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], ofdir, a1_dlist[i]);
-    }
+    char nn_stmp[2048], l2_stmp[2048];
+    nn_dlist[i] = (char *)malloc(2048 * sizeof(char));
+    l2_dlist[i] = (char *)malloc(2048 * sizeof(char));
+
+    add_prefix(argv[i], "nn", nn_stmp);
+    change_path(nn_stmp, of_dir, nn_dlist[i]);
+    add_prefix(argv[i], "l2", l2_stmp);
+    change_path(l2_stmp, of_dir, l2_dlist[i]);
   }
 
   // Main part for calculation
-  a1_plus(argv, a1_dlist, n_xyz, N_df);
+  naive_norm(argv, nn_dlist, n_xyz, N_df);
+  l2_norm(argv, l2_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
   for (int i = 0; i < N_df; i++)
   {
-    free(a1_dlist[i]);
+    free(nn_dlist[i]);
+    free(l2_dlist[i]);
   }
 
   return 0;
@@ -161,23 +145,13 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-inline DOUBLE sphere_sym(DOUBLE *data, int x, int y, int z, int spacelength)
+void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int N_df)
 {
-  return (CORR(data, x, y, z, spacelength) + CORR(data, y, z, x, spacelength) + CORR(data, z, x, y, spacelength) + CORR(data, x, z, y, spacelength) + CORR(data, z, y, x, spacelength) + CORR(data, y, x, z, spacelength)) / 6.0;
-}
-
-inline DOUBLE a1_sym(DOUBLE *data, int x, int y, int z, int spacelength)
-{
-  return (sphere_sym(data, x, y, z, spacelength) + sphere_sym(data, x, y, spacelength - z, spacelength) + sphere_sym(data, x, spacelength - y, z, spacelength) + sphere_sym(data, x, spacelength - y, spacelength - z, spacelength) + sphere_sym(data, spacelength - x, y, z, spacelength) + sphere_sym(data, spacelength - x, y, spacelength - z, spacelength) + sphere_sym(data, spacelength - x, spacelength - y, z, spacelength) + sphere_sym(data, spacelength - x, spacelength - y, spacelength - z, spacelength)) / 8.0;
-}
-
-void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df)
-{
-  int array_length = int(pow(spacelength, 3));
+  int array_length = int(pow(n_xyz, 3));
 
   for (int i = 0; i < N_df; i++)
   {
-    DOUBLE tmp[array_length], result[array_length];
+    COMPLX tmp[array_length], result[array_length];
 
     for (int j = 0; j < array_length; j++) // Initialize the empty arrays
     {
@@ -185,17 +159,44 @@ void a1_plus(char *rawdlist[], char *a1list[], int spacelength, int N_df)
     }
 
     read_bin(rawdlist[i], array_length, tmp);
+    
+    for (int j = 0; j < array_length; j++) // Compute C_n(t) = C(t)/C(0)
+    {
+      result[j] = tmp[j]/tmp[0];
+    }
 
-#pragma omp parallel for
-    for (int ix = 0; ix < spacelength; ix++)
-#pragma omp parallel for
-      for (int iy = 0; iy < spacelength; iy++)
-#pragma omp parallel for
-        for (int iz = 0; iz < spacelength; iz++)
-        {
-          CORR(result, ix, iy, iz, spacelength) = a1_sym(tmp, ix, iy, iz, spacelength);
-        }
+    write_bin(nnlist[i], array_length, result);
+  }
+}
 
-    write_bin(a1list[i], array_length, result);
+void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df)
+{
+  int array_length = int(pow(n_xyz, 3));
+
+  for (int i = 0; i < N_df; i++)
+  {
+    COMPLX tmp[array_length], result[array_length];
+    DOUBLE norm_fact = 0.0;
+
+    for (int j = 0; j < array_length; j++) // Initialize the empty arrays
+    {
+      tmp[j] = result[j] = 0.0;
+    }
+
+    read_bin(rawdlist[i], array_length, tmp);
+    
+    for (int j = 0; j < array_length; j++)
+    {
+      norm_fact += norm(tmp[j]);
+    }
+
+    norm_fact = sqrt(norm_fact);
+
+    for (int j = 0; j < array_length; j++) // Compute C_n(t) = C(t)/\sqrt(\sum_{C^2})
+    {
+      result[j] = tmp[j]/norm_fact;
+    }
+
+    write_bin(l2list[i], array_length, result);
   }
 }

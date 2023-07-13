@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Effective mass! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Temporal length:     %d\n", n_t);
+  fprintf(stderr, "##  Temporal size:       %d\n", n_t);
 
-  // Create an arrary to store ofnames
+  // Create an array to store ofnames
   char *exp_dlist[N_df], *csh_dlist[N_df];
 
   for (int i = 0; i < N_df; i++)

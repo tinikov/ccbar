@@ -8,18 +8,18 @@ fi
 
 ulimit -n 1024
 TSIZE=$1
-XXPT=$2
+X2PT=$2
 
 ROOT=.
 BIN_DIR=$ROOT/bin
 DATA_DIR=$ROOT/data
-RAW_DIR=$DATA_DIR/raw/$XXPT
+RAW_DIR=$DATA_DIR/raw/$X2PT
 
 echo -e "Pre-processing for \033[1;35m$RAW_DIR\033[0m"
 echo " "
 
-TR_DIR=$DATA_DIR/$XXPT/trev
-JR_DIR=$DATA_DIR/$XXPT/jsample
+TR_DIR=$DATA_DIR/$X2PT/trev
+JR_DIR=$DATA_DIR/$X2PT/jsample
 rm -rf $TR_DIR $JR_DIR
 
 for type in $(ls $RAW_DIR); do

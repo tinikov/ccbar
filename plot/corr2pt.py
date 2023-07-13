@@ -4,7 +4,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
-from matplotlib import markers
 
 tsize = 64
 

@@ -2,55 +2,42 @@
 # version: 1.0
 
 if [ $# != 3 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [SPACESITES] [TIMESITES] [XXPT]"
+  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
   exit 1
 fi
 
 ulimit -n 1024
-SPACESITES=$1
-TIMESITES=$2
-XXPT=$3
+XYZSIZE=$1
+TSIZE=$2
+X4PT=$3
 
 ROOT=.
 BIN_DIR=$ROOT/bin
 DATA_DIR=$ROOT/data
-SAMPLE_DIR=$DATA_DIR/$XXPT/jsample
+SAMPLE_DIR=$DATA_DIR/$X4PT/jsample
 
-ARRAY_LENGTH=$(($SPACESITES * $SPACESITES * $SPACESITES))
-T_HALF=$(($TIMESITES / 2))
+ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
+T_HALF=$(($TSIZE / 2))
 
-echo -e "Conducting KS(TD)-method in \033[1;35m$XXPTDIR\033[0m"
-echo " "
-
-O_DIR=result/$XXPT/corr
-NN_DIR=$DATA_DIR/$XXPT/naive-norm
-L2_DIR=$DATA_DIR/$XXPT/l2-norm
-rm -rf $O_DIR $NN_DIR $L2_DIR
-
-# # Pre-potential
-# for type in $(ls $SAMPLE_DIR); do
-#   echo -e "Pre-potential for \033[1;35m$SAMPLE_DIR/$type\033[0m"
-#   echo " "
-
-#   for T in {00..$T_HALF}; do
-#     echo -e "For \033[1;35m$T\033[0m ..."
-#     mkdir -p $LAP_DIR/$type/$T
-#     # $BIN_DIR/ppot -s $SPACESITES -d $LAP_DIR/$type/$T -p LAP $SAMPLE_DIR/$type/$T/*
-#     $BIN_DIR/ppot -s $SPACESITES -d $LAP_DIR/$type/$T $SAMPLE_DIR/$type/$T/*
-#   done
-#   echo " "
-# done
-
-# Jackknife and finalize part
-# mkdir -p $O_DIR/nn/binary
-# mkdir -p $O_DIR/l2/binary
+NORM_DIR=$DATA_DIR/$X4PT/norm
+O_DIR=result/$X4PT/corr
+rm -rf $O_DIR $NORM_DIR
 
 for type in $(ls $SAMPLE_DIR); do
-  mkdir -p $O_DIR/$type/raw/binary
-  for T in $(ls $SAMPLE_DIR/$type); do
-    echo -e "Jackknife average \033[1;35m$SAMPLE_DIR/$type/$T\033[0m ..."
-    $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/raw/binary/$T $SAMPLE_DIR/$type/$T/4pt.*
+  # Normalization, Jackknife and Finalization
+  mkdir -p $O_DIR/$type/binary
+  for T in {00..$T_HALF}; do
+    echo -e "Normalizing \033[1;35m$type/$T\033[0m ..."
+    mkdir -p $NORM_DIR/$type/$T
+    $BIN_DIR/norm -n $XYZSIZE -d $NORM_DIR/$type/$T $SAMPLE_DIR/$type/$T/4pt.*
+    echo " "
+    echo -e "Jackknife average \033[1;35m$type/$T\033[0m ..."
+    $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/plain.$T $SAMPLE_DIR/$type/$T/4pt.*
+    $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/nn.$T $NORM_DIR/$type/$T/nn.*
+    $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/l2.$T $NORM_DIR/$type/$T/l2.*
     echo " "
   done
-  $BIN_DIR/cart2sphr -s $SPACESITES -d $O_DIR/$type/raw -p "txt" $O_DIR/$type/raw/binary/*
+  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/plain.*
+  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/nn.*
+  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/l2.*
 done

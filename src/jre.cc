@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
   fprintf(stderr, "##  Total of data files:  %d\n", N_df);
   fprintf(stderr, "##  Array length:         %d\n", array_length);
 
-  // Create an arrary to store ofnames
+  // Create an array to store ofnames
   char *jre_dlist[N_df];
 
   if (is_add_prefix)

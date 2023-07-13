@@ -9,12 +9,12 @@ fi
 ulimit -n 1024
 XYZSIZE=$1
 TSIZE=$2
-XXPT=$3
+X4PT=$3
 
 ROOT=.
 BIN_DIR=$ROOT/bin
 DATA_DIR=$ROOT/data
-RAW_DIR=$DATA_DIR/raw/$XXPT
+RAW_DIR=$DATA_DIR/raw/$X4PT
 
 ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
 T_HALF=$(($TSIZE / 2))
@@ -22,9 +22,9 @@ T_HALF=$(($TSIZE / 2))
 echo -e "Pre-processing for \033[1;35m$RAW_DIR\033[0m"
 echo " "
 
-TR_DIR=$DATA_DIR/$XXPT/trev
-A1_DIR=$DATA_DIR/$XXPT/a1plus
-JR_DIR=$DATA_DIR/$XXPT/jsample
+TR_DIR=$DATA_DIR/$X4PT/trev
+A1_DIR=$DATA_DIR/$X4PT/a1plus
+JR_DIR=$DATA_DIR/$X4PT/jsample
 rm -rf $TR_DIR $A1_DIR $JR_DIR
 
 for type in $(ls $RAW_DIR); do

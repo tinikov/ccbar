@@ -23,7 +23,7 @@ void usage(char *name)
                   "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
           name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -s <LENGTH>:      Space length\n"
+                  "    -n <XYZSIZE>:     Spacial size of lattice\n"
                   "    -d <OFDIR>:       Directory of output files\n"
                   "    [-p] <PREFIX>:    Prefix for output files\n"
                   "    [-h, --help]:     Print help\n");
@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -l: n_xyz
-    if (strcmp(argv[0], "-s") == 0)
+    // -n: n_xyz
+    if (strcmp(argv[0], "-n") == 0)
     {
       n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!n_xyz)
@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
   // Initialization
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Cartesian to Spherical! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Spacial size:        %d\n", n_xyz);
+  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
   char *sphr_dlist[N_df];

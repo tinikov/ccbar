@@ -19,8 +19,8 @@ SAMPLE_DIR=$DATA_DIR/$X4PT/jsample
 ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
 T_HALF=$(($TSIZE / 2))
 
-NORM_DIR=$DATA_DIR/$X4PT/norm
 O_DIR=result/$X4PT/corr
+NORM_DIR=$DATA_DIR/$X4PT/norm
 rm -rf $O_DIR $NORM_DIR
 
 for type in $(ls $SAMPLE_DIR); do
@@ -37,7 +37,7 @@ for type in $(ls $SAMPLE_DIR); do
     $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/l2.$T $NORM_DIR/$type/$T/l2.*
     echo " "
   done
-  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/plain.*
-  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/nn.*
-  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/l2.*
+  $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/plain.*
+  $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/nn.*
+  $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/l2.*
 done

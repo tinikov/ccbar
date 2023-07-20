@@ -2,7 +2,7 @@
 # version: 1.0
 
 if [ $# != 3 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [XXPT]"
+  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
   exit 1
 fi
 
@@ -31,7 +31,7 @@ for type in $(ls $SAMPLE_DIR); do
   for T in {00..$T_HALF}; do
     echo -e "For \033[1;35m$T\033[0m ..."
     mkdir -p $LAP_DIR/$type/$T
-    $BIN_DIR/ppot -s $XYZSIZE -d $LAP_DIR/$type/$T $SAMPLE_DIR/$type/$T/*
+    $BIN_DIR/prev -n $XYZSIZE -d $LAP_DIR/$type/$T $SAMPLE_DIR/$type/$T/*
     echo " "
   done
 done
@@ -44,5 +44,5 @@ for type in $(ls $LAP_DIR); do
     $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/$T $LAP_DIR/$type/$T/4pt.*
     echo " "
   done
-  $BIN_DIR/cart2sphr -s $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/*
+  $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/*
 done

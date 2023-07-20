@@ -11,7 +11,7 @@ fks-td \
 jre \
 mean \
 norm \
-ppot \
+prev \
 trev2 \
 
 PRE = \

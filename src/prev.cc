@@ -1,5 +1,5 @@
 /**
- * @file ppot.cc
+ * @file prev.cc
  * @author TC (reeft137@gmail.com)
  * @brief Pre-potential: [▽^2 C(r,t)]/C(r,t)
  * @version 1.0
@@ -22,7 +22,7 @@ void usage(char *name)
   fprintf(stderr, "USAGE: \n"
                   "    %s [OPTIONS] ifname1 ifname2 [ifname3 ...]\n", name);
   fprintf(stderr, "OPTIONS: \n"
-                  "    -s <SPACE>:       Space length\n"
+                  "    -n <XYZSIZE>:     Spacial size of lattice\n"
                   "    -d <OFDIR>:       Directory of output files\n"
                   "    [-p] <PREFIX>:    Prefix for output files\n"
                   "    [-h, --help]:     Print help\n");
@@ -41,7 +41,7 @@ void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df);
 //     |________________________|
 
 int n_xyz = 0;
-static const char *ofdir = NULL;
+static const char *of_dir = NULL;
 static const char *of_prefix = NULL;
 bool is_add_prefix = false;
 // __________________________________
@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
       exit(0);
     }
 
-    // -s: n_xyz
-    if (strcmp(argv[0], "-s") == 0)
+    // -n: n_xyz
+    if (strcmp(argv[0], "-n") == 0)
     {
       n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!n_xyz)
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0)
     {
-      ofdir = argv[1];
+      of_dir = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (n_xyz == 0 || ofdir == NULL)
+  if (n_xyz == 0 || of_dir == NULL)
   {
     usage(program_name);
     exit(1);
@@ -119,38 +119,38 @@ int main(int argc, char *argv[])
   // Initialization
   const int N_df = argc; // # of data files
   fprintf(stderr, "##  Pre-potential! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
-  fprintf(stderr, "##  Space length:        %d\n", n_xyz);
+  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
-  char *ppot_dlist[N_df];
+  char *prev_dlist[N_df];
 
   if (is_add_prefix)
   {
     for (int i = 0; i < N_df; i++)
     {
       char stmp[2048];
-      ppot_dlist[i] = (char *)malloc(2048 * sizeof(char));
+      prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
       add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, ofdir, ppot_dlist[i]);
+      change_path(stmp, of_dir, prev_dlist[i]);
     }
   }
   else
   {
     for (int i = 0; i < N_df; i++)
     {
-      ppot_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], ofdir, ppot_dlist[i]);
+      prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
+      change_path(argv[i], of_dir, prev_dlist[i]);
     }
   }
 
   // Main part for calculation
-  pre_potential(argv, ppot_dlist, n_xyz, N_df);
+  pre_potential(argv, prev_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
   for (int i = 0; i < N_df; i++)
   {
-    free(ppot_dlist[i]);
+    free(prev_dlist[i]);
   }
 
   return 0;

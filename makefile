@@ -21,7 +21,10 @@ misc.o
 TARGETS = $(addprefix $(BIN)/,$(PROG_NAME))
 OBJS = $(addprefix $(SOURCE)/,$(PRE))
 
-all: $(TARGETS)
+all: bin $(TARGETS)
+
+bin:
+	mkdir -p $(BIN)
 
 $(TARGETS): $(BIN)/%: $(SOURCE)/%.o $(OBJS)
 	$(CXX) $(CXXFLAGS) $< $(OBJS) -o $@

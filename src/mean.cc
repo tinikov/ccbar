@@ -91,6 +91,11 @@ int main(int argc, char *argv[])
     if (strcmp(argv[0], "-o") == 0)
     {
       ofname = argv[1];
+      if (ofname == NULL)
+      {
+        usage(program_name);
+        exit(1);
+      }
       argc -= 2;
       argv += 2;
       continue;
@@ -120,7 +125,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (array_length == 0 || ofname == NULL || argc < 2)
+  if (argc < 2)
   {
     usage(program_name);
     exit(1);

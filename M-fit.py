@@ -2,8 +2,6 @@
 
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import ticker
 from scipy.optimize import curve_fit
 
 parser = argparse.ArgumentParser(prog="M-fit", description="Fit hadron masses")

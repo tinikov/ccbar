@@ -9,18 +9,18 @@ fi
 ulimit -n 1024
 XYZSIZE=$1
 TSIZE=$2
-XXPT=$3
+X4PT=$3
 
 ROOT=.
 BIN_DIR=$ROOT/bin
 DATA_DIR=$ROOT/data
-SAMPLE_DIR=$DATA_DIR/$XXPT/jsample
+SAMPLE_DIR=$DATA_DIR/$X4PT/jsample
 
 ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
 T_HALF=$(($TSIZE / 2))
 
-O_DIR=result/$XXPT/prepot
-LAP_DIR=$DATA_DIR/$XXPT/lap
+O_DIR=result/$X4PT/preV
+LAP_DIR=$DATA_DIR/$X4PT/lap
 rm -rf $O_DIR $LAP_DIR
 
 # Pre-potential

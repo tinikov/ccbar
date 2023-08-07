@@ -85,7 +85,7 @@ for i in range(5):
     hmass_l.append(np.loadtxt("../result/l2pt/effmass/txt.csh.{}".format(type[i])))
 
 # Gauge
-path = ["../fig/effmass/c2pt", "../fig/effmass/l2pt"]  # C, L
+path = ["../fig/effmass/coulomb", "../fig/effmass/landau"]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)

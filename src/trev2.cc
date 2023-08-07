@@ -90,6 +90,11 @@ int main(int argc, char *argv[])
     if (strcmp(argv[0], "-d") == 0)
     {
       of_dir = argv[1];
+      if (of_dir == NULL)
+      {
+        usage(program_name);
+        exit(1);
+      }
       argc -= 2;
       argv += 2;
       continue;
@@ -115,13 +120,6 @@ int main(int argc, char *argv[])
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
-    exit(1);
-  }
-
-  // Make sure of all needed syntax
-  if (n_t == 0 || of_dir == NULL)
-  {
     usage(program_name);
     exit(1);
   }

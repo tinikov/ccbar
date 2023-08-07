@@ -1,7 +1,7 @@
 /**
- * @file fks-td.cc
+ * @file v-td.cc
  * @author TC (reeft137@gmail.com)
- * @brief F_{KS} (time-dependent version)
+ * @brief Vcc and Vspin (time-dependent version)
  * @version 1.0
  * @date 2023-05-03
  *
@@ -23,7 +23,9 @@ void usage(char *name)
           name);
   fprintf(stderr, "OPTIONS: \n"
                   "    -l <LENGTH>:       Array length\n"
-                  "    -o <OFDIR>:        ofname of F_KS\n"
+                  "    -mc <MASS>:        Kinetic mass of charm quark\n"
+                  "    -oc <OFDIR>:       ofname of Vcc\n"
+                  "    -os <OFDIR>:       ofname of Vspin\n"
                   "    [-h, --help]:      Print help\n");
 }
 // __________________________________
@@ -33,7 +35,9 @@ void usage(char *name)
 //     |________________________|
 
 int array_length = 0;
-static const char *of_name = NULL;
+DOUBLE mc = 0.0;
+static const char *vcc_name = NULL;
+static const char *vspin_name = NULL;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -75,15 +79,33 @@ int main(int argc, char *argv[])
       continue;
     }
 
-    // -o: ofname
-    if (strcmp(argv[0], "-o") == 0)
+    // -mc: charm quark mass
+    if (strcmp(argv[0], "-mc") == 0)
     {
-      of_name = argv[1];
-      if (of_name == NULL)
+      mc = atof(argv[1]);
+      if (!mc)
       {
         usage(program_name);
         exit(1);
       }
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
+    // -oc: ofname of Vcc
+    if (strcmp(argv[0], "-oc") == 0)
+    {
+      vcc_name = argv[1];
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
+    // -os: ofname of Vspin
+    if (strcmp(argv[0], "-os") == 0)
+    {
+      vspin_name = argv[1];
       argc -= 2;
       argv += 2;
       continue;
@@ -95,7 +117,7 @@ int main(int argc, char *argv[])
   }
 
   // Make sure of all needed syntax
-  if (argc != 6)
+  if (vcc_name == NULL || vspin_name == NULL || argc != 6)
   {
     usage(program_name);
     exit(1);
@@ -118,7 +140,8 @@ int main(int argc, char *argv[])
   ddt = (log(cv_p / cps_p) - log(cv_m / cps_m)) / 2.0;
   fks = (ppotv - ppotps) / ddt;
 
-  write_bin(of_name, array_length, fks);
+  write_bin(vspin_name, array_length, ddt);
+  write_bin(vcc_name, array_length, fks);
 
   return 0;
 }

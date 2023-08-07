@@ -74,7 +74,7 @@ for i in range(5):
 yrange_all = [[1.5, 3.1], [1.6, 3.2], [2.2, 3.6], [2.4, 3.8], [2.4, 3.8]]
 
 # Gauge
-path = ["../fig/effmass/c2pt", "../fig/effmass/l2pt"]  # C, L
+path = ["../fig/effmass/coulomb", "../fig/effmass/landau"]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)

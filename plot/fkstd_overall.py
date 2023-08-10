@@ -3,7 +3,6 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import ticker
 
 a = 0.090713
 a_invrs = 2.1753

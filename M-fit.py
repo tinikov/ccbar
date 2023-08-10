@@ -23,7 +23,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--init_val",
-    type=float,
+    type=np.float64,
     nargs=2,
     metavar=("A", "M"),
     default=(1.0, 1.0),
@@ -34,7 +34,7 @@ args = parser.parse_args()
 tmin = args.range[0]
 tmax = args.range[1]
 n_t = args.tsize
-if tmin >= tmax or tmin <= 0 or tmax >= n_t:
+if tmin >= tmax or tmin < 0 or tmax > n_t:
     print("Please check the range for fit! ")
     exit(1)
 tsites = np.arange(0, n_t, 1)
@@ -49,7 +49,7 @@ def single_exp(n, A, M):
 
 if N_df == 1:
     print("\n#################################################")
-    print("##  TEST FIT (for the fit interval) (lattice unit)")
+    print("##  TEST FIT (to test the fit range) (LU)")
     print("##  Fit range:  [{}, {}]".format(tmin, tmax))
     print("##  Fit func:   exp\n")
 

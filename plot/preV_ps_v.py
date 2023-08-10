@@ -19,24 +19,18 @@ plt.rcParams["font.size"] = font["size"]
 plt.rcParams["mathtext.fontset"] = font["mathfamily"]
 
 style = {
-    "fmt": "x",
-    "markersize": 1.7,
+    "fmt": ".",
+    "markersize": 1,
     "markeredgewidth": 0.3,
     "linewidth": 0.3,
 }
 
 
-def all_plot(data, filename, trange, xrange=None, yrange=None):
+def all_plot(ps, v, filename, trange, xrange=None, yrange=None):
     fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
 
-    for i in trange:
-        ax.errorbar(
-            data[i][:, 0],
-            data[i][:, 1],
-            data[i][:, 2],
-            label=r"$n_t=$" + str(i).rjust(2, "0"),
-            **style
-        )
+    ax.errorbar(ps[:, 0], ps[:, 1], ps[:, 2], label=r"$PS$", **style)
+    ax.errorbar(v[:, 0], v[:, 1], v[:, 2], label=r"$V$", **style)
 
     ax.minorticks_on()
     legend_default_style = {
@@ -61,7 +55,7 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
 
 # Gauge
-path = ["../fig/preV/coulomb", "../fig/preV/landau"]  # C, L
+path = ["../fig/preV/coulomb/ch-each", "../fig/preV/landau/ch-each"]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
@@ -94,12 +88,14 @@ for igauge in range(2):
                 )
             )
 
-for igauge in range(2):
-    for ichan in range(2):
-        all_plot(
-            data=data[igauge][ichan],
-            filename="{}/{}_all".format(path[igauge], channel[ichan]),
-            trange=np.arange(0, 28, 3),
-            xrange=[0, 13],
-            yrange=[-1, 0.4],
-        )
+
+# for igauge in range(2):
+for i in range(32):
+    all_plot(
+        ps=data[1][0][i],
+        v=data[1][1][i],
+        filename="{}/{}".format(path[1], str(i).rjust(2, "0")),
+        trange=np.arange(0, 28, 3),
+        xrange=[0, 13],
+        yrange=[-0.1, 0.1],
+    )

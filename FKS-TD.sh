@@ -24,12 +24,11 @@ echo -e "Conducting KS(TD)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
 
 O_DIR=result/$X4PT/FKS-TD
-LN_DIR=$DATA_DIR/$X4PT/ddtln
 FKS_DIR=$DATA_DIR/$X4PT/fks-td
-rm -rf $O_DIR $LN_DIR $FKS_DIR
+rm -rf $O_DIR $FKS_DIR
 
 # F_{KS} (time-dependent)
-echo "##  F_{KS} (time-dependent)l! "
+echo "##  F_{KS} (time-dependent)! "
 echo "##  Time sites total (reversed): $T_HALF"
 echo "##  Array length:                $ARRAY_LENGTH"
 echo "#######################################"

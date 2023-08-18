@@ -205,7 +205,7 @@ void jackknife_mean(char *rawdlist[], const char *result, int array_length, int 
     rtmp = 0.0;
     keep_real(tmp, rtmp, array_length);
 
-    var += pow((rtmp - mean), 2);
+    var += (rtmp - mean) * (rtmp - mean);
   }
 
   var = sqrt(var * DOUBLE(N_df - 1) / DOUBLE(N_df));
@@ -235,7 +235,7 @@ void arithmetic_mean(char *rawdlist[], const char *result, int array_length, int
     tmp = 0.0;
     read_bin(rawdlist[i], array_length, tmp);
 
-    mean += tmp / DOUBLE(N_df);
+    mean += tmp / COMPLX(N_df, 0.0);
   }
 
   write_bin(result, array_length, mean);

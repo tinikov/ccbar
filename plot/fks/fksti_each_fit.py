@@ -3,7 +3,8 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from lmfit import Model
+from iminuit import Minuit
+from iminuit.cost import LeastSquares
 
 a = 0.090713
 a_invrs = 2.1753
@@ -12,14 +13,14 @@ tmin = 10
 tmax = 27
 
 rmin = 0.01
-rmax = [1.34, 1.34]
+rmax = [0.82, 0.82]
 
-path = ["../fig/FKS/coulomb-TD/each", "../fig/FKS/landau-TD/each"]
+path = ["../fig/FKS/coulomb-TI/each", "../fig/FKS/landau-TI/each"]
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/FKS-TD", "../result/l4pt/FKS-TD"]
+datapath = ["../result/c4pt/FKS-TI", "../result/l4pt/FKS-TI"]
 
 
 def gaussian(x, A, B, C):
@@ -30,15 +31,13 @@ def gaussian2(x, A1, B1, A2, B2, C):
     return gaussian(x, A1, B1, 0) + gaussian(x, A2, B2, 0) + C
 
 
-gaussian2_model = Model(gaussian2)
-
-params2 = gaussian2_model.make_params(
-    A1=-1,
-    B1=10,
-    A2=-10,
-    B2=1,
-    C=1,
-)
+para = {
+    "A1": -1,
+    "B1": 10,
+    "A2": -10,
+    "B2": 1,
+    "C": 1,
+}
 
 # Font setting
 font = {
@@ -63,11 +62,15 @@ for igauge in range(2):
         sorted_indices = np.argsort(subdata[:, 0])
 
         fitdata = subdata[sorted_indices]
+
         fitsites = fitdata[:, 0]
         fitfks = fitdata[:, 1]
         fiterr = fitdata[:, 2]
 
-        result = gaussian2_model.fit(fitfks, params2, x=fitsites, weights=1 / fiterr)
+        # Fit
+        least_squares = LeastSquares(fitsites, fitfks, fiterr, gaussian2)
+        m = Minuit(least_squares, **para)
+        m.migrad()
 
         # Draw
         style = {
@@ -89,20 +92,20 @@ for igauge in range(2):
         x_fit = np.arange(0, 28, 0.01)
         ax.plot(
             x_fit * a,
-            gaussian2(x_fit, **result.best_values) * a_invrs,
+            gaussian2(x_fit, *m.values) * a_invrs,
             linewidth=0.75,
             label="fit",
         )
         ax.plot(
             x_fit * a,
-            np.full(x_fit.shape, result.best_values["C"]) * a_invrs,
+            np.full(x_fit.shape, m.values["C"]) * a_invrs,
             linewidth=0.75,
             label=r"$m_c$",
         )
 
         # Set grid (reserved)
-        ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
-        ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.8)
+        # ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
+        # ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.8)
 
         ax.minorticks_on()
         legend_default_style = {
@@ -116,7 +119,7 @@ for igauge in range(2):
         ax.set(xlim=(0, 1.2))
 
         ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=-0.1)
-        ax.set(ylim=(-2, 4))
+        ax.set(ylim=(-2, 3))
 
         fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
         fig.savefig("{}/{}.png".format(path[igauge], str(i).rjust(2, "0")), dpi=600)

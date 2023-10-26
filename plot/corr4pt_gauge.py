@@ -3,10 +3,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import ticker
 
 a = 0.090713
 tsize = 64
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -57,12 +57,12 @@ def gauge_plot(cdata, ct, ldata, lt, filename, xrange=None, yrange=None):
     ax.legend(loc=3, **legend_default_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$C(r)$", labelpad=-0.1)
     ax.set_yscale("log")
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
@@ -72,7 +72,7 @@ def gauge_plot(cdata, ct, ldata, lt, filename, xrange=None, yrange=None):
 
 
 # Gauge
-path = "../fig/corr/"
+path = "{}/fig/corr/".format(codeRoot)
 if not os.path.exists(path):
     os.makedirs(path)
 
@@ -87,28 +87,36 @@ channel = ["ps", "v"]
 # Read data
 nn_ps_c, nn_v_c, nn_ps_l, nn_v_l = [[] for _ in range(4)]
 for it in range(32):
-    nn_ps_c.append(np.loadtxt("../result/c4pt/corr/ps/txt.nn.{}".format(timelist[it])))
-    nn_v_c.append(np.loadtxt("../result/c4pt/corr/v/txt.nn.{}".format(timelist[it])))
-    nn_ps_l.append(np.loadtxt("../result/l4pt/corr/ps/txt.nn.{}".format(timelist[it])))
-    nn_v_l.append(np.loadtxt("../result/l4pt/corr/v/txt.nn.{}".format(timelist[it])))
+    nn_ps_c.append(
+        np.loadtxt("{}/result/c4pt/corr/ps/txt.nn.{}".format(codeRoot, timelist[it]))
+    )
+    nn_ps_l.append(
+        np.loadtxt("{}/result/l4pt/corr/ps/txt.nn.{}".format(codeRoot, timelist[it]))
+    )
+    nn_v_c.append(
+        np.loadtxt("{}/result/c4pt/corr/v/txt.nn.{}".format(codeRoot, timelist[it]))
+    )
+    nn_v_l.append(
+        np.loadtxt("{}/result/l4pt/corr/v/txt.nn.{}".format(codeRoot, timelist[it]))
+    )
 
 # PLOT
 gauge_plot(
     nn_ps_c,
-    20,
+    28,
     nn_ps_l,
-    27,
+    28,
     filename="{}/4pt_gauge_ps".format(path),
     xrange=[0, 1.2],
-    yrange=[8e-4, 1],
+    yrange=[5e-4, 1],
 )
 
 gauge_plot(
     nn_v_c,
-    20,
+    28,
     nn_v_l,
-    27,
+    28,
     filename="{}/4pt_gauge_v".format(path),
     xrange=[0, 1.2],
-    yrange=[2e-3, 1],
+    yrange=[5e-4, 1],
 )

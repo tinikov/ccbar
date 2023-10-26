@@ -10,23 +10,25 @@
 #include "correlator.h"
 #include "data_process.h"
 #include "misc.h"
+#include "type_alias.h"
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |     Usage function     |
 //     |________________________|
 
-void usage(char *name)
-{
+void usage(char *name) {
   fprintf(stderr, "From Cartesian coordinate to Spherical coordinate\n");
-  fprintf(stderr, "USAGE: \n"
-                  "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
+  fprintf(stderr,
+          "USAGE: \n"
+          "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
           name);
-  fprintf(stderr, "OPTIONS: \n"
-                  "    -n <XYZSIZE>:     Spacial size of lattice\n"
-                  "    -d <OFDIR>:       Directory of output files\n"
-                  "    [-p] <PREFIX>:    Prefix for output files\n"
-                  "    [-h, --help]:     Print help\n");
+  fprintf(stderr,
+          "OPTIONS: \n"
+          "    -n <XYZSIZE>:     Spacial size of lattice\n"
+          "    -d <OFDIR>:       Directory of output files\n"
+          "    [-p] <PREFIX>:    Prefix for output files\n"
+          "    [-h, --help]:     Print help\n");
 }
 // __________________________________
 //     .________|______|________.
@@ -34,7 +36,8 @@ void usage(char *name)
 //     |    Custom functions    |
 //     |________________________|
 
-void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz, int N_df);
+void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
+                            int N_df);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -51,8 +54,7 @@ bool is_add_prefix = false;
 //     |      Main Function     |
 //     |________________________|
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   char program_name[128];
   strncpy(program_name, basename(argv[0]), 127);
   argc--;
@@ -63,21 +65,19 @@ int main(int argc, char *argv[])
   //    |  Dealing with Options  |
   //    |________________________|
 
-  while (argc > 0 && argv[0][0] == '-') // deal with all options regardless of their order
+  while (argc > 0 &&
+         argv[0][0] == '-')  // deal with all options regardless of their order
   {
     // -h and --help: show usage
-    if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0)
-    {
+    if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(program_name);
       exit(0);
     }
 
     // -n: n_xyz
-    if (strcmp(argv[0], "-n") == 0)
-    {
-      n_xyz = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!n_xyz)
-      {
+    if (strcmp(argv[0], "-n") == 0) {
+      n_xyz = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!n_xyz) {
         usage(program_name);
         exit(1);
       }
@@ -87,11 +87,9 @@ int main(int argc, char *argv[])
     }
 
     // -d: directory for output file
-    if (strcmp(argv[0], "-d") == 0)
-    {
+    if (strcmp(argv[0], "-d") == 0) {
       of_dir = argv[1];
-      if (of_dir == NULL)
-      {
+      if (of_dir == NULL) {
         usage(program_name);
         exit(1);
       }
@@ -101,8 +99,7 @@ int main(int argc, char *argv[])
     }
 
     // -p: prefix for output file
-    if (strcmp(argv[0], "-p") == 0)
-    {
+    if (strcmp(argv[0], "-p") == 0) {
       of_prefix = argv[1];
       is_add_prefix = true;
       argc -= 2;
@@ -116,7 +113,11 @@ int main(int argc, char *argv[])
   }
 
   // Initialization
-  const int N_df = argc; // # of data files
+  const int N_df = argc;  // # of data files
+  if (N_df < 1) {
+    usage(program_name);
+    exit(1);
+  }
   fprintf(stderr, "##  Cartesian to Spherical! \n");
   fprintf(stderr, "##  Total of data files:  %d\n", N_df);
   fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
@@ -124,20 +125,15 @@ int main(int argc, char *argv[])
   // Create an array to store ofnames
   char *sphr_dlist[N_df];
 
-  if (is_add_prefix)
-  {
-    for (int i = 0; i < N_df; i++)
-    {
+  if (is_add_prefix) {
+    for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       add_prefix(argv[i], of_prefix, stmp);
       change_path(stmp, of_dir, sphr_dlist[i]);
     }
-  }
-  else
-  {
-    for (int i = 0; i < N_df; i++)
-    {
+  } else {
+    for (int i = 0; i < N_df; i++) {
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       change_path(argv[i], of_dir, sphr_dlist[i]);
     }
@@ -147,8 +143,7 @@ int main(int argc, char *argv[])
   cartesian_to_spherical(argv, sphr_dlist, n_xyz, N_df);
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++)
-  {
+  for (int i = 0; i < N_df; i++) {
     free(sphr_dlist[i]);
   }
 
@@ -160,37 +155,31 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz, int N_df)
-{
+void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
+                            int N_df) {
   int array_length = pow(n_xyz, 3);
 
-  for (int i = 0; i < N_df; i++)
-  {
+  for (int i = 0; i < N_df; i++) {
     COMPLX tmp[array_length];
-
-#pragma omp parallel for
-    for (int j = 0; j < array_length; j++) // Initialize the empty arrays
+    for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
     {
       tmp[j] = 0.0;
     }
     read_bin(rawdlist[i], array_length, tmp);
 
     FILE *fp = fopen(sphrdlist[i], "w");
-    if (fp == NULL)
-    {
+    if (fp == NULL) {
       perror(sphrdlist[i]);
       exit(1);
     }
-#pragma omp parallel for
+
     for (int i = 0; i < n_xyz / 2 + 1; i++)
-#pragma omp parallel for
       for (int j = i; j < n_xyz / 2 + 1; j++)
-#pragma omp parallel for
-        for (int k = j; k < n_xyz / 2 + 1; k++)
-        { 
+        for (int k = j; k < n_xyz / 2 + 1; k++) {
           DOUBLE re, im, distance = 0.0;
 
-          distance = sqrt(pow(DOUBLE(i), 2) + pow(DOUBLE(j), 2) + pow(DOUBLE(k), 2));
+          distance =
+              sqrt(pow(DOUBLE(i), 2) + pow(DOUBLE(j), 2) + pow(DOUBLE(k), 2));
           re = CORR(tmp, i, j, k, n_xyz).real();
           im = CORR(tmp, i, j, k, n_xyz).imag();
 

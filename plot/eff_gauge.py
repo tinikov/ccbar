@@ -7,6 +7,7 @@ from matplotlib import ticker
 
 tsize = 64
 cutoff = 2.1753
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -58,12 +59,12 @@ def gauge_plot(coulomb, landau, filename, cutoff=1.0, xrange=None, yrange=None, 
 
     ax.set_xlabel(r"$n_t$", labelpad=-1)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(4))
-    ax.xaxis.set_minor_locator(ticker.NullLocator())
-    if not xrange is None:
+    # ax.xaxis.set_minor_locator(ticker.NullLocator())
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$m_{\rm eff}\ [{\rm GeV}$]", labelpad=1)
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.14, right=0.98, bottom=0.13, top=0.97)
@@ -71,22 +72,26 @@ def gauge_plot(coulomb, landau, filename, cutoff=1.0, xrange=None, yrange=None, 
     plt.close()
 
 
-# Destination
-path = "../fig/effmass"
-if not os.path.exists(path):
-    os.makedirs(path)
-
 # Channel
 channel = ["ps", "v", "s", "av", "t"]
 
 emass_c, emass_l = [[] for _ in range(2)]  # Read data files
 for i in range(5):
-    emass_c.append(np.loadtxt("../result/c2pt/effmass/txt.exp.{}".format(channel[i])))
-    emass_l.append(np.loadtxt("../result/l2pt/effmass/txt.exp.{}".format(channel[i])))
+    emass_c.append(
+        np.loadtxt("{}/result/c2pt/effmass/txt.exp.{}".format(codeRoot, channel[i]))
+    )
+    emass_l.append(
+        np.loadtxt("{}/result/l2pt/effmass/txt.exp.{}".format(codeRoot, channel[i]))
+    )
 
 xrange_all = [[4, 28], [4, 28], [0, 28], [0, 28], [0, 28]]
 yrange_all = [[2.7, 3], [2.8, 3.1], [3.2, 3.6], [3.3, 3.6], [3.3, 3.6]]
 loc = [8, 8, 2, 2, 2]
+
+# Destination
+path = "{}/fig/effmass".format(codeRoot)
+if not os.path.exists(path):
+    os.makedirs(path)
 
 # PLOT
 for i in range(5):
@@ -97,5 +102,5 @@ for i in range(5):
         cutoff=cutoff,
         xrange=xrange_all[i],
         yrange=yrange_all[i],
-        loc=loc[i]
+        loc=loc[i],
     )

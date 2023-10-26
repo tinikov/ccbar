@@ -2,7 +2,8 @@
 
 import argparse
 import numpy as np
-from scipy.optimize import curve_fit
+from iminuit import Minuit
+from iminuit.cost import LeastSquares
 
 parser = argparse.ArgumentParser(prog="M-fit", description="Fit hadron masses")
 parser.add_argument(
@@ -21,14 +22,6 @@ parser.add_argument(
     metavar=("MIN", "MAX"),
     help="fit range: [nt_min, nt_max]",
 )
-parser.add_argument(
-    "--init_val",
-    type=np.float64,
-    nargs=2,
-    metavar=("A", "M"),
-    default=(1.0, 1.0),
-    help="initial values (A, M); (1.0, 1.0) by default",
-)
 args = parser.parse_args()
 
 tmin = args.range[0]
@@ -43,9 +36,15 @@ fitsites = np.arange(tmin, tmax, 1)
 N_df = len(args.ifname)
 
 
-def single_exp(n, A, M):
+# Define functions for fit
+def exp(n, A, M):
     return A * np.exp(-M * n)
 
+
+para = {
+    "A": 0.01,
+    "M": 1.0,
+}
 
 if N_df == 1:
     print("\n#################################################")
@@ -58,19 +57,20 @@ if N_df == 1:
     err = rawdata[:, 2]
 
     fitdata = rawdata[tmin:tmax]
+
     fitcorr = fitdata[:, 1]
     fiterr = fitdata[:, 2]
 
-    popt, pcov, infodict, errmsg, ier = curve_fit(
-        single_exp, fitsites, fitcorr, sigma=fiterr, full_output=True
-    )
+    # Fit
+    least_squares = LeastSquares(fitsites, fitcorr, fiterr, exp)
+    m = Minuit(least_squares, **para)
+    m.migrad()
 
-    df = tmax - tmin - 2 - 1  # degree of freedom: (# of data) - (# of parameters) - 1
-    chisq = np.sum(np.square(infodict["fvec"]))
-
-    print("##  A      = {}".format(popt[0]))
-    print("##  M      = {} (lattice unit)".format(popt[1]))
-    print("##  χ^2/df = {}".format(chisq / df))
+    # degree of freedom: (# of data) - (# of parameters) - 1
+    df = tmax - tmin - 2 - 1
+    print("##  A      = {}".format(m.values["A"]))
+    print("##  M      = {} (lattice unit)".format(m.values["M"]))
+    print("##  χ^2/df = {}".format(m.fval / df))
 else:
     print("\n#################################################")
     print("##  FITTING HADRON MASS (lattice unit)")
@@ -82,9 +82,9 @@ else:
     file_index = 0
 
     for ifname in args.ifname:
+        rawdata = np.loadtxt(ifname, dtype=np.float64)[0:n_t]
         file_index += 1
 
-        rawdata = np.loadtxt(ifname, dtype=np.float64)[0:n_t]
         corr = rawdata[:, 1]
         err = rawdata[:, 2]
 
@@ -92,18 +92,20 @@ else:
         fitcorr = fitdata[:, 1]
         fiterr = fitdata[:, 2]
 
+        # Fit
         print("##  Progress: ({}/{})".format(file_index, N_df), end="\r")
-        popt, pcov, infodict, errmsg, ier = curve_fit(
-            single_exp, fitsites, fitcorr, sigma=fiterr, full_output=True
-        )
+        least_squares = LeastSquares(fitsites, fitcorr, fiterr, exp)
+        m = Minuit(least_squares, **para)
+        m.migrad()
 
-        A_arr.append(popt[0])
-        M_arr.append(popt[1])
-        chisq_arr.append(np.sum(np.square(infodict["fvec"])))
+        A_arr.append(m.values["A"])
+        M_arr.append(m.values["M"])
+        chisq_arr.append(m.fval)
 
     print("##  Progress: ({}/{})\n".format(N_df, N_df))
 
-    df = tmax - tmin - 2 - 1  # degree of freedom: (# of data) - (# of parameters) - 1
+    # degree of freedom: (# of data) - (# of parameters) - 1
+    df = tmax - tmin - 2 - 1
 
     A_arr = np.array(A_arr)
     M_arr = np.array(M_arr)

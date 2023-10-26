@@ -1,7 +1,7 @@
 /**
  * @file correlator.h
  * @author TC (reeft137@gmail.com)
- * @brief 
+ * @brief
  * @version 1.0
  * @date 2023-05-03
  *
@@ -21,8 +21,7 @@
 //   return corr_r;
 // }
 
-inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int n_xyz)
-{
+inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int n_xyz) {
   x = (x + n_xyz) % n_xyz;
   y = (y + n_xyz) % n_xyz;
   z = (z + n_xyz) % n_xyz;

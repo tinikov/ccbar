@@ -9,23 +9,26 @@
 
 #include "data_process.h"
 #include "misc.h"
+#include "type_alias.h"
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |     Usage function     |
 //     |________________________|
 
-void usage(char *name)
-{
+void usage(char *name) {
   fprintf(stderr, "Time reversal for 2-point correlators\n");
-  fprintf(stderr, "USAGE: \n"
-                  "    %s [OPTIONS] ifname1 [ifname2 ...]\n", name);
-  fprintf(stderr, "OPTIONS: \n"
-                  "    -n <TSIZE>:       Temporal size of lattice\n"
-                  "    -d <OFDIR>:       Directory of output files\n"
-                  "    [-p] <PREFIX>:    Prefix for output files\n"
-                  "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
-                  "    [-h, --help]:     Print help\n");
+  fprintf(stderr,
+          "USAGE: \n"
+          "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
+          name);
+  fprintf(stderr,
+          "OPTIONS: \n"
+          "    -n <TSIZE>:       Temporal size of lattice\n"
+          "    -d <OFDIR>:       Directory of output files\n"
+          "    [-p] <PREFIX>:    Prefix for output files\n"
+          "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
+          "    [-h, --help]:     Print help\n");
 }
 // __________________________________
 //     .________|______|________.
@@ -51,8 +54,7 @@ bool is_save_txt = false;
 //     |      Main Function     |
 //     |________________________|
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   char program_name[128];
   strncpy(program_name, basename(argv[0]), 127);
   argc--;
@@ -63,21 +65,19 @@ int main(int argc, char *argv[])
   //    |  Dealing with Options  |
   //    |________________________|
 
-  while (argc > 0 && argv[0][0] == '-') // deal with all options regardless of their order
+  while (argc > 0 &&
+         argv[0][0] == '-')  // deal with all options regardless of their order
   {
     // -h and --help: show usage
-    if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0)
-    {
+    if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(program_name);
       exit(0);
     }
 
     // -n: n_t
-    if (strcmp(argv[0], "-n") == 0)
-    {
-      n_t = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!n_t)
-      {
+    if (strcmp(argv[0], "-n") == 0) {
+      n_t = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!n_t) {
         usage(program_name);
         exit(1);
       }
@@ -87,11 +87,9 @@ int main(int argc, char *argv[])
     }
 
     // -d: directory for output file
-    if (strcmp(argv[0], "-d") == 0)
-    {
+    if (strcmp(argv[0], "-d") == 0) {
       of_dir = argv[1];
-      if (of_dir == NULL)
-      {
+      if (of_dir == NULL) {
         usage(program_name);
         exit(1);
       }
@@ -101,8 +99,7 @@ int main(int argc, char *argv[])
     }
 
     // -p: prefix for output file
-    if (strcmp(argv[0], "-p") == 0)
-    {
+    if (strcmp(argv[0], "-p") == 0) {
       of_prefix = argv[1];
       is_add_prefix = true;
       argc -= 2;
@@ -111,8 +108,7 @@ int main(int argc, char *argv[])
     }
 
     // -t: save txt
-    if (strcmp(argv[0], "-t") == 0)
-    {
+    if (strcmp(argv[0], "-t") == 0) {
       is_save_txt = true;
       argc--;
       argv++;
@@ -125,7 +121,11 @@ int main(int argc, char *argv[])
   }
 
   // Initialization
-  const int N_df = argc; // # of data files
+  const int N_df = argc;  // # of data files
+  if (N_df < 1) {
+    usage(program_name);
+    exit(1);
+  }
   fprintf(stderr, "##  Time reversal! \n");
   fprintf(stderr, "##  Total of data files:  %d\n", N_df);
   fprintf(stderr, "##  Temporal size:        %d\n", n_t);
@@ -133,20 +133,15 @@ int main(int argc, char *argv[])
   // Create an array to store ofnames
   char *tr_dlist[N_df];
 
-  if (is_add_prefix)
-  {
-    for (int i = 0; i < N_df; i++)
-    {
+  if (is_add_prefix) {
+    for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       add_prefix(argv[i], of_prefix, stmp);
       change_path(stmp, of_dir, tr_dlist[i]);
     }
-  }
-  else
-  {
-    for (int i = 0; i < N_df; i++)
-    {
+  } else {
+    for (int i = 0; i < N_df; i++) {
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       change_path(argv[i], of_dir, tr_dlist[i]);
     }
@@ -155,10 +150,8 @@ int main(int argc, char *argv[])
   // Main part for calculation
   time_reverse_2pt(argv, tr_dlist, n_t, N_df);
 
-  if (is_save_txt)
-  {
-    for (int i = 0; i < N_df; i++)
-    {
+  if (is_save_txt) {
+    for (int i = 0; i < N_df; i++) {
       char txttmp[2048];
       add_prefix(tr_dlist[i], "txt", txttmp);
       bin2txt(tr_dlist[i], txttmp, n_t);
@@ -166,8 +159,7 @@ int main(int argc, char *argv[])
   }
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++)
-  {
+  for (int i = 0; i < N_df; i++) {
     free(tr_dlist[i]);
   }
 
@@ -179,14 +171,10 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df)
-{
-#pragma omp parallel for
-  for (int i = 0; i < N_df; i++)
-  {
+void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df) {
+  for (int i = 0; i < N_df; i++) {
     COMPLX raw[n_t], data[n_t];
-    for (int j = 0; j < n_t; j++)
-      raw[j] = data[j] = 0.0;
+    for (int j = 0; j < n_t; j++) raw[j] = data[j] = 0.0;
 
     read_bin(rawdlist[i], n_t, raw);
 

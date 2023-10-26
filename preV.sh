@@ -1,12 +1,13 @@
-#!/bin/zsh
+#!/bin/bash
 # version: 1.0
 
 if [ $# != 3 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
+  echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
   exit 1
 fi
 
 ulimit -n 1024
+
 XYZSIZE=$1
 TSIZE=$2
 X4PT=$3
@@ -28,8 +29,9 @@ for type in $(ls $SAMPLE_DIR); do
   echo -e "Pre-potential for \033[1;35m$SAMPLE_DIR/$type\033[0m"
   echo " "
 
-  for T in {00..$T_HALF}; do
-    echo -e "For \033[1;35m$T\033[0m ..."
+  for ((it = 0; it <= $T_HALF; it = it + 1)); do
+    T=$(printf "%02d" $it)
+    echo -e "For \033[1;35m$T\033[0m..."
     mkdir -p $LAP_DIR/$type/$T
     $BIN_DIR/prev -n $XYZSIZE -d $LAP_DIR/$type/$T $SAMPLE_DIR/$type/$T/*
     echo " "
@@ -40,9 +42,13 @@ done
 for type in $(ls $LAP_DIR); do
   mkdir -p $O_DIR/$type/binary
   for T in $(ls $LAP_DIR/$type); do
-    echo -e "Jackknife average \033[1;35m$LAP_DIR/$type/$T\033[0m ..."
+    echo -e "Jackknife average \033[1;35m$LAP_DIR/$type/$T\033[0m..."
     $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/$type/binary/$T $LAP_DIR/$type/$T/4pt.*
     echo " "
   done
   $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/*
+  echo " "
 done
+
+echo -e "\033[1;35mFinished!\033[0m\n"
+echo " "

@@ -1,12 +1,13 @@
-#!/bin/zsh
+#!/bin/bash
 # version: 1.0
 
 if [ $# != 2 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [TSIZE] [X2PT]"
+  echo -e "\033[1mUSAGE:\033[0m $(basename $0) [TSIZE] [X2PT]"
   exit 1
 fi
 
 ulimit -n 1024
+
 TSIZE=$1
 X2PT=$2
 
@@ -35,3 +36,6 @@ for type in $(ls $RAW_DIR); do
 
   echo " "
 done
+
+echo -e "\033[1;35mFinished!\033[0m\n"
+echo " "

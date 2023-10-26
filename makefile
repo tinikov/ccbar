@@ -1,5 +1,4 @@
-OMPDIR=/opt/homebrew/opt/libomp
-CXXFLAGS = -Wall -std=c++17 -I$(OMPDIR)/include -O3
+CXXFLAGS = -Wall -std=c++17 -O3
 
 SOURCE = ./src
 BIN = ./bin
@@ -8,6 +7,8 @@ a1plus \
 cart2sphr \
 effmass \
 fks-td \
+fks-td-pro \
+fks-ti \
 jre \
 mean \
 norm \

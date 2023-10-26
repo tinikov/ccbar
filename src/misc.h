@@ -4,7 +4,7 @@
  * @brief misc = miscellaneous
  *        Provides 2 functions:
  *        void add_prefix(): Add prefix to a file name;
- *        void change_path(): Change the directory part for a file name. 
+ *        void change_path(): Change the directory part for a file name.
  * @version 1.0
  * @date 2023-05-03
  *
@@ -13,10 +13,10 @@
 #ifndef IS_INCLUDED_MISC_H
 #define IS_INCLUDED_MISC_H
 
+#include <libgen.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libgen.h>
 
 /**
  * @brief Add prefix to a file name (preserving the original path)

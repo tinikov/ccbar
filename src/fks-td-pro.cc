@@ -1,12 +1,11 @@
 /**
  * @file fks-td.cc
  * @author TC (reeft137@gmail.com)
- * @brief F_{KS} (time-dependent version)
+ * @brief F_{KS} (time-dependent version) (5-point stencil)
  * @version 1.0
  * @date 2023-05-03
  *
  */
-
 #include <vector>
 
 #include "data_process.h"
@@ -19,10 +18,11 @@
 //     |________________________|
 
 void usage(char *name) {
-  fprintf(stderr, "F_{KS} (time-dependent version)\n");
+  fprintf(stderr, "F_{KS} (time-dependent pro version)\n");
   fprintf(stderr,
           "USAGE: \n"
-          "    %s [OPTIONS] CV(t-1) CV(t+1) CPS(t-1) CPS(t+1) ppotV ppotPS\n",
+          "    %s [OPTIONS] CV(t-2) CV(t-1) CV(t+1) CV(t+2) CPS(t-2) CPS(t-1) "
+          "CPS(t+1) CPS(t+2) ppotV ppotPS\n",
           name);
   fprintf(stderr,
           "OPTIONS: \n"
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Make sure of all needed syntax
-  if (argc != 6) {
+  if (argc != 10) {
     usage(program_name);
     exit(1);
   }
@@ -103,13 +103,11 @@ int main(int argc, char *argv[]) {
   fprintf(stderr, "##  F_{KS} (time-dependent)! \n");
   fprintf(stderr, "##  Array length:        %d\n", array_length);
 
-  // Output files
   CVARRAY ddt(array_length), fks(array_length);
-  ddt = fks = 0.0;
 
   std::vector<CVARRAY> data;
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 10; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
 
@@ -117,8 +115,10 @@ int main(int argc, char *argv[]) {
     data.push_back(tmp);
   }
 
-  ddt = (log(data[1] / data[3]) - log(data[0] / data[2])) / 2.0;
-  fks = (data[4] - data[5]) / ddt;
+  ddt = (-log(data[3] / data[7]) + 8 * log(data[2] / data[6]) -
+         8 * log(data[1] / data[5]) + log(data[0] / data[4])) /
+        12.0;
+  fks = (data[8] - data[9]) / ddt;
 
   write_bin(of_name, array_length, fks);
 

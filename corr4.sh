@@ -1,12 +1,13 @@
-#!/bin/zsh
+#!/bin/bash
 # version: 1.0
 
 if [ $# != 3 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
+  echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
   exit 1
 fi
 
 ulimit -n 1024
+
 XYZSIZE=$1
 TSIZE=$2
 X4PT=$3
@@ -26,7 +27,8 @@ rm -rf $O_DIR $NORM_DIR
 for type in $(ls $SAMPLE_DIR); do
   # Normalization, Jackknife and Finalization
   mkdir -p $O_DIR/$type/binary
-  for T in {00..$T_HALF}; do
+  for ((it = 0; it <= $T_HALF; it = it + 1)); do
+    T=$(printf "%02d" $it)
     echo -e "Normalizing \033[1;35m$type/$T\033[0m ..."
     mkdir -p $NORM_DIR/$type/$T
     $BIN_DIR/norm -n $XYZSIZE -d $NORM_DIR/$type/$T $SAMPLE_DIR/$type/$T/4pt.*
@@ -40,4 +42,8 @@ for type in $(ls $SAMPLE_DIR); do
   $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/plain.*
   $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/nn.*
   $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR/$type -p "txt" $O_DIR/$type/binary/l2.*
+  echo " "
 done
+
+echo -e "\033[1;35mFinished!\033[0m\n"
+echo " "

@@ -32,7 +32,7 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
     for i in trange:
         ax.errorbar(
-            data[i][:, 0] * a + 0.0005 * (i - trange[0]),
+            data[i][:, 0] * a,
             data[i][:, 1] * a_invrs,
             data[i][:, 2] * a_invrs,
             label=r"$n_t=$" + str(i).rjust(2, "0"),
@@ -46,14 +46,14 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
         "fontsize": 7,
         "labelspacing": 0.1,
     }
-    ax.legend(loc=2, **legend_default_style)
+    ax.legend(loc=3, bbox_to_anchor=(0.18, 0), **legend_default_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=-0.1)
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
@@ -85,16 +85,16 @@ for i in range(1, 32):
 
 all_plot(
     data=fks_c,
-    filename="{}/conv".format(path[0]),
-    trange=np.arange(21, 28, 1),
-    xrange=[0.54, 0.65],
-    yrange=[1.5, 2.5],
+    filename="{}/all".format(path[0]),
+    trange=np.arange(3, 28, 3),
+    xrange=[0, 1.2],
+    yrange=[-12, 4],
 )
 
-# all_plot(
-#     data=fks_l,
-#     filename="{}/all".format(path[1]),
-#     trange=np.arange(3, 28, 3),
-#     xrange=[0, 1.2],
-#     yrange=[-12, 4],
-# )
+all_plot(
+    data=fks_l,
+    filename="{}/all".format(path[1]),
+    trange=np.arange(3, 28, 3),
+    xrange=[0, 1.2],
+    yrange=[-12, 4],
+)

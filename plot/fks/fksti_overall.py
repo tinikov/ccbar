@@ -49,11 +49,11 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
     ax.legend(loc=3, bbox_to_anchor=(0.18, 0), **legend_default_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=-0.1)
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
@@ -62,12 +62,12 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
 
 # Gauge
-path = ["../fig/FKS/coulomb-TD", "../fig/FKS/landau-TD"]  # C, L
+path = ["../fig/FKS/coulomb-TI", "../fig/FKS/landau-TI"]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/FKS-TD", "../result/l4pt/FKS-TD"]
+datapath = ["../result/c4pt/FKS-TI", "../result/l4pt/FKS-TI"]
 
 # Time
 timelist = []
@@ -77,11 +77,11 @@ for i in range(32):
 # Read data
 fks_c, fks_l = [[] for _ in range(2)]
 
-fks_c.append(np.loadtxt("../result/c4pt/FKS-TD/txt.01"))
-fks_l.append(np.loadtxt("../result/l4pt/FKS-TD/txt.01"))
+fks_c.append(np.loadtxt("../result/c4pt/FKS-TI/txt.01"))
+fks_l.append(np.loadtxt("../result/l4pt/FKS-TI/txt.01"))
 for i in range(1, 32):
-    fks_c.append(np.loadtxt("../result/c4pt/FKS-TD/txt.{}".format(timelist[i])))
-    fks_l.append(np.loadtxt("../result/l4pt/FKS-TD/txt.{}".format(timelist[i])))
+    fks_c.append(np.loadtxt("../result/c4pt/FKS-TI/txt.{}".format(timelist[i])))
+    fks_l.append(np.loadtxt("../result/l4pt/FKS-TI/txt.{}".format(timelist[i])))
 
 all_plot(
     data=fks_c,

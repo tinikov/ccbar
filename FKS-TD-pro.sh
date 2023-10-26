@@ -24,8 +24,8 @@ T_HALF=$(($TSIZE / 2))
 echo -e "Conducting KS(TD)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
 
-O_DIR=result/$X4PT/FKS-TD
-FKS_DIR=$DATA_DIR/$X4PT/fks-td
+O_DIR=result/$X4PT/FKS-TD-pro
+FKS_DIR=$DATA_DIR/$X4PT/fks-td-pro
 rm -rf $O_DIR $FKS_DIR
 
 # F_{KS} (time-dependent)
@@ -33,27 +33,39 @@ echo "##  F_{KS} (time-dependent)! "
 echo "##  Time sites total: $T_HALF"
 echo "##  Array length:     $ARRAY_LENGTH"
 echo "#######################################"
-for ((it = 1; it < $T_HALF; it = it + 1)); do
+for ((it = 2; it < $T_HALF - 1; it = it + 1)); do
+	t2m=$(printf "%02d" $(($it - 2)))
+	t1m=$(printf "%02d" $(($it - 1)))
 	T=$(printf "%02d" $it)
+	t1p=$(printf "%02d" $(($it + 1)))
+	t2p=$(printf "%02d" $(($it + 2)))
+
 	echo -e "\033[1;35m$T\033[0m now..."
-	tm=$(printf "%02d" $(($it - 1)))
-	tp=$(printf "%02d" $(($it + 1)))
+
 	mkdir -p $FKS_DIR/$T
 	for psgauge in $(ls $SAMPLE_DIR/ps/$T); do
 		ogauge=${psgauge/.ps./.}
 		vgauge=${psgauge/.ps./.v.}
-		vm=${vgauge/+$T/+$tm}
-		vp=${vgauge/+$T/+$tp}
-		psm=${psgauge/+$T/+$tm}
-		psp=${psgauge/+$T/+$tp}
+		v2m=${vgauge/+$T/+$t2m}
+		v1m=${vgauge/+$T/+$t1m}
+		v1p=${vgauge/+$T/+$t1p}
+		v2p=${vgauge/+$T/+$t2p}
+		ps2m=${psgauge/+$T/+$t2m}
+		ps1m=${psgauge/+$T/+$t1m}
+		ps1p=${psgauge/+$T/+$t1p}
+		ps2p=${psgauge/+$T/+$t2p}
 
-		$BIN_DIR/fks-td \
+		$BIN_DIR/fks-td-pro \
 			-l $ARRAY_LENGTH \
 			-o $FKS_DIR/$T/$ogauge \
-			$SAMPLE_DIR/v/$tm/$vm \
-			$SAMPLE_DIR/v/$tp/$vp \
-			$SAMPLE_DIR/ps/$tm/$psm \
-			$SAMPLE_DIR/ps/$tp/$psp \
+			$SAMPLE_DIR/v/$t2m/$v2m \
+			$SAMPLE_DIR/v/$t1m/$v1m \
+			$SAMPLE_DIR/v/$t1p/$v1p \
+			$SAMPLE_DIR/v/$t2p/$v2p \
+			$SAMPLE_DIR/ps/$t2m/$ps2m \
+			$SAMPLE_DIR/ps/$t1m/$ps1m \
+			$SAMPLE_DIR/ps/$t1p/$ps1p \
+			$SAMPLE_DIR/ps/$t2p/$ps2p \
 			$LAP_DIR/v/$T/$vgauge \
 			$LAP_DIR/ps/$T/$psgauge \
 			>/dev/null 2>&1

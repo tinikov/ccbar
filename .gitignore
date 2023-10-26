@@ -41,3 +41,5 @@
 /book-doc
 /book-stat
 /.draft
+/plot/plot.code-workspace
+/plot/.vscode

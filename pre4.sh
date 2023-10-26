@@ -1,12 +1,14 @@
-#!/bin/zsh
+#!/bin/bash
 # version: 1.0
 
 if [ $# != 3 ]; then
-  echo "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
+  echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
   exit 1
 fi
 
 ulimit -n 1024
+export OMP_NUM_THREADS=4
+
 XYZSIZE=$1
 TSIZE=$2
 X4PT=$3
@@ -33,12 +35,13 @@ for type in $(ls $RAW_DIR); do
 
   # Time reversal
   echo "##  Time reversal! "
-  echo "##  Time sites total:  \033[1;35m$TSIZE\033[0m"
+  echo -e "##  Time sites total:  \033[1;35m$TSIZE\033[0m"
   echo "##  Array length:      $ARRAY_LENGTH"
   echo "#######################################"
-  for T in {00..$T_HALF}; do
+  for ((it = 0; it <= $T_HALF; it = it + 1)); do
+    T=$(printf "%02d" $it)
     t1=$T
-    t2=$(printf "%02d" $((($TSIZE - $t1) % $TSIZE)))
+    t2=$(printf "%02d" $((($TSIZE - $it) % $TSIZE)))
     echo -e "Averaging \033[1;35m$t1\033[0m and \033[1;35m$t2\033[0m to generate \033[1;35m$T\033[0m now..."
     mkdir -p $TR_DIR/$type/$t1
     for gauge in $(ls $RAW_DIR/$type/$t1); do
@@ -50,7 +53,8 @@ for type in $(ls $RAW_DIR); do
   echo " "
 
   # A1+ Projection
-  for T in {00..$T_HALF}; do
+  for ((it = 0; it <= $T_HALF; it = it + 1)); do
+    T=$(printf "%02d" $it)
     echo -e "For \033[1;35m$T\033[0m ..."
     mkdir -p $A1_DIR/$type/$T
     $BIN_DIR/a1plus -n $XYZSIZE -d $A1_DIR/$type/$T $TR_DIR/$type/$T/4pt.*
@@ -58,10 +62,14 @@ for type in $(ls $RAW_DIR); do
   echo " "
 
   # Jackknife resampling
-  for T in {00..$T_HALF}; do
+  for ((it = 0; it <= $T_HALF; it = it + 1)); do
+    T=$(printf "%02d" $it)
     echo -e "For \033[1;35m$T\033[0m ..."
     mkdir -p $JR_DIR/$type/$T
     $BIN_DIR/jre -l $ARRAY_LENGTH -d $JR_DIR/$type/$T $A1_DIR/$type/$T/4pt.*
   done
   echo " "
 done
+
+echo -e "\033[1;35mFinished!\033[0m\n"
+echo " "

@@ -7,6 +7,7 @@ from matplotlib import ticker
 
 a = 0.090713
 tsize = 64
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -48,13 +49,13 @@ def all_plot(data, filename, trange, ntype, xrange=None, yrange=None):
     }
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$C(r)$", labelpad=-0.1)
     ax.set_yscale("log")
     ax.yaxis.set_major_locator(ticker.LogLocator(base=10, numticks=7))
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     if ntype == "plain":
@@ -65,7 +66,9 @@ def all_plot(data, filename, trange, ntype, xrange=None, yrange=None):
         ax.legend(loc=3, bbox_to_anchor=(-0.03, -0.02), **legend_default_style)
     elif ntype == "l2":
         fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
-        if filename == "../fig/corr/l4pt/l2_ps" or filename == "../fig/corr/l4pt/l2_ps":
+        if filename == "{}/fig/corr/l4pt/l2_ps".format(
+            codeRoot
+        ) or filename == "{}/fig/corr/l4pt/l2_v".format(codeRoot):
             ax.legend(loc=1, bbox_to_anchor=(1.01, 1.02), **legend_default_style)
         else:
             ax.legend(loc=3, bbox_to_anchor=(-0.03, -0.02), **legend_default_style)
@@ -75,12 +78,18 @@ def all_plot(data, filename, trange, ntype, xrange=None, yrange=None):
 
 
 # Gauge
-path = ["../fig/corr/c4pt", "../fig/corr/l4pt"]  # C, L
+path = [
+    "{}/fig/corr/c4pt".format(codeRoot),
+    "{}/fig/corr/l4pt".format(codeRoot),
+]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/corr", "../result/l4pt/corr"]
+datapath = [
+    "{}/result/c4pt/corr".format(codeRoot),
+    "{}/result/l4pt/corr".format(codeRoot),
+]
 
 # Time
 timelist = []
@@ -137,7 +146,7 @@ for igauge in range(2):
                 filename="{}/{}_{}".format(
                     path[igauge], type_all[itype], channel[ichan]
                 ),
-                trange=np.arange(0, 28, 3),
+                trange=np.arange(1, 29, 3),
                 ntype="{}".format(type_all[itype]),
                 xrange=[0, 1.2],
                 yrange=yrange_all[igauge][ichan][itype],

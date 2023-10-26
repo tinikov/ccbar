@@ -1,7 +1,7 @@
 /**
  * @file type_alias.h
  * @author TC (reeft137@gmail.com)
- * @brief 
+ * @brief
  * @version 1.0
  * @date 2023-05-03
  *

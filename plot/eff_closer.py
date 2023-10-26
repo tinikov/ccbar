@@ -21,31 +21,44 @@ plt.rcParams["font.size"] = font["size"]
 plt.rcParams["mathtext.fontset"] = font["mathfamily"]
 
 style = {
-    "markersize": 4.5,
-    "markeredgewidth": 0.7,
-    "linewidth": 0.4,
+    "markersize": 2.5,
+    "markeredgewidth": 0.35,
+    "linewidth": 0.35,
     # "capsize": 1,
     # "capthick": 0.2,
 }
 
 
-def type_plot(exp, cosh, filename, cutoff=1.0, xrange=None, yrange=None):
+def all_plot(
+    data,
+    type,
+    filename,
+    tsize,
+    cutoff=1.0,
+    xrange=None,
+    yrange=None,
+):
     fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    all_markers = ["*", "3", ".", "x", "4", "+", "1", "2"]
 
     index = np.arange(0, tsize, 1)
-    ax.errorbar(
-        index, exp[:, 1] * cutoff, exp[:, 2] * cutoff, label="exp", **style, fmt="x"
-    )
-    ax.errorbar(
-        index, cosh[:, 1] * cutoff, cosh[:, 2] * cutoff, label="cosh", **style, fmt="+"
-    )
+    for i in range(len(type)):
+        marker = all_markers[0 : len(type)]
+        ax.errorbar(
+            index,
+            data[i][:, 1] * cutoff,
+            data[i][:, 2] * cutoff,
+            label=type[i].upper(),
+            **style,
+            fmt=marker[i]
+        )
 
     # Set grid (reserved)
     ax.grid(which="major", color="#DDDDDD", linewidth=0.5)
     ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
 
     ax.minorticks_on()
-    ax.legend(loc=8, handletextpad=0.1, frameon=False)
+    ax.legend(loc=2, bbox_to_anchor=(0.95, 1.02), handletextpad=0.1, frameon=False)
 
     ax.set_xlabel(r"$n_t$", labelpad=-1)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(4))
@@ -57,30 +70,23 @@ def type_plot(exp, cosh, filename, cutoff=1.0, xrange=None, yrange=None):
     if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
-    fig.subplots_adjust(left=0.13, right=0.98, bottom=0.13, top=0.97)
+    # fig.subplots_adjust(left=0.155, right=0.85, bottom=0.13, top=0.96)
+    fig.subplots_adjust(left=0.13, right=0.85, bottom=0.13, top=0.97)
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
 
 
-# Channel
-channel = ["ps", "v", "s", "av", "t"]
+# Read data files
+type = ["ps", "v", "s", "av", "t"]
+hmass_c, hmass_l = [[] for _ in range(2)]
 
-emass_c, emass_l, hmass_c, hmass_l = [[] for _ in range(4)]  # Read data files
 for i in range(5):
-    emass_c.append(
-        np.loadtxt("{}/result/c2pt/effmass/txt.exp.{}".format(codeRoot, channel[i]))
-    )
-    emass_l.append(
-        np.loadtxt("{}/result/l2pt/effmass/txt.exp.{}".format(codeRoot, channel[i]))
-    )
     hmass_c.append(
-        np.loadtxt("{}/result/c2pt/effmass/txt.csh.{}".format(codeRoot, channel[i]))
+        np.loadtxt("{}/result/c2pt/effmass/txt.csh.{}".format(codeRoot, type[i]))
     )
     hmass_l.append(
-        np.loadtxt("{}/result/l2pt/effmass/txt.csh.{}".format(codeRoot, channel[i]))
+        np.loadtxt("{}/result/l2pt/effmass/txt.csh.{}".format(codeRoot, type[i]))
     )
-
-yrange_all = [[1.5, 3.1], [1.6, 3.2], [2.2, 3.6], [2.4, 3.8], [2.4, 3.8]]
 
 # Gauge
 path = [
@@ -90,17 +96,16 @@ path = [
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
-edata = [emass_c, emass_l]  # C, L
-hdata = [hmass_c, hmass_l]  # C, L
+data = [hmass_c, hmass_l]  # C, L
 
 # PLOT
 for i in range(2):
-    for j in range(5):
-        type_plot(
-            edata[i][j],
-            hdata[i][j],
-            "{}/type_{}".format(path[i], channel[j]),
-            cutoff=cutoff,
-            xrange=[0, 32],
-            yrange=yrange_all[j],
-        )
+    all_plot(
+        data[i],
+        type,
+        "{}/closer".format(path[i]),
+        tsize,
+        cutoff=cutoff,
+        xrange=[4, 28],
+        yrange=[2.8, 3.6],
+    )

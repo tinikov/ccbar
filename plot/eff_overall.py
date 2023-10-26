@@ -7,6 +7,7 @@ from matplotlib import ticker
 
 tsize = 64
 cutoff = 2.1753
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -42,19 +43,19 @@ def all_plot(
 
     index = np.arange(0, tsize, 1)
     for i in range(len(type)):
-        marker = all_markers[0:len(type)]
+        marker = all_markers[0 : len(type)]
         ax.errorbar(
             index,
             data[i][:, 1] * cutoff,
             data[i][:, 2] * cutoff,
             label=type[i].upper(),
-            **style, 
+            **style,
             fmt=marker[i]
         )
 
     # Set grid (reserved)
-    # ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
-    # ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.8)
+    # ax.grid(which="major", color="#DDDDDD", linewidth=0.5)
+    # ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
 
     ax.minorticks_on()
     ax.legend(loc=3, bbox_to_anchor=(0.12, 0.02), handletextpad=0.1, frameon=False)
@@ -62,11 +63,11 @@ def all_plot(
     ax.set_xlabel(r"$n_t$", labelpad=-1)
     ax.xaxis.set_major_locator(ticker.MultipleLocator(8))
     ax.xaxis.set_minor_locator(ticker.NullLocator())
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$m_{\rm eff}\ [{\rm GeV}$]", labelpad=1)
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.13, right=0.98, bottom=0.13, top=0.97)
@@ -79,13 +80,24 @@ type = ["ps", "v", "s", "av", "t"]
 emass_c, emass_l, hmass_c, hmass_l = [[] for _ in range(4)]
 
 for i in range(5):
-    emass_c.append(np.loadtxt("../result/c2pt/effmass/txt.exp.{}".format(type[i])))
-    emass_l.append(np.loadtxt("../result/l2pt/effmass/txt.exp.{}".format(type[i])))
-    hmass_c.append(np.loadtxt("../result/c2pt/effmass/txt.csh.{}".format(type[i])))
-    hmass_l.append(np.loadtxt("../result/l2pt/effmass/txt.csh.{}".format(type[i])))
+    emass_c.append(
+        np.loadtxt("{}/result/c2pt/effmass/txt.exp.{}".format(codeRoot, type[i]))
+    )
+    emass_l.append(
+        np.loadtxt("{}/result/l2pt/effmass/txt.exp.{}".format(codeRoot, type[i]))
+    )
+    hmass_c.append(
+        np.loadtxt("{}/result/c2pt/effmass/txt.csh.{}".format(codeRoot, type[i]))
+    )
+    hmass_l.append(
+        np.loadtxt("{}/result/l2pt/effmass/txt.csh.{}".format(codeRoot, type[i]))
+    )
 
 # Gauge
-path = ["../fig/effmass/coulomb", "../fig/effmass/landau"]  # C, L
+path = [
+    "{}/fig/effmass/coulomb".format(codeRoot),
+    "{}/fig/effmass/landau".format(codeRoot),
+]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)

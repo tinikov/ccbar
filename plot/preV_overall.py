@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 a = 0.090713
 tsize = 64
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -48,11 +49,11 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
     ax.legend(loc=4, **legend_default_style)
 
     ax.set_xlabel(r"$n_r$", labelpad=-1)
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$\frac{\nabla^2\phi(r)}{\phi(r)}\cdot a^2$", labelpad=-0.1)
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.17, right=0.97, bottom=0.13, top=0.96)
@@ -61,12 +62,18 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
 
 # Gauge
-path = ["../fig/preV/coulomb", "../fig/preV/landau"]  # C, L
+path = [
+    "{}/fig/preV/coulomb".format(codeRoot),
+    "{}/fig/preV/landau".format(codeRoot),
+]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/preV", "../result/l4pt/preV"]
+datapath = [
+    "{}/result/c4pt/preV".format(codeRoot),
+    "{}/result/l4pt/preV".format(codeRoot),
+]
 
 # Time
 timelist = []
@@ -99,7 +106,7 @@ for igauge in range(2):
         all_plot(
             data=data[igauge][ichan],
             filename="{}/{}_all".format(path[igauge], channel[ichan]),
-            trange=np.arange(0, 28, 3),
+            trange=np.arange(1, 29, 3),
             xrange=[0, 13],
             yrange=[-1, 0.4],
         )

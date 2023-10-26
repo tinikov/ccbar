@@ -9,23 +9,26 @@
 
 #include "data_process.h"
 #include "misc.h"
+#include "type_alias.h"
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |     Usage function     |
 //     |________________________|
 
-void usage(char *name)
-{
-  fprintf(stderr, "Effective masses for charmonium (ofname: exp.xxx and csh.xxx)\n");
-  fprintf(stderr, "USAGE: \n"
-                  "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
+void usage(char *name) {
+  fprintf(stderr,
+          "Effective masses for charmonium (ofname: exp.xxx and csh.xxx)\n");
+  fprintf(stderr,
+          "USAGE: \n"
+          "    %s [OPTIONS] ifname1 [ifname2 ...]\n",
           name);
-  fprintf(stderr, "OPTIONS: \n"
-                  "    -n <TSIZE>:       Temporal size of lattice\n"
-                  "    -d <OFDIR>:       Directory of output files\n"
-                  "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
-                  "    [-h, --help]:     Print help\n");
+  fprintf(stderr,
+          "OPTIONS: \n"
+          "    -n <TSIZE>:       Temporal size of lattice\n"
+          "    -d <OFDIR>:       Directory of output files\n"
+          "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
+          "    [-h, --help]:     Print help\n");
 }
 // __________________________________
 //     .________|______|________.
@@ -50,8 +53,7 @@ bool is_save_txt = false;
 //     |      Main Function     |
 //     |________________________|
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   char program_name[128];
   strncpy(program_name, basename(argv[0]), 127);
   argc--;
@@ -62,21 +64,19 @@ int main(int argc, char *argv[])
   //    |  Dealing with Options  |
   //    |________________________|
 
-  while (argc > 0 && argv[0][0] == '-') // deal with all options regardless of their order
+  while (argc > 0 &&
+         argv[0][0] == '-')  // deal with all options regardless of their order
   {
     // -h and --help: show usage
-    if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0)
-    {
+    if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(program_name);
       exit(0);
     }
 
     // -n: n_t
-    if (strcmp(argv[0], "-n") == 0)
-    {
-      n_t = atoi(argv[1]); // atoi(): convert ASCII string to integer
-      if (!n_t)
-      {
+    if (strcmp(argv[0], "-n") == 0) {
+      n_t = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!n_t) {
         usage(program_name);
         exit(1);
       }
@@ -86,11 +86,9 @@ int main(int argc, char *argv[])
     }
 
     // -d: directory for output file
-    if (strcmp(argv[0], "-d") == 0)
-    {
+    if (strcmp(argv[0], "-d") == 0) {
       of_dir = argv[1];
-      if (of_dir == NULL)
-      {
+      if (of_dir == NULL) {
         usage(program_name);
         exit(1);
       }
@@ -100,8 +98,7 @@ int main(int argc, char *argv[])
     }
 
     // -t: save txt
-    if (strcmp(argv[0], "-t") == 0)
-    {
+    if (strcmp(argv[0], "-t") == 0) {
       is_save_txt = true;
       argc--;
       argv++;
@@ -114,7 +111,11 @@ int main(int argc, char *argv[])
   }
 
   // Initialization
-  const int N_df = argc; // # of data files
+  const int N_df = argc;  // # of data files
+  if (N_df < 1) {
+    usage(program_name);
+    exit(1);
+  }
   fprintf(stderr, "##  Effective mass! \n");
   fprintf(stderr, "##  Total of data files: %d\n", N_df);
   fprintf(stderr, "##  Temporal size:       %d\n", n_t);
@@ -122,8 +123,7 @@ int main(int argc, char *argv[])
   // Create an array to store ofnames
   char *exp_dlist[N_df], *csh_dlist[N_df];
 
-  for (int i = 0; i < N_df; i++)
-  {
+  for (int i = 0; i < N_df; i++) {
     char stmp[2048];
 
     exp_dlist[i] = (char *)malloc(2048 * sizeof(char));
@@ -139,10 +139,8 @@ int main(int argc, char *argv[])
   exp_mass(argv, exp_dlist, n_t, N_df);
   csh_mass(argv, csh_dlist, n_t, N_df);
 
-  if (is_save_txt)
-  {
-    for (int i = 0; i < N_df; i++)
-    {
+  if (is_save_txt) {
+    for (int i = 0; i < N_df; i++) {
       char txttmp[2048];
 
       add_prefix(exp_dlist[i], "txt", txttmp);
@@ -154,8 +152,7 @@ int main(int argc, char *argv[])
   }
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++)
-  {
+  for (int i = 0; i < N_df; i++) {
     free(exp_dlist[i]);
     free(csh_dlist[i]);
   }
@@ -168,23 +165,16 @@ int main(int argc, char *argv[])
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df)
-{
-#pragma omp parallel for
-  for (int i = 0; i < N_df; i++)
-  {
+void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df) {
+  for (int i = 0; i < N_df; i++) {
     COMPLX raw[n_t], effmass[n_t];
-#pragma omp parallel for
-    for (int j = 0; j < n_t; j++)
-    {
+    for (int j = 0; j < n_t; j++) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
     read_bin(rawdlist[i], n_t, raw);
 
-#pragma omp parallel for
-    for (int j = 0; j < n_t; j++)
-    {
+    for (int j = 0; j < n_t; j++) {
       effmass[j].real(log(raw[j].real() / raw[(j + 1) % n_t].real()));
     }
 
@@ -192,57 +182,47 @@ void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df)
   }
 }
 
-DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t)
-{
+DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t) {
 #define JMAX 100
 #define M0 0.001
 #define M1 10.0
 #define MACC 1.0e-12
-#define coshtype(m) (corr1 / corr2 - cosh((m) * (n_t / 2.0 - t1)) / cosh((m) * (n_t / 2.0 - t2)))
+#define coshtype(m) \
+  (corr1 / corr2 - cosh((m) * (n_t / 2.0 - t1)) / cosh((m) * (n_t / 2.0 - t2)))
 
   DOUBLE dm, f, fmid, mmid, mass;
 
   f = coshtype(M0);
   fmid = coshtype(M1);
-  if (f * fmid >= 0.0)
-  {
+  if (f * fmid >= 0.0) {
     fprintf(stderr, "Root must be bracketed for bisection in RTBIS\n");
     return NAN;
   }
   mass = f < 0.0 ? (dm = M1 - M0, M0) : (dm = M0 - M1, M1);
-  for (int j = 1; j <= JMAX; j++)
-  {
+  for (int j = 1; j <= JMAX; j++) {
     mmid = mass + (dm *= 0.5);
     fmid = coshtype(mmid);
-    if (fmid <= 0.0)
-      mass = mmid;
-    if (fabs(dm) < MACC || fmid == 0.0)
-      return mass;
+    if (fmid <= 0.0) mass = mmid;
+    if (fabs(dm) < MACC || fmid == 0.0) return mass;
   }
   fprintf(stderr, "Too many bisections in RTBIS");
   return 0.0;
 }
 
-void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df)
-{
-#pragma omp parallel for
-  for (int i = 0; i < N_df; i++)
-  {
+void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df) {
+  for (int i = 0; i < N_df; i++) {
     COMPLX raw[n_t], effmass[n_t];
-#pragma omp parallel for
-    for (int j = 0; j < n_t; j++)
-    {
+    for (int j = 0; j < n_t; j++) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
     read_bin(rawdlist[i], n_t, raw);
 
-#pragma omp parallel for
-    for (int j = 0; j < n_t; j++)
-    {
+    for (int j = 0; j < n_t; j++) {
       int t1 = j;
       int t2 = (j + 1) % n_t;
-      effmass[j].real(coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), n_t));
+      effmass[j].real(
+          coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), n_t));
     }
 
     write_bin(cshlist[i], n_t, effmass);

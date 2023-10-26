@@ -1,13 +1,11 @@
 /**
- * @file fks-td.cc
+ * @file fks-ti.cc
  * @author TC (reeft137@gmail.com)
- * @brief F_{KS} (time-dependent version)
+ * @brief F_{KS} (time-independent version)
  * @version 1.0
- * @date 2023-05-03
+ * @date 2023-10-11
  *
  */
-
-#include <vector>
 
 #include "data_process.h"
 #include "misc.h"
@@ -19,15 +17,16 @@
 //     |________________________|
 
 void usage(char *name) {
-  fprintf(stderr, "F_{KS} (time-dependent version)\n");
+  fprintf(stderr, "F_{KS} (time-independent version)\n");
   fprintf(stderr,
           "USAGE: \n"
-          "    %s [OPTIONS] CV(t-1) CV(t+1) CPS(t-1) CPS(t+1) ppotV ppotPS\n",
+          "    %s [OPTIONS] ppotV ppotPS\n",
           name);
   fprintf(stderr,
           "OPTIONS: \n"
           "    -l <LENGTH>:       Array length\n"
-          "    -o <OFNAME>:        ofname of F_KS\n"
+          "    -m <MDIFF>:        (M_V - M_PS) (LUnit)\n"
+          "    -o <OFNAME>:       ofname of F_KS\n"
           "    [-h, --help]:      Print help\n");
 }
 // __________________________________
@@ -37,6 +36,7 @@ void usage(char *name) {
 //     |________________________|
 
 int array_length = 0;
+DOUBLE mdiff = 0;
 static const char *of_name = NULL;
 // __________________________________
 //     .________|______|________.
@@ -76,6 +76,18 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    // -m: mdiff
+    if (strcmp(argv[0], "-m") == 0) {
+      mdiff = atof(argv[1]);  // atof(): convert ASCII string to float
+      if (mdiff == 0) {
+        usage(program_name);
+        exit(1);
+      }
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
     // -o: of_name
     if (strcmp(argv[0], "-o") == 0) {
       of_name = argv[1];
@@ -94,31 +106,22 @@ int main(int argc, char *argv[]) {
   }
 
   // Make sure of all needed syntax
-  if (argc != 6) {
+  if (argc != 2) {
     usage(program_name);
     exit(1);
   }
 
   // Initialization
-  fprintf(stderr, "##  F_{KS} (time-dependent)! \n");
+  fprintf(stderr, "##  F_{KS} (time-independent)! \n");
   fprintf(stderr, "##  Array length:        %d\n", array_length);
 
-  // Output files
-  CVARRAY ddt(array_length), fks(array_length);
-  ddt = fks = 0.0;
+  CVARRAY ppotv(array_length), ppotps(array_length), fks(array_length);
+  ppotv = ppotps = fks = 0.0;
 
-  std::vector<CVARRAY> data;
+  read_bin(argv[0], array_length, ppotv);
+  read_bin(argv[1], array_length, ppotps);
 
-  for (int i = 0; i < 6; i++) {
-    CVARRAY tmp(array_length);
-    tmp = 0.0;
-
-    read_bin(argv[i], array_length, tmp);
-    data.push_back(tmp);
-  }
-
-  ddt = (log(data[1] / data[3]) - log(data[0] / data[2])) / 2.0;
-  fks = (data[4] - data[5]) / ddt;
+  fks = - (ppotv - ppotps) / mdiff;
 
   write_bin(of_name, array_length, fks);
 

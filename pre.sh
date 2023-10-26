@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # version: 1.0
 
 ./pre2.sh 64 c2pt

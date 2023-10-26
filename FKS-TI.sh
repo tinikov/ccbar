@@ -1,79 +1,62 @@
-# #!/bin/bash
-# ulimit -n 1024
+#!/bin/bash
+# version: 1.0
 
-# cd $1
-# DATA_DIR=$(pwd -P)
-# DATA_DIR_BASE=$(basename $DATA_DIR)
-# LQCD_BASE_DIR=/home/puppy/LQCD
-# SPACESITES=32
+if [ $# != 4 ]; then
+  echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT] [MDIFF]"
+  exit 1
+fi
 
-# cd $DATA_DIR
+ulimit -n 1024
 
-# rm -rf lap-tmp mc-tmp
+XYZSIZE=$1
+TSIZE=$2
+X4PT=$3
+MDIFF=$4
 
-# for config in $(ls raw/ps/00); do
-#     conftmp=${config/TR.4pt.ps.+00./}
-#     confbase=${conftmp/RC32x64_B1900Kud01378100Ks01364000C1715-/}
+ROOT=.
+BIN_DIR=$ROOT/bin
+DATA_DIR=$ROOT/data
+LAP_DIR=$DATA_DIR/$X4PT/lap
 
-#     echo "###########################################################################"
-#     echo start for $confbase
-#     echo "###########################################################################"
-#     echo ""
-#     for time in {00..31}; do
-#         echo "###########################################################################"
-#         echo "$time without $confbase started at: "
-#         date
-#         echo "###########################################################################"
-#         echo ""
-#         for type in $(ls raw); do
-#             thisconf=${config/TR.4pt.ps.+00/TR.4pt.$type.+$time}
+ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
+T_HALF=$(($TSIZE / 2))
 
-#             # select one out to generate JK sample
-#             mv raw/$type/$time/$thisconf $DATA_DIR
+echo -e "Conducting KS(TI)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
+echo " "
 
-#             # make directory for laplacian tmp files
-#             mkdir -p lap-tmp/$type
+O_DIR=result/$X4PT/FKS-TI
+FKS_DIR=$DATA_DIR/$X4PT/fks-ti
+rm -rf $O_DIR $FKS_DIR
 
-#             # calculate
-#             echo "###########################################################################"
-#             echo "Laplacian of \"$DATA_DIR_BASE/raw/$type/$time\" (without $confbase)"
-#             echo "###########################################################################"
-#             $LQCD_BASE_DIR/bin/recc_mc -spacelength $SPACESITES raw/$type/$time/TR.*
+# F_{KS} (time-independent)
+echo "##  F_{KS} (time-independent)! "
+echo "##  Time sites total: $T_HALF"
+echo "##  Array length:     $ARRAY_LENGTH"
+echo "#######################################"
+for ((it = 1; it < $T_HALF; it = it + 1)); do
+  T=$(printf "%02d" $it)
+  echo -e "\033[1;35m$T\033[0m now..."
+  mkdir -p $FKS_DIR/$T
+  for psgauge in $(ls $LAP_DIR/ps/$T); do
+    ogauge=${psgauge/.ps./.}
+    vgauge=${psgauge/.ps./.v.}
 
-#             # move the tmp files
-#             mv raw/$type/$time/lap.* lap-tmp/$type
+    $BIN_DIR/fks-ti -l $ARRAY_LENGTH -m $MDIFF -o $FKS_DIR/$T/$ogauge $LAP_DIR/v/$T/$vgauge $LAP_DIR/ps/$T/$psgauge >/dev/null 2>&1
+  done
+done
+echo " "
 
-#             # move JK sample back
-#             mv $DATA_DIR/$thisconf raw/$type/$time
-#         done
+# Jackknife and finalize part
+mkdir -p $O_DIR/binary
 
-#         echo ""
-#         echo "###########################################################################"
-#         echo "Calculating m_c of $time (without $confbase)"
-#         echo "###########################################################################"
-#         for idata in $(ls lap-tmp/v); do
-#             V_DATA=$idata
-#             PS_DATA=${idata/.v./.ps.}
-#             # V0_DATA=${idata/lap.TR.4pt.v./v0.}
-#             MC_DATA=${idata/lap.TR.4pt.v./mc.}
+for T in $(ls $FKS_DIR); do
+  echo -e "Jackknife average \033[1;35m$FKS_DIR/$T\033[0m ..."
+  $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/binary/$T $FKS_DIR/$T/4pt.*
+  echo " "
+done
 
-#             mkdir -p mc-tmp/$time-$confbase
+$BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR -p "txt" $O_DIR/binary/*
+echo " "
 
-#             # $LQCD_BASE_DIR/bin/KSpot -v0 -spacelength $SPACESITES -ofname pot-tmp/v0/$time/$V0_DATA laplacian-tmp/v/$time/$V_DATA laplacian-tmp/ps/$time/$PS_DATA
-#             $LQCD_BASE_DIR/bin/KSpot -vs -spacelength $SPACESITES -ofname mc-tmp/$time-$confbase/$MC_DATA lap-tmp/v/$V_DATA lap-tmp/ps/$PS_DATA
-#         done
-
-#         rm -rf lap-tmp
-
-#         mkdir -p mc-tmp/$time
-#         $LQCD_BASE_DIR/bin/space -spacelength $SPACESITES -sphout mc-tmp/$time/WO-$confbase mc-tmp/$time-$confbase/mc.*
-
-#         rm -rf mc-tmp/$time-$confbase
-#         echo ""
-#         echo "###########################################################################"
-#         echo "$time without $confbase finished at: "
-#         date
-#         echo "###########################################################################"
-#         echo ""
-#     done
-# done
+echo -e "\033[1;35mFinished!\033[0m\n"
+echo " "

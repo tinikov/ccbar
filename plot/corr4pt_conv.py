@@ -3,10 +3,10 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import ticker
 
 a = 0.090713
 tsize = 64
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -49,13 +49,12 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
     ax.legend(loc=3, **legend_default_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-    if not xrange is None:
+    if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
     ax.set_ylabel(r"$C(r)$", labelpad=-0.1)
     ax.set_yscale("log")
-    # ax.yaxis.set_major_locator(ticker.LogLocator(base=10, numticks=7))
-    if not yrange is None:
+    if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
     fig.subplots_adjust(left=0.155, right=0.97, bottom=0.13, top=0.96)
@@ -64,12 +63,18 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
 
 # Gauge
-path = ["../fig/corr/c4pt", "../fig/corr/l4pt"]  # C, L
+path = [
+    "{}/fig/corr/c4pt".format(codeRoot),
+    "{}/fig/corr/l4pt".format(codeRoot),
+]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/corr", "../result/l4pt/corr"]
+datapath = [
+    "{}/result/c4pt/corr".format(codeRoot),
+    "{}/result/l4pt/corr".format(codeRoot),
+]
 
 # Time
 timelist = []
@@ -98,8 +103,9 @@ for igauge in range(2):
             )
 
 # PLOT
-yrange_all = [[[8e-4, 0.07], [1e-3, 0.12]], [[4e-3, 0.1], [1e-2, 0.2]]]
-trange_all = [np.arange(22, 28, 1), np.arange(22, 28, 1)]
+xrange_all = [[0.9, 1.0], [0.6, 1.2]]
+yrange_all = [[[8e-4, 0.02], [1e-3, 0.05]], [[4e-3, 0.1], [1e-2, 0.3]]]
+trange_all = [np.arange(24, 29, 1), np.arange(24, 29, 1)]
 shift_all = [[True, True], [False, False]]
 
 for igauge in range(2):
@@ -109,6 +115,6 @@ for igauge in range(2):
                 data=data[igauge][ichan],
                 filename="{}/{}_conv".format(path[igauge], channel[ichan]),
                 trange=trange_all[igauge],
-                xrange=[0.6, 1.2],
+                xrange=xrange_all[igauge],
                 yrange=yrange_all[igauge][ichan],
             )

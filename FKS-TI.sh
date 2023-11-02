@@ -2,8 +2,8 @@
 # version: 1.0
 
 if [ $# != 4 ]; then
-  echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT] [MDIFF]"
-  exit 1
+	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT] [MDIFF]"
+	exit 1
 fi
 
 ulimit -n 1024
@@ -33,16 +33,16 @@ echo "##  F_{KS} (time-independent)! "
 echo "##  Time sites total: $T_HALF"
 echo "##  Array length:     $ARRAY_LENGTH"
 echo "#######################################"
-for ((it = 1; it < $T_HALF; it = it + 1)); do
-  T=$(printf "%02d" $it)
-  echo -e "\033[1;35m$T\033[0m now..."
-  mkdir -p $FKS_DIR/$T
-  for psgauge in $(ls $LAP_DIR/ps/$T); do
-    ogauge=${psgauge/.ps./.}
-    vgauge=${psgauge/.ps./.v.}
+for ((it = 0; it < $T_HALF; it = it + 1)); do
+	T=$(printf "%02d" $it)
+	echo -e "\033[1;35m$T\033[0m now..."
+	mkdir -p $FKS_DIR/$T
+	for psgauge in $(ls $LAP_DIR/ps/$T); do
+		ogauge=${psgauge/.ps./.}
+		vgauge=${psgauge/.ps./.v.}
 
-    $BIN_DIR/fks-ti -l $ARRAY_LENGTH -m $MDIFF -o $FKS_DIR/$T/$ogauge $LAP_DIR/v/$T/$vgauge $LAP_DIR/ps/$T/$psgauge >/dev/null 2>&1
-  done
+		$BIN_DIR/fks-ti -l $ARRAY_LENGTH -m $MDIFF -o $FKS_DIR/$T/$ogauge $LAP_DIR/v/$T/$vgauge $LAP_DIR/ps/$T/$psgauge >/dev/null 2>&1
+	done
 done
 echo " "
 
@@ -50,9 +50,9 @@ echo " "
 mkdir -p $O_DIR/binary
 
 for T in $(ls $FKS_DIR); do
-  echo -e "Jackknife average \033[1;35m$FKS_DIR/$T\033[0m ..."
-  $BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/binary/$T $FKS_DIR/$T/4pt.*
-  echo " "
+	echo -e "Jackknife average \033[1;35m$FKS_DIR/$T\033[0m ..."
+	$BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/binary/$T $FKS_DIR/$T/4pt.*
+	echo " "
 done
 
 $BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR -p "txt" $O_DIR/binary/*

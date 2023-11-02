@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 a = 0.090713
 a_invrs = 2.1753
 tsize = 64
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -46,7 +47,8 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
         "fontsize": 7,
         "labelspacing": 0.1,
     }
-    ax.legend(loc=2, **legend_default_style)
+    # ax.legend(loc=2, **legend_default_style)
+    ax.legend(loc=2, bbox_to_anchor=(0.95, 1.02), **legend_default_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
     if xrange is not None:
@@ -56,18 +58,25 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
     if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
-    fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
+    # fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
+    fig.subplots_adjust(left=0.13, right=0.85, bottom=0.13, top=0.96)
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
 
 
 # Gauge
-path = ["../fig/FKS/coulomb-TI", "../fig/FKS/landau-TI"]  # C, L
+path = [
+    "{}/fig/FKS/coulomb-TI".format(codeRoot),
+    "{}/fig/FKS/landau-TI".format(codeRoot),
+]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/FKS-TI", "../result/l4pt/FKS-TI"]
+datapath = [
+    "{}/result/c4pt/FKS-TI".format(codeRoot),
+    "{}/result/l4pt/FKS-TI".format(codeRoot),
+]
 
 # Time
 timelist = []
@@ -77,24 +86,22 @@ for i in range(32):
 # Read data
 fks_c, fks_l = [[] for _ in range(2)]
 
-fks_c.append(np.loadtxt("../result/c4pt/FKS-TI/txt.01"))
-fks_l.append(np.loadtxt("../result/l4pt/FKS-TI/txt.01"))
-for i in range(1, 32):
-    fks_c.append(np.loadtxt("../result/c4pt/FKS-TI/txt.{}".format(timelist[i])))
-    fks_l.append(np.loadtxt("../result/l4pt/FKS-TI/txt.{}".format(timelist[i])))
+for i in range(0, 32):
+    fks_c.append(np.loadtxt("{}/txt.{}".format(datapath[0], timelist[i])))
+    fks_l.append(np.loadtxt("{}/txt.{}".format(datapath[1], timelist[i])))
 
 all_plot(
     data=fks_c,
     filename="{}/conv".format(path[0]),
-    trange=np.arange(21, 28, 1),
-    xrange=[0.54, 0.65],
-    yrange=[1.6, 2.4],
+    trange=np.arange(21, 29, 1),
+    xrange=[0.54, 0.66],
+    yrange=[1.5, 2.5],
 )
 
 all_plot(
     data=fks_l,
     filename="{}/conv".format(path[1]),
-    trange=np.arange(21, 28, 1),
+    trange=np.arange(21, 29, 1),
     xrange=[0.54, 0.64],
-    yrange=[1.2, 2.0],
+    yrange=[1.1, 2.1],
 )

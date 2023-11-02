@@ -45,7 +45,7 @@ def all_plot(
     for i in range(len(type)):
         marker = all_markers[0 : len(type)]
         ax.errorbar(
-            index,
+            index + 0.1 * i,
             data[i][:, 1] * cutoff,
             data[i][:, 2] * cutoff,
             label=type[i].upper(),

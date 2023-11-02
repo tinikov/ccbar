@@ -54,7 +54,7 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
     if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
-    ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=-0.1)
+    ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=1.5)
     if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
@@ -86,31 +86,20 @@ for i in range(32):
 # Read data
 fks_c, fks_l = [[] for _ in range(2)]
 
-fks_c.append(np.loadtxt("{}/result/c4pt/FKS-TD/txt.02".format(codeRoot)))
-fks_c.append(np.loadtxt("{}/result/c4pt/FKS-TD/txt.02".format(codeRoot)))
-fks_l.append(np.loadtxt("{}/result/l4pt/FKS-TD/txt.02".format(codeRoot)))
-fks_l.append(np.loadtxt("{}/result/l4pt/FKS-TD/txt.02".format(codeRoot)))
-for i in range(2, 30):
-    fks_c.append(
-        np.loadtxt("{}/result/c4pt/FKS-TD/txt.{}".format(codeRoot, timelist[i]))
-    )
-    fks_l.append(
-        np.loadtxt("{}/result/l4pt/FKS-TD/txt.{}".format(codeRoot, timelist[i]))
-    )
-
-# all_plot(
-#     data=fks_c,
-#     filename="{}/conv14_20".format(path[0]),
-#     trange=np.arange(14, 21, 1),
-#     xrange=[0.54, 0.65],
-#     yrange=[1.5, 2.5],
-# )
+fks_c.append(np.loadtxt("{}/txt.02".format(datapath[0])))
+fks_l.append(np.loadtxt("{}/txt.02".format(datapath[1])))
+# fks_c.append(np.loadtxt("{}/txt.02".format(datapath[0])))
+# fks_l.append(np.loadtxt("{}/txt.02".format(datapath[1])))
+for i in range(1, 28):
+# for i in range(2, 27):
+    fks_c.append(np.loadtxt("{}/txt.{}".format(datapath[0], timelist[i])))
+    fks_l.append(np.loadtxt("{}/txt.{}".format(datapath[1], timelist[i])))
 
 all_plot(
     data=fks_c,
-    filename="{}/conv8_17".format(path[0]),
-    trange=np.arange(8, 18, 1),
-    xrange=[0.54, 0.65],
+    filename="{}/conv".format(path[0]),
+    trange=np.arange(21, 28, 1),
+    xrange=[0.54, 0.66],
     yrange=[1.5, 2.5],
 )
 
@@ -118,6 +107,6 @@ all_plot(
     data=fks_l,
     filename="{}/conv".format(path[1]),
     trange=np.arange(21, 28, 1),
-    xrange=[0.54, 0.64],
-    yrange=[1, 1.8],
+    xrange=[0.54, 0.66],
+    yrange=[0.9, 1.9],
 )

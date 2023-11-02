@@ -24,8 +24,8 @@ T_HALF=$(($TSIZE / 2))
 echo -e "Conducting KS(TD)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
 
-O_DIR=result/$X4PT/FKS-TD-pro
-FKS_DIR=$DATA_DIR/$X4PT/fks-td-pro
+O_DIR=result/$X4PT/FKS-TD-5pt
+FKS_DIR=$DATA_DIR/$X4PT/fks-td-5pt
 rm -rf $O_DIR $FKS_DIR
 
 # F_{KS} (time-dependent)
@@ -55,7 +55,7 @@ for ((it = 2; it < $T_HALF - 1; it = it + 1)); do
 		ps1p=${psgauge/+$T/+$t1p}
 		ps2p=${psgauge/+$T/+$t2p}
 
-		$BIN_DIR/fks-td-pro \
+		$BIN_DIR/fks-td-5pt \
 			-l $ARRAY_LENGTH \
 			-o $FKS_DIR/$T/$ogauge \
 			$SAMPLE_DIR/v/$t2m/$v2m \

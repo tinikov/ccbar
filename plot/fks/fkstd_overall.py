@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 a = 0.090713
 a_invrs = 2.1753
 tsize = 64
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
 font = {
@@ -62,12 +63,18 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
 
 # Gauge
-path = ["../fig/FKS/coulomb-TD", "../fig/FKS/landau-TD"]  # C, L
+path = [
+    "{}/fig/FKS/coulomb-TD".format(codeRoot),
+    "{}/fig/FKS/landau-TD".format(codeRoot),
+]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/FKS-TD", "../result/l4pt/FKS-TD"]
+datapath = [
+    "{}/result/c4pt/FKS-TD".format(codeRoot),
+    "{}/result/l4pt/FKS-TD".format(codeRoot),
+]
 
 # Time
 timelist = []
@@ -77,11 +84,14 @@ for i in range(32):
 # Read data
 fks_c, fks_l = [[] for _ in range(2)]
 
-fks_c.append(np.loadtxt("../result/c4pt/FKS-TD/txt.01"))
-fks_l.append(np.loadtxt("../result/l4pt/FKS-TD/txt.01"))
-for i in range(1, 32):
-    fks_c.append(np.loadtxt("../result/c4pt/FKS-TD/txt.{}".format(timelist[i])))
-    fks_l.append(np.loadtxt("../result/l4pt/FKS-TD/txt.{}".format(timelist[i])))
+fks_c.append(np.loadtxt("{}/txt.01".format(datapath[0])))
+fks_l.append(np.loadtxt("{}/txt.01".format(datapath[1])))
+# fks_c.append(np.loadtxt("{}/txt.02".format(datapath[0])))
+# fks_l.append(np.loadtxt("{}/txt.02".format(datapath[1])))
+# for i in range(2, 31):
+for i in range(2, 32):
+    fks_c.append(np.loadtxt("{}/txt.{}".format(datapath[0], timelist[i])))
+    fks_l.append(np.loadtxt("{}/txt.{}".format(datapath[1], timelist[i])))
 
 all_plot(
     data=fks_c,

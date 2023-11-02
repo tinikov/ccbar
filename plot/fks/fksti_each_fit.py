@@ -8,19 +8,26 @@ from iminuit.cost import LeastSquares
 
 a = 0.090713
 a_invrs = 2.1753
+codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 tmin = 10
-tmax = 27
+tmax = 28
 
 rmin = 0.01
 rmax = [0.82, 0.82]
 
-path = ["../fig/FKS/coulomb-TI/each", "../fig/FKS/landau-TI/each"]
+path = [
+    "{}/fig/FKS/coulomb-TI/each".format(codeRoot),
+    "{}/fig/FKS/landau-TI/each".format(codeRoot),
+]
 for ipath in path:
     if not os.path.exists(ipath):
         os.makedirs(ipath)
 
-datapath = ["../result/c4pt/FKS-TI", "../result/l4pt/FKS-TI"]
+datapath = [
+    "{}/result/c4pt/FKS-TI".format(codeRoot),
+    "{}/result/l4pt/FKS-TI".format(codeRoot),
+]
 
 
 def gaussian(x, A, B, C):
@@ -50,6 +57,10 @@ plt.rcParams["font.family"] = font["family"]
 plt.rcParams["font.size"] = font["size"]
 plt.rcParams["mathtext.fontset"] = font["mathfamily"]
 
+yrange = [[1.5, 2.5], [1.1, 2.1]]
+# yrange = [[-2, 3], [-2, 3]]
+text_ysite = [2.43, 2.03]
+
 for igauge in range(2):
     for i in range(tmin, tmax + 1):
         # Fit
@@ -68,8 +79,8 @@ for igauge in range(2):
         fiterr = fitdata[:, 2]
 
         # Fit
-        least_squares = LeastSquares(fitsites, fitfks, fiterr, gaussian2)
-        m = Minuit(least_squares, **para)
+        least_squares = LeastSquares(fitsites, fitfks, fiterr, gaussian2)  # type: ignore
+        m = Minuit(least_squares, **para)  # type: ignore
         m.migrad()
 
         # Draw
@@ -96,16 +107,16 @@ for igauge in range(2):
             linewidth=0.75,
             label="fit",
         )
-        ax.plot(
-            x_fit * a,
-            np.full(x_fit.shape, m.values["C"]) * a_invrs,
-            linewidth=0.75,
-            label=r"$m_c$",
-        )
+        # ax.plot(
+        #     x_fit * a,
+        #     np.full(x_fit.shape, m.values["C"]) * a_invrs,
+        #     linewidth=0.75,
+        #     label=r"$m_c$",
+        # )
 
         # Set grid (reserved)
-        # ax.grid(which="major", color="#DDDDDD", linewidth=0.8)
-        # ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.8)
+        ax.grid(which="major", color="#DDDDDD", linewidth=0.5)
+        ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
 
         ax.minorticks_on()
         legend_default_style = {
@@ -113,14 +124,26 @@ for igauge in range(2):
             "fontsize": 7,
             "labelspacing": 0.1,
         }
-        ax.legend(loc=4, bbox_to_anchor=(0.88, 0.04), **legend_default_style)
+        # ax.legend(loc=4, bbox_to_anchor=(0.88, 0.04), **legend_default_style)
+        ax.legend(loc=2, **legend_default_style)
 
         ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-        ax.set(xlim=(0, 1.2))
+        ax.set(xlim=(0.54, 0.66))
+        # ax.set(xlim=(0, 1.2))
 
-        ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=-0.1)
-        ax.set(ylim=(-2, 3))
+        ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=1.5)
+        ax.set(ylim=(yrange[igauge][0], yrange[igauge][1]))
+        # ax.set(ylim=(-2, 3))
 
+        ax.text(0.645, text_ysite[igauge], r"$t = {}$".format(str(i).rjust(2, "0")))
+        ax.text(
+            0.55,
+            text_ysite[igauge] - 0.9,
+            r"$m_c =$"
+            + r"${}$".format(round(m.values["C"] * a_invrs * 1000))
+            + r"$\ [{\rm MeV}]$",
+        )
+        
         fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
         fig.savefig("{}/{}.png".format(path[igauge], str(i).rjust(2, "0")), dpi=600)
         plt.close()

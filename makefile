@@ -7,7 +7,7 @@ a1plus \
 cart2sphr \
 effmass \
 fks-td \
-fks-td-pro \
+fks-td-5pt \
 fks-ti \
 jre \
 mean \

@@ -42,7 +42,7 @@ def gauge_plot(coulomb, landau, filename, cutoff=1.0, xrange=None, yrange=None, 
         fmt="x"
     )
     ax.errorbar(
-        index,
+        index + 0.12,
         landau[:, 1] * cutoff,
         landau[:, 2] * cutoff,
         label="Landau",

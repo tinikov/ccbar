@@ -39,7 +39,7 @@
 /blog
 /bin
 /book-doc
-/book-stat
+/book-static
 /.draft
 /plot/plot.code-workspace
 /plot/.vscode

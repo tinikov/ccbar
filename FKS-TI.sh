@@ -18,8 +18,8 @@ BIN_DIR=$ROOT/bin
 DATA_DIR=$ROOT/data
 LAP_DIR=$DATA_DIR/$X4PT/lap
 
-ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
-T_HALF=$(($TSIZE / 2))
+ARRAY_LENGTH=$((XYZSIZE * XYZSIZE * XYZSIZE))
+T_HALF=$((TSIZE / 2))
 
 echo -e "Conducting KS(TI)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
@@ -33,7 +33,7 @@ echo "##  F_{KS} (time-independent)! "
 echo "##  Time sites total: $T_HALF"
 echo "##  Array length:     $ARRAY_LENGTH"
 echo "#######################################"
-for ((it = 0; it < $T_HALF; it = it + 1)); do
+for ((it = 0; it < T_HALF; it = it + 1)); do
 	T=$(printf "%02d" $it)
 	echo -e "\033[1;35m$T\033[0m now..."
 	mkdir -p $FKS_DIR/$T

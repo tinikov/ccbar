@@ -24,7 +24,8 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
     }
 
     legend_default_style = {
-        "loc": 1,
+        "loc": 2,
+        "bbox_to_anchor": (0.95, 1.02),
         "handletextpad": 0,
         "frameon": False,
         "fontsize": 8,
@@ -33,22 +34,23 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
 
     for i in trange:
         ax.errorbar(
-            data[i][:, 0] * a + 0.0004 * (i - trange[0]),
+            data[i][:, 0] * a,
             data[i][:, 1],
             data[i][:, 2],
             label=r"$n_t=$" + str(i).rjust(2, "0"),
             **errbar_plot_style
         )
 
-    ax.legend(**legend_default_style)
-
     ax.set_xlabel(r"$r\ [{\rm fm}]$")
     if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
-    ax.set_ylabel(r"$C(r)$", labelpad=3)
+    ax.set_ylabel(r"$C(r)$")
+
     if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
+
+    ax.legend(**legend_default_style)
 
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
@@ -79,7 +81,10 @@ channel = ["ps", "v"]
 # Read data
 nn_ps_c, nn_v_c, nn_ps_l, nn_v_l = [[] for _ in range(4)]
 
-data = [[nn_ps_c, nn_v_c], [nn_ps_l, nn_v_l]]
+data = [
+    [nn_ps_c, nn_v_c],
+    [nn_ps_l, nn_v_l],
+]
 
 for igauge in range(2):
     for ichan in range(2):
@@ -95,16 +100,15 @@ for igauge in range(2):
             )
 
 # PLOT
-xrange_all = [[[1.0, 1.1], [0.9, 1.0]], [[1.2, 1.3], [1.1, 1.2]]]
-yrange_all = [[[0.001, 0.006], [0.006, 0.024]], [[0.002, 0.012], [0.017, 0.045]]]
 
 for igauge in range(2):
     for ichan in range(2):
-        for itype in range(3):
             all_plot(
                 data=data[igauge][ichan],
-                filename="{}/{}_conv".format(path[igauge], channel[ichan]),
-                trange=np.arange(24, 29, 1),
-                xrange=xrange_all[igauge][ichan],
-                yrange=yrange_all[igauge][ichan],
+                filename="{}/nn_{}".format(
+                    path[igauge], channel[ichan]
+                ),
+                trange=np.arange(1, 29, 3),
+                xrange=[0, 1.2],
+                yrange=[-0.05, 1]
             )

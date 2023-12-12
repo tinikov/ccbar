@@ -7,7 +7,6 @@
  *
  */
 
-#include "correlator.h"
 #include "data_process.h"
 #include "misc.h"
 #include "type_alias.h"
@@ -185,8 +184,7 @@ void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df) {
 
     norm_fact = sqrt(norm_fact);
 
-    for (int j = 0; j < array_length;
-         j++)  // Compute C_n(t) = C(t)/\sqrt(\sum_{C^2})
+    for (int j = 0; j < array_length; j++)  // C_n(t) = C(t)/\sqrt(\sum_{C^2})
     {
       result[j] = tmp[j] / norm_fact;
     }

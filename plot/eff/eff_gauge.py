@@ -4,33 +4,41 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
+import scienceplots
+
+plt.style.use("science")
 
 tsize = 64
 cutoff = 2.1753
 codeRoot = "/Users/chen/LQCD/code/ccbar"
 
-# Font setting
-font = {
-    "family": "Charter",
-    "size": 8,
-    "mathfamily": "stix",
-}
-
-plt.rcParams["font.family"] = font["family"]
-plt.rcParams["font.size"] = font["size"]
-plt.rcParams["mathtext.fontset"] = font["mathfamily"]
-
-style = {
-    "markersize": 4.5,
-    "markeredgewidth": 0.7,
-    "linewidth": 0.4,
-    # "capsize": 1,
-    # "capthick": 0.2,
-}
-
 
 def gauge_plot(coulomb, landau, filename, cutoff=1.0, xrange=None, yrange=None, loc=8):
     fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+
+    errbar_plot_style1 = {
+        "fmt": "D",
+        "color": "xkcd:primary blue",
+        "markersize": 2.8,
+        "markeredgewidth": 0.35,
+        "linewidth": 0.25,
+        "fillstyle": "none",
+    }
+
+    errbar_plot_style2 = {
+        "fmt": "s",
+        "color": "xkcd:bright red",
+        "markersize": 2.8,
+        "markeredgewidth": 0.35,
+        "linewidth": 0.25,
+        "fillstyle": "none",
+    }
+
+    legend_default_style = {
+        "handletextpad": 0,
+        "fontsize": 8,
+        "labelspacing": 0.4,
+    }
 
     index = np.arange(0, tsize, 1)
     ax.errorbar(
@@ -38,36 +46,31 @@ def gauge_plot(coulomb, landau, filename, cutoff=1.0, xrange=None, yrange=None, 
         coulomb[:, 1] * cutoff,
         coulomb[:, 2] * cutoff,
         label="Coulomb",
-        **style,
-        fmt="x"
+        **errbar_plot_style1,
     )
     ax.errorbar(
-        index + 0.12,
+        index,
         landau[:, 1] * cutoff,
         landau[:, 2] * cutoff,
         label="Landau",
-        **style,
-        fmt="+"
+        **errbar_plot_style2,
     )
 
     # Set grid (reserved)
     ax.grid(which="major", color="#DDDDDD", linewidth=0.5)
     ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
 
-    ax.minorticks_on()
-    ax.legend(loc=loc, handletextpad=0.1, frameon=False)
+    ax.legend(loc=loc, **legend_default_style)
 
-    ax.set_xlabel(r"$n_t$", labelpad=-1)
+    ax.set_xlabel(r"$n_t$")
     ax.xaxis.set_major_locator(ticker.MultipleLocator(4))
-    # ax.xaxis.set_minor_locator(ticker.NullLocator())
     if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
-    ax.set_ylabel(r"$m_{\rm eff}\ [{\rm GeV}$]", labelpad=1)
+    ax.set_ylabel(r"$m_{\rm eff}\ [{\rm GeV}$]", labelpad=3)
     if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
-    fig.subplots_adjust(left=0.14, right=0.98, bottom=0.13, top=0.97)
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
 

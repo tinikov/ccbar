@@ -16,6 +16,6 @@
 using DOUBLE = double;
 using COMPLX = std::complex<double>;
 using DVARRAY = std::valarray<double>;
-using CVARRAY = std::valarray<std::complex<double>>;
+using CVARRAY = std::valarray<std::complex<double> >;
 
 #endif

@@ -4,8 +4,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-a = 0.090713
-tsize = 64
 codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting
@@ -21,7 +19,7 @@ plt.rcParams["mathtext.fontset"] = font["mathfamily"]
 
 style = {
     "fmt": "x",
-    "markersize": 1.3,
+    "markersize": 1.7,
     "markeredgewidth": 0.3,
     "linewidth": 0.3,
 }
@@ -109,6 +107,6 @@ for igauge in range(2):
             data=data[igauge][ichan],
             filename="{}/{}_conv".format(path[igauge], channel[ichan]),
             trange=np.arange(23, 29, 1),
-            xrange=[8.1, 9.7],
+            xrange=[8.6, 9.7],
             yrange=yrange_gauge[igauge],
         )

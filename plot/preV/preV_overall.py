@@ -4,8 +4,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-a = 0.090713
-tsize = 64
 codeRoot = "/Users/chen/LQCD/code/ccbar"
 
 # Font setting

@@ -18,8 +18,8 @@ DATA_DIR=$ROOT/data
 SAMPLE_DIR=$DATA_DIR/$X4PT/jsample
 LAP_DIR=$DATA_DIR/$X4PT/lap
 
-ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
-T_HALF=$(($TSIZE / 2))
+ARRAY_LENGTH=$((XYZSIZE * XYZSIZE * XYZSIZE))
+T_HALF=$((TSIZE / 2))
 
 echo -e "Conducting KS(TD)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
@@ -33,12 +33,12 @@ echo "##  F_{KS} (time-dependent)! "
 echo "##  Time sites total: $T_HALF"
 echo "##  Array length:     $ARRAY_LENGTH"
 echo "#######################################"
-for ((it = 2; it < $T_HALF - 1; it = it + 1)); do
-	t2m=$(printf "%02d" $(($it - 2)))
-	t1m=$(printf "%02d" $(($it - 1)))
+for ((it = 2; it < T_HALF - 1; it = it + 1)); do
+	t2m=$(printf "%02d" $((it - 2)))
+	t1m=$(printf "%02d" $((it - 1)))
 	T=$(printf "%02d" $it)
-	t1p=$(printf "%02d" $(($it + 1)))
-	t2p=$(printf "%02d" $(($it + 2)))
+	t1p=$(printf "%02d" $((it + 1)))
+	t2p=$(printf "%02d" $((it + 2)))
 
 	echo -e "\033[1;35m$T\033[0m now..."
 

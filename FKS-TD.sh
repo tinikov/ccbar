@@ -18,8 +18,8 @@ DATA_DIR=$ROOT/data
 SAMPLE_DIR=$DATA_DIR/$X4PT/jsample
 LAP_DIR=$DATA_DIR/$X4PT/lap
 
-ARRAY_LENGTH=$(($XYZSIZE * $XYZSIZE * $XYZSIZE))
-T_HALF=$(($TSIZE / 2))
+ARRAY_LENGTH=$((XYZSIZE * XYZSIZE * XYZSIZE))
+T_HALF=$((TSIZE / 2))
 
 echo -e "Conducting KS(TD)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
@@ -33,11 +33,11 @@ echo "##  F_{KS} (time-dependent)! "
 echo "##  Time sites total: $T_HALF"
 echo "##  Array length:     $ARRAY_LENGTH"
 echo "#######################################"
-for ((it = 1; it < $T_HALF; it = it + 1)); do
+for ((it = 1; it < T_HALF; it = it + 1)); do
 	T=$(printf "%02d" $it)
 	echo -e "\033[1;35m$T\033[0m now..."
-	tm=$(printf "%02d" $(($it - 1)))
-	tp=$(printf "%02d" $(($it + 1)))
+	tm=$(printf "%02d" $((it - 1)))
+	tp=$(printf "%02d" $((it + 1)))
 	mkdir -p $FKS_DIR/$T
 	for psgauge in $(ls $SAMPLE_DIR/ps/$T); do
 		ogauge=${psgauge/.ps./.}

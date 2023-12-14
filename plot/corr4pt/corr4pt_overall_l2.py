@@ -27,7 +27,7 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
         "loc": "best",
         "handletextpad": 0,
         "frameon": False,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.3,
     }
 
@@ -105,7 +105,7 @@ for igauge in range(2):
         all_plot(
             data=data[igauge][ichan],
             filename="{}/l2_{}".format(path[igauge], channel[ichan]),
-            trange=np.arange(1, 29, 3),
-            xrange=[0, 1.2],
+            trange=np.append(np.array([0]), np.arange(4, 30, 5)),
+            xrange=[0, 2.5],
             yrange=yrange_all[ichan],
         )

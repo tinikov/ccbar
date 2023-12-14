@@ -37,7 +37,7 @@ def gauge_plot(cdata, ct, ldata, lt, filename, xrange=None, yrange=None):
         "loc": 1,
         "handletextpad": 0,
         "frameon": False,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.3,
     }
 
@@ -102,20 +102,20 @@ for it in range(32):
 # PLOT
 gauge_plot(
     l2_ps_c,
-    28,
+    29,
     l2_ps_l,
-    28,
+    29,
     filename="{}/4pt_gauge_ps".format(path),
-    xrange=[0, 1.2],
+    xrange=[0, 2.5],
     yrange=[-0.05, 0.6],
 )
 
 gauge_plot(
     l2_v_c,
-    28,
+    29,
     l2_v_l,
-    28,
+    29,
     filename="{}/4pt_gauge_v".format(path),
-    xrange=[0, 1.2],
+    xrange=[0, 2.5],
     yrange=[-0.04, 0.4],
 )

@@ -37,16 +37,24 @@ def type_plot(exp, cosh, filename, cutoff=1.0, xrange=None, yrange=None):
     legend_default_style = {
         "loc": 8,
         "handletextpad": 0,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.4,
     }
 
     index = np.arange(0, tsize, 1)
     ax.errorbar(
-        index, exp[:, 1] * cutoff, exp[:, 2] * cutoff, label="exp", **errbar_plot_style1
+        index + 0.5,
+        exp[:, 1] * cutoff,
+        exp[:, 2] * cutoff,
+        label="exp",
+        **errbar_plot_style1
     )
     ax.errorbar(
-        index, cosh[:, 1] * cutoff, cosh[:, 2] * cutoff, label="cosh", **errbar_plot_style2
+        index + 0.5,
+        cosh[:, 1] * cutoff,
+        cosh[:, 2] * cutoff,
+        label="cosh",
+        **errbar_plot_style2
     )
 
     # Set grid (reserved)

@@ -91,7 +91,7 @@ for i in range(0, 32):
 all_plot(
     data=fks_c,
     filename="{}/all".format(path[0]),
-    trange=np.arange(1, 29, 3),
+    trange=np.append(np.array([0]), np.arange(4, 30, 5)),
     xrange=[0, 1.2],
     yrange=[-12, 4],
 )
@@ -99,7 +99,7 @@ all_plot(
 all_plot(
     data=fks_l,
     filename="{}/all".format(path[1]),
-    trange=np.arange(1, 29, 3),
+    trange=np.append(np.array([0]), np.arange(4, 30, 5)),
     xrange=[0, 1.2],
     yrange=[-12, 4],
 )

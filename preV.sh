@@ -20,7 +20,7 @@ SAMPLE_DIR=$DATA_DIR/$X4PT/jsample
 ARRAY_LENGTH=$((XYZSIZE * XYZSIZE * XYZSIZE))
 T_HALF=$((TSIZE / 2))
 
-O_DIR=result/$X4PT/preV
+O_DIR=$ROOT/result/$X4PT/preV
 LAP_DIR=$DATA_DIR/$X4PT/lap
 rm -rf $O_DIR $LAP_DIR
 

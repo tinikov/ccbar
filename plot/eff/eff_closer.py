@@ -23,7 +23,7 @@ def all_plot(
     yrange=None,
 ):
     fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
-    
+
     errbar_plot_style = {
         "markersize": 3.5,
         "markeredgewidth": 0.4,
@@ -33,17 +33,16 @@ def all_plot(
 
     legend_default_style = {
         "handletextpad": 0,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.4,
     }
 
     all_markers = ["o", "h", "v", "H", "p", "s", "^", "<", ">"]
 
-
     index = np.arange(0, tsize, 1)
     for i in range(len(type)):
         ax.errorbar(
-            index,
+            index + 0.5 + 0.06 * (i - 3),
             data[i][:, 1] * cutoff,
             data[i][:, 2] * cutoff,
             label=type[i].upper(),
@@ -100,6 +99,6 @@ for i in range(2):
         "{}/closer".format(path[i]),
         tsize,
         cutoff=cutoff,
-        xrange=[4, 28],
+        xrange=[4, 29],
         yrange=[2.8, 3.6],
     )

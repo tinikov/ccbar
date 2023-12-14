@@ -9,6 +9,10 @@
 
 #include "data_process.h"
 
+#include <complex>
+
+#include "type_alias.h"
+
 void read_bin(const char *if_name, int array_length, DOUBLE *data) {
   FILE *fp = fopen(if_name, "rb");
   if (fp == NULL) {
@@ -127,5 +131,11 @@ void keep_real(CVARRAY &data, DVARRAY &realdata, int array_length) {
 void keep_imag(CVARRAY &data, DVARRAY &imagdata, int array_length) {
   for (int i = 0; i < array_length; i++) {
     imagdata[i] = data[i].imag();
+  }
+}
+
+void varry_norm(CVARRAY &data, DVARRAY &normdata, int array_length) {
+  for (int i = 0; i < array_length; i++) {
+    normdata[i] = sqrt(norm(data[i]));
   }
 }

@@ -229,6 +229,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
     keep_real(tmp, rtmp, array_length);
+    // varry_norm(tmp, rtmp, array_length);
 
     sum += rtmp;
     sum_square += rtmp * rtmp;
@@ -236,7 +237,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
 
   // Second round: Generate the Jackknife sampled data and calculate the
   // variance
-  //               Also, save files to samdlist[]
+  // Also, save files to samdlist[]
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
@@ -245,6 +246,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
     keep_real(tmp, rtmp, array_length);
+    // varry_norm(tmp, rtmp, array_length);
 
     value = (sum - rtmp) / (N_df - 1.0);
     // About this variance, please refer to eq.(7.37) on P.383, Montvay LQCD

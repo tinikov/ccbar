@@ -36,20 +36,20 @@ def gauge_plot(coulomb, landau, filename, cutoff=1.0, xrange=None, yrange=None, 
 
     legend_default_style = {
         "handletextpad": 0,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.4,
     }
 
     index = np.arange(0, tsize, 1)
     ax.errorbar(
-        index,
+        index + 0.5,
         coulomb[:, 1] * cutoff,
         coulomb[:, 2] * cutoff,
         label="Coulomb",
         **errbar_plot_style1,
     )
     ax.errorbar(
-        index,
+        index + 0.5,
         landau[:, 1] * cutoff,
         landau[:, 2] * cutoff,
         label="Landau",
@@ -87,7 +87,7 @@ for i in range(5):
         np.loadtxt("{}/result/l2pt/effmass/txt.exp.{}".format(codeRoot, channel[i]))
     )
 
-xrange_all = [[4, 28], [4, 28], [0, 28], [0, 28], [0, 28]]
+xrange_all = [[4, 29], [4, 29], [0, 29], [0, 29], [0, 29]]
 yrange_all = [[2.7, 3], [2.8, 3.1], [3.2, 3.6], [3.3, 3.6], [3.3, 3.6]]
 loc = [8, 8, 2, 2, 2]
 

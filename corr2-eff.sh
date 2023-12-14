@@ -19,7 +19,7 @@ SAMPLE_DIR=$DATA_DIR/$XXPT/jsample
 echo -e "Effective mass and finalization for \033[1;35m$XXPTDIR\033[0m"
 echo " "
 
-O_DIR=result/$XXPT
+O_DIR=$ROOT/result/$XXPT
 EFF_DIR=$DATA_DIR/$XXPT/effmass
 rm -rf $O_DIR $EFF_DIR
 

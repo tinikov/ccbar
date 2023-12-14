@@ -7,7 +7,6 @@ if [ $# != 3 ]; then
 fi
 
 ulimit -n 1024
-export OMP_NUM_THREADS=4
 
 XYZSIZE=$1
 TSIZE=$2

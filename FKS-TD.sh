@@ -24,7 +24,7 @@ T_HALF=$((TSIZE / 2))
 echo -e "Conducting KS(TD)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
 echo " "
 
-O_DIR=result/$X4PT/FKS-TD
+O_DIR=$ROOT/result/$X4PT/FKS-TD
 FKS_DIR=$DATA_DIR/$X4PT/fks-td
 rm -rf $O_DIR $FKS_DIR
 

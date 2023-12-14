@@ -34,7 +34,7 @@ def all_plot(
     legend_default_style = {
         "loc": "best",
         "handletextpad": 0,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.4,
     }
 
@@ -43,7 +43,7 @@ def all_plot(
     index = np.arange(0, tsize, 2)
     for i in range(len(type)):
         ax.errorbar(
-            index,
+            index + 0.5,
             data[i][:, 1][0::2] * cutoff,
             data[i][:, 2][0::2] * cutoff,
             label=type[i].upper(),

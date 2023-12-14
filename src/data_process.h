@@ -56,8 +56,8 @@ void bin2txt(const char *bin_fname, const char *txt_fname, int array_length);
  * @brief Keep the real part of the data
  *
  * @param data original data (complex valarray)
- * @param rdata real part of the valarray (double valarray)
- * @param array_length
+ * @param realdata real part of the valarray (double valarray)
+ * @param array_length Total of complex numbers
  */
 void keep_real(CVARRAY &data, DVARRAY &realdata, int array_length);
 
@@ -65,9 +65,17 @@ void keep_real(CVARRAY &data, DVARRAY &realdata, int array_length);
  * @brief Keep the imaginary part of the data
  *
  * @param data original data (complex valarray)
- * @param rdata imaginary part of the valarray (double valarray)
- * @param array_length
+ * @param imagdata imaginary part of the valarray (double valarray)
+ * @param array_length Total of complex numbers
  */
 void keep_imag(CVARRAY &data, DVARRAY &imagdata, int array_length);
 
+/**
+ * @brief Calculate the norm of the complex data
+ *
+ * @param data original data (complex valarray)
+ * @param normdata norm of the valarray (double valarray)
+ * @param array_length Total of complex numbers
+ */
+void varry_norm(CVARRAY &data, DVARRAY &normdata, int array_length);
 #endif

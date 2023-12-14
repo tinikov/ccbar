@@ -32,7 +32,7 @@ def all_plot(
     legend_default_style = {
         "loc": "best",
         "handletextpad": 0,
-        "fontsize": 8,
+        "fontsize": 7,
         "labelspacing": 0.4,
     }
 

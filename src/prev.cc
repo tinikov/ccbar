@@ -1,6 +1,6 @@
 /**
  * @file prev.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief Pre-potential: [▽^2 C(r,t)]/C(r,t)
  * @version 1.0
  * @date 2023-05-03

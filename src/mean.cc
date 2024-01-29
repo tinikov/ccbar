@@ -1,6 +1,6 @@
 /**
  * @file mean.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief Mean for raw data (Optional: jackknife variance)
  * @version 1.0
  * @date 2023-05-03

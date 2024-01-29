@@ -2,7 +2,7 @@
 # version: 1.0
 
 if [ $# != 2 ]; then
-	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [TSIZE] [X2PT]"
+	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [TSIZE] [X2PT] [ROOTDIR] [DATADIR]"
 	exit 1
 fi
 

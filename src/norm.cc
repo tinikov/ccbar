@@ -1,6 +1,6 @@
 /**
  * @file norm.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief Normalizaion for 4-point correlators
  * @version 1.0
  * @date 2023-07-10

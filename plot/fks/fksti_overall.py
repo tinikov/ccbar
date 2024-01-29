@@ -3,61 +3,54 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import scienceplots
+
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 a_invrs = 2.1753
 tsize = 64
-codeRoot = "/Users/chen/LQCD/code/ccbar"
-
-# Font setting
-font = {
-    "family": "Charter",
-    "size": 8,
-    "mathfamily": "stix",
-}
-
-plt.rcParams["font.family"] = font["family"]
-plt.rcParams["font.size"] = font["size"]
-plt.rcParams["mathtext.fontset"] = font["mathfamily"]
-
-style = {
-    "fmt": "x",
-    "markersize": 1.7,
-    "markeredgewidth": 0.3,
-    "linewidth": 0.3,
-}
+codeRoot = "/Volumes/X6/work/ccbar"
 
 
 def all_plot(data, filename, trange, xrange=None, yrange=None):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    fig, ax = plt.subplots()
+
+    errbar_plot_style = {
+        "fmt": ".",
+        "markersize": 3,
+        "markeredgewidth": 0.4,
+        "linewidth": 0.25,
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
+    }
+
+    legend_default_style = {
+        "loc": 2,
+        "bbox_to_anchor": (0.95, 1.02),
+        "handletextpad": 0,
+        "labelspacing": 0.3,
+    }
 
     for i in trange:
         ax.errorbar(
             data[i][:, 0] * a,
-            data[i][:, 1] * a_invrs,
+            -data[i][:, 1] * a_invrs,
             data[i][:, 2] * a_invrs,
             label=r"$n_t=$" + str(i).rjust(2, "0"),
-            **style
+            **errbar_plot_style
         )
 
-    ax.minorticks_on()
-    legend_default_style = {
-        "handletextpad": 0,
-        "frameon": False,
-        "fontsize": 7,
-        "labelspacing": 0.1,
-    }
-    ax.legend(loc=3, bbox_to_anchor=(0.18, 0), **legend_default_style)
+    ax.legend(**legend_default_style)
 
-    ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
+    ax.set_xlabel(r"$r\ [{\rm fm}]$")
     if xrange is not None:
-        ax.set(xlim=(xrange[0], xrange[1]))
+        ax.set_xlim(xrange[0], xrange[1])
 
-    ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=-0.1)
+    ax.set_ylabel(r"$F_{\rm KS}(r)\ [{\rm GeV}]$")
     if yrange is not None:
-        ax.set(ylim=(yrange[0], yrange[1]))
+        ax.set_ylim(yrange[0], yrange[1])
 
-    fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
 
@@ -91,15 +84,15 @@ for i in range(0, 32):
 all_plot(
     data=fks_c,
     filename="{}/all".format(path[0]),
-    trange=np.append(np.array([0]), np.arange(4, 30, 5)),
+    trange=np.arange(4, 30, 5),
     xrange=[0, 1.2],
-    yrange=[-12, 4],
+    yrange=[-3, 1],
 )
 
 all_plot(
     data=fks_l,
     filename="{}/all".format(path[1]),
-    trange=np.append(np.array([0]), np.arange(4, 30, 5)),
+    trange=np.arange(4, 30, 5),
     xrange=[0, 1.2],
-    yrange=[-12, 4],
+    yrange=[-3, 1],
 )

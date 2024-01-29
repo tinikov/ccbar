@@ -13,6 +13,7 @@ mean \
 norm \
 prev \
 trev2 \
+v-ti \
 
 PRE = \
 data_process.o \

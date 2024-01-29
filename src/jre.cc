@@ -1,6 +1,6 @@
 /**
  * @file jre.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief Jackknife resampling for raw data
  * @version 1.0
  * @date 2023-05-03

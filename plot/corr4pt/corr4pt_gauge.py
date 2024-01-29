@@ -3,69 +3,72 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 import scienceplots
 
-plt.style.use("science")
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 tsize = 64
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+codeRoot = "/Volumes/X6/work/ccbar"
+int_c = 2.0 * np.sqrt(np.pi)
 
 
 def gauge_plot(cdata, ct, ldata, lt, filename, xrange=None, yrange=None):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    fig, ax = plt.subplots()  # picture size
 
     errbar_plot_style1 = {
-        "fmt": "o",
+        "fmt": ".",
         "color": "xkcd:primary blue",
-        "markersize": 2.5,
-        "markeredgewidth": 0.35,
+        "markersize": 3,
+        "markeredgewidth": 0.4,
         "linewidth": 0.25,
-        "fillstyle": "none",
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
     }
 
     errbar_plot_style2 = {
-        "fmt": "s",
+        "fmt": ".",
         "color": "xkcd:bright red",
-        "markersize": 2.2,
-        "markeredgewidth": 0.35,
+        "markersize": 3,
+        "markeredgewidth": 0.4,
         "linewidth": 0.25,
-        "fillstyle": "none",
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
     }
 
-    legend_default_style = {
+    legend_style = {
         "loc": 1,
         "handletextpad": 0,
-        "frameon": False,
-        "fontsize": 7,
         "labelspacing": 0.3,
     }
 
     ax.errorbar(
         cdata[ct][:, 0] * a,
-        cdata[ct][:, 1] * 2 * np.sqrt(np.pi),
-        cdata[ct][:, 2] * 2 * np.sqrt(np.pi),
+        cdata[ct][:, 1] * int_c,
+        cdata[ct][:, 2] * int_c,
         label=r"Coulomb ($n_t=$" + str(ct).rjust(2, "0") + ")",
         **errbar_plot_style1
     )
 
     ax.errorbar(
         ldata[lt][:, 0] * a,
-        ldata[lt][:, 1] * 2 * np.sqrt(np.pi),
-        ldata[lt][:, 2] * 2 * np.sqrt(np.pi),
+        ldata[lt][:, 1] * int_c,
+        ldata[lt][:, 2] * int_c,
         label=r"Landau ($n_t=$" + str(lt).rjust(2, "0") + ")",
         **errbar_plot_style2
     )
 
-    ax.legend(**legend_default_style)
+    ax.legend(**legend_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$")
     if xrange is not None:
-        ax.set(xlim=(xrange[0], xrange[1]))
+        ax.set_xlim(xrange[0], xrange[1])
 
-    ax.set_ylabel(r"$C(r)$", labelpad=3)
+    ax.yaxis.set_major_locator(ticker.MultipleLocator(0.1))
+    ax.set_ylabel(r"$C(r)$")
     if yrange is not None:
-        ax.set(ylim=(yrange[0], yrange[1]))
+        ax.set_ylim(yrange[0], yrange[1])
 
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
@@ -106,8 +109,8 @@ gauge_plot(
     l2_ps_l,
     29,
     filename="{}/4pt_gauge_ps".format(path),
-    xrange=[0, 2.5],
-    yrange=[-0.05, 0.6],
+    xrange=[0.05, 2.5],
+    yrange=[-0.02, 0.4],
 )
 
 gauge_plot(
@@ -116,6 +119,6 @@ gauge_plot(
     l2_v_l,
     29,
     filename="{}/4pt_gauge_v".format(path),
-    xrange=[0, 2.5],
-    yrange=[-0.04, 0.4],
+    xrange=[0.05, 2.5],
+    yrange=[-0.02, 0.4],
 )

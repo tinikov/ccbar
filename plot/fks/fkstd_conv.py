@@ -3,71 +3,66 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import ticker
+import scienceplots
+
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 a_invrs = 2.1753
 tsize = 64
-codeRoot = "/Users/chen/LQCD/code/ccbar"
-
-# Font setting
-font = {
-    "family": "Charter",
-    "size": 8,
-    "mathfamily": "stix",
-}
-
-plt.rcParams["font.family"] = font["family"]
-plt.rcParams["font.size"] = font["size"]
-plt.rcParams["mathtext.fontset"] = font["mathfamily"]
-
-style = {
-    "fmt": "x",
-    "markersize": 1.7,
-    "markeredgewidth": 0.3,
-    "linewidth": 0.3,
-}
+codeRoot = "/Volumes/X6/work/ccbar"
 
 
 def all_plot(data, filename, trange, xrange=None, yrange=None):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    fig, ax = plt.subplots()
+
+    errbar_plot_style = {
+        "fmt": ".",
+        "markersize": 3.8,
+        "markeredgewidth": 0.4,
+        "linewidth": 0.3,
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
+    }
+
+    legend_style = {
+        "loc": 2,
+        "bbox_to_anchor": (0.95, 1.02),
+        "handletextpad": 0,
+        "labelspacing": 0.3,
+    }
 
     for i in trange:
+        re_i = i - trange[0]
+        t_all = trange[-1] - trange[0]
         ax.errorbar(
-            data[i][:, 0] * a + 0.0005 * (i - trange[0]),
-            data[i][:, 1] * a_invrs,
+            data[i][:, 0] * a + 0.00035 * (re_i - np.ceil(t_all / 2)),
+            -data[i][:, 1] * a_invrs,
             data[i][:, 2] * a_invrs,
             label=r"$n_t=$" + str(i).rjust(2, "0"),
-            **style
+            **errbar_plot_style
         )
 
-    ax.minorticks_on()
-    legend_default_style = {
-        "handletextpad": 0,
-        "frameon": False,
-        "fontsize": 7,
-        "labelspacing": 0.1,
-    }
-    # ax.legend(loc=2, **legend_default_style)
-    ax.legend(loc=2, bbox_to_anchor=(0.95, 1.02), **legend_default_style)
+    ax.legend(**legend_style)
 
-    ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(0.02))
+    ax.set_xlabel(r"$r\ [{\rm fm}]$")
     if xrange is not None:
-        ax.set(xlim=(xrange[0], xrange[1]))
+        ax.set_xlim(xrange[0], xrange[1])
 
-    ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=1.5)
+    ax.set_ylabel(r"$F_{\rm KS}(r)$")
     if yrange is not None:
-        ax.set(ylim=(yrange[0], yrange[1]))
+        ax.set_ylim(yrange[0], yrange[1])
 
-    # fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
-    fig.subplots_adjust(left=0.13, right=0.85, bottom=0.13, top=0.96)
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
 
 
 # Gauge
 path = [
-    "{}/fig/FKS/coulomb-TD".format(codeRoot),
-    "{}/fig/FKS/landau-TD".format(codeRoot),
+    "{}/fig/FKS/coulomb-TD/conv".format(codeRoot),
+    "{}/fig/FKS/landau-TD/conv".format(codeRoot),
 ]  # C, L
 for ipath in path:
     if not os.path.exists(ipath):
@@ -86,27 +81,26 @@ for i in range(32):
 # Read data
 fks_c, fks_l = [[] for _ in range(2)]
 
-fks_c.append(np.loadtxt("{}/txt.02".format(datapath[0])))
-fks_l.append(np.loadtxt("{}/txt.02".format(datapath[1])))
-# fks_c.append(np.loadtxt("{}/txt.02".format(datapath[0])))
-# fks_l.append(np.loadtxt("{}/txt.02".format(datapath[1])))
-for i in range(1, 28):
-# for i in range(2, 27):
+fks_c.append(np.loadtxt("{}/txt.01".format(datapath[0])))
+fks_l.append(np.loadtxt("{}/txt.01".format(datapath[1])))
+for i in range(1, 31):
     fks_c.append(np.loadtxt("{}/txt.{}".format(datapath[0], timelist[i])))
     fks_l.append(np.loadtxt("{}/txt.{}".format(datapath[1], timelist[i])))
 
-all_plot(
-    data=fks_c,
-    filename="{}/conv".format(path[0]),
-    trange=np.arange(21, 28, 1),
-    xrange=[0.54, 0.66],
-    yrange=[1.5, 2.5],
-)
+for irc in range(0, 10):
+    all_plot(
+        data=fks_c,
+        filename="{}/{}".format(path[0], str(irc + 1).rjust(2, "0")),
+        trange=np.arange(23, 29, 1),
+        xrange=[0.4 + irc * 0.04, 0.4 + (irc + 1) * 0.04],
+        yrange=[-2.4, -1.6],
+    )
 
-all_plot(
-    data=fks_l,
-    filename="{}/conv".format(path[1]),
-    trange=np.arange(21, 28, 1),
-    xrange=[0.54, 0.66],
-    yrange=[0.9, 1.9],
-)
+for irl in range(0, 20):
+    all_plot(
+        data=fks_l,
+        filename="{}/{}".format(path[1], str(irl + 1).rjust(2, "0")),
+        trange=np.arange(23, 29, 1),
+        xrange=[0.4 + irl * 0.04, 0.4 + (irl + 1) * 0.04],
+        yrange=[-1.7, -1.1],
+    )

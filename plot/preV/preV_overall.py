@@ -3,30 +3,30 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import scienceplots
 
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+plt.style.use(["science", "nature"])
 
-# Font setting
-font = {
-    "family": "Charter",
-    "size": 8,
-    "mathfamily": "stix",
-}
-
-plt.rcParams["font.family"] = font["family"]
-plt.rcParams["font.size"] = font["size"]
-plt.rcParams["mathtext.fontset"] = font["mathfamily"]
-
-style = {
-    "fmt": "x",
-    "markersize": 1.7,
-    "markeredgewidth": 0.3,
-    "linewidth": 0.3,
-}
+codeRoot = "/Volumes/X6/work/ccbar"
 
 
 def all_plot(data, filename, trange, xrange=None, yrange=None):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    fig, ax = plt.subplots()
+
+    errbar_plot_style = {
+        "fmt": ".",
+        "markersize": 3,
+        "markeredgewidth": 0.4,
+        "linewidth": 0.25,
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
+    }
+
+    legend_style = {
+        "loc": 4,
+        "handletextpad": 0,
+        "labelspacing": 0.3,
+    }
 
     for i in trange:
         ax.errorbar(
@@ -34,27 +34,19 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
             data[i][:, 1],
             data[i][:, 2],
             label=r"$n_t=$" + str(i).rjust(2, "0"),
-            **style
+            **errbar_plot_style
         )
 
-    ax.minorticks_on()
-    legend_default_style = {
-        "handletextpad": 0,
-        "frameon": False,
-        "fontsize": 7,
-        "labelspacing": 0.1,
-    }
-    ax.legend(loc=4, **legend_default_style)
+    ax.legend(**legend_style)
 
-    ax.set_xlabel(r"$n_r$", labelpad=-1)
+    ax.set_xlabel(r"$n_r$")
     if xrange is not None:
         ax.set(xlim=(xrange[0], xrange[1]))
 
-    ax.set_ylabel(r"$\frac{\nabla^2\phi(r)}{\phi(r)}\cdot a^2$", labelpad=-0.1)
+    ax.set_ylabel(r"$\frac{\nabla^2\phi(r)}{\phi(r)}\cdot a^2$")
     if yrange is not None:
         ax.set(ylim=(yrange[0], yrange[1]))
 
-    fig.subplots_adjust(left=0.17, right=0.97, bottom=0.13, top=0.96)
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
 
@@ -104,7 +96,7 @@ for igauge in range(2):
         all_plot(
             data=data[igauge][ichan],
             filename="{}/{}_all".format(path[igauge], channel[ichan]),
-            trange=np.arange(1, 29, 3),
-            xrange=[0, 13],
-            yrange=[-1, 0.4],
+            trange=np.append(np.array([0]), np.arange(4, 30, 5)),
+            xrange=[0, 14],
+            yrange=[-0.8, 0.5],
         )

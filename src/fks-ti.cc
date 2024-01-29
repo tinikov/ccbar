@@ -1,6 +1,6 @@
 /**
  * @file fks-ti.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief F_{KS} (time-independent version)
  * @version 1.0
  * @date 2023-10-11

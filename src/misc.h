@@ -1,6 +1,6 @@
 /**
  * @file misc.h
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief misc = miscellaneous
  *        Provides 2 functions:
  *        void add_prefix(): Add prefix to a file name;

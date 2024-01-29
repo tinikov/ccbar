@@ -3,21 +3,13 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
+import scienceplots
+
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 tsize = 64
-codeRoot = "/Users/chen/LQCD/code/ccbar"
-
-# Font setting
-font = {
-    "family": "Charter",
-    "size": 8,
-    "mathfamily": "stix",
-}
-
-plt.rcParams["font.family"] = font["family"]
-plt.rcParams["font.size"] = font["size"]
-plt.rcParams["mathtext.fontset"] = font["mathfamily"]
+codeRoot = "/Volumes/X6/work/ccbar"
 
 style = {
     "fmt": "x",

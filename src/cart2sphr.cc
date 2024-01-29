@@ -1,6 +1,6 @@
 /**
  * @file cart2sphr.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief From Cartesian coordinate to Spherical coordinate
  * @version 1.0
  * @date 2023-05-03

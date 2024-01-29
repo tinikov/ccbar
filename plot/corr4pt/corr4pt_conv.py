@@ -3,52 +3,59 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 import scienceplots
 
-plt.style.use("science")
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 tsize = 64
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+codeRoot = "/Volumes/X6/work/ccbar"
+int_c = 2.0 * np.sqrt(np.pi)
 
 
-def all_plot(data, filename, trange, xrange=None, yrange=None):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+def all_plot(data, filename, trange, xrange=None, yrange=None, tick_locator=None):
+    fig, ax = plt.subplots()
 
     errbar_plot_style = {
         "fmt": ".",
-        "markersize": 3,
-        "markeredgewidth": 0.2,
-        "linewidth": 0.2,
-        "fillstyle": "none",
+        "markersize": 4,
+        "markeredgewidth": 0.4,
+        "linewidth": 0.25,
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
     }
 
-    legend_default_style = {
+    legend_style = {
         "loc": 1,
         "handletextpad": 0,
-        "frameon": False,
-        "fontsize": 7,
         "labelspacing": 0.3,
     }
 
     for i in trange:
+        re_i = i - trange[0]
+        t_all = trange[-1] - trange[0]
         ax.errorbar(
-            data[i][:, 0] * a + 0.0004 * (i - trange[0]),
-            data[i][:, 1],
-            data[i][:, 2],
+            data[i][:, 0] * a + 0.00025 * (re_i - np.ceil(t_all / 2)),
+            data[i][:, 1] * int_c,
+            data[i][:, 2] * int_c,
             label=r"$n_t=$" + str(i).rjust(2, "0"),
             **errbar_plot_style
         )
 
-    ax.legend(**legend_default_style)
+    ax.legend(**legend_style)
 
     ax.set_xlabel(r"$r\ [{\rm fm}]$")
     if xrange is not None:
-        ax.set(xlim=(xrange[0], xrange[1]))
+        ax.set_xlim(xrange[0], xrange[1])
 
-    ax.set_ylabel(r"$C(r)$", labelpad=3)
+    ax.set_ylabel(r"$C(r)$")
     if yrange is not None:
-        ax.set(ylim=(yrange[0], yrange[1]))
+        ax.set_ylim(yrange[0], yrange[1])
+    if tick_locator is not None:
+        ax.yaxis.set_major_locator(tick_locator)
+
+    ax.ticklabel_format(style="sci", scilimits=(-1, 2), axis="y")
 
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()
@@ -77,16 +84,16 @@ for i in range(32):
 channel = ["ps", "v"]
 
 # Read data
-nn_ps_c, nn_v_c, nn_ps_l, nn_v_l = [[] for _ in range(4)]
+l2_ps_c, l2_v_c, l2_ps_l, l2_v_l = [[] for _ in range(4)]
 
-data = [[nn_ps_c, nn_v_c], [nn_ps_l, nn_v_l]]
+data = [[l2_ps_c, l2_v_c], [l2_ps_l, l2_v_l]]
 
 for igauge in range(2):
     for ichan in range(2):
         for i in range(32):
             data[igauge][ichan].append(
                 np.loadtxt(
-                    "{}/{}/txt.nn.{}".format(
+                    "{}/{}/txt.l2.{}".format(
                         datapath[igauge],
                         channel[ichan],
                         timelist[i],
@@ -95,16 +102,20 @@ for igauge in range(2):
             )
 
 # PLOT
-xrange_all = [[[1.0, 1.1], [0.9, 1.0]], [[1.2, 1.3], [1.1, 1.2]]]
-yrange_all = [[[0.001, 0.006], [0.006, 0.024]], [[0.002, 0.012], [0.017, 0.045]]]
+xrange_all = [[[1.024, 1.052], [1.024, 1.052]], [[1.024, 1.052], [1.024, 1.052]]]
+yrange_all = [
+    [[0.00125, 0.0024], [0.0019, 0.004]],
+    [[0.004, 0.007], [0.0066, 0.013]],
+]
+tick_locator = [None, ticker.MultipleLocator(0.0004), None, None]
 
 for igauge in range(2):
     for ichan in range(2):
-        for itype in range(3):
-            all_plot(
-                data=data[igauge][ichan],
-                filename="{}/{}_conv".format(path[igauge], channel[ichan]),
-                trange=np.arange(24, 30, 1),
-                xrange=xrange_all[igauge][ichan],
-                yrange=yrange_all[igauge][ichan],
-            )
+        all_plot(
+            data=data[igauge][ichan],
+            filename="{}/{}_conv".format(path[igauge], channel[ichan]),
+            trange=np.arange(24, 30, 1),
+            xrange=xrange_all[igauge][ichan],
+            yrange=yrange_all[igauge][ichan],
+            tick_locator=tick_locator[igauge + ichan],
+        )

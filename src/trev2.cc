@@ -1,6 +1,6 @@
 /**
  * @file trev2.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief Time reversal for 2-point correlators
  * @version 1.0
  * @date 2023-05-03

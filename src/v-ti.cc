@@ -1,9 +1,9 @@
 /**
- * @file v-td.cc
- * @author Tianchen Zhang 
- * @brief Vcc and Vspin (time-dependent version)
+ * @file v-ti.cc
+ * @author Tianchen Zhang
+ * @brief Central potential (time-independent version)
  * @version 1.0
- * @date 2023-05-03
+ * @date 2023-10-11
  *
  */
 
@@ -17,17 +17,19 @@
 //     |________________________|
 
 void usage(char *name) {
-  fprintf(stderr, "F_{KS} (time-dependent version)\n");
+  fprintf(stderr, "Central potential (time-independent version)\n");
   fprintf(stderr,
           "USAGE: \n"
-          "    %s [OPTIONS] CV(t-1) CV(t+1) CPS(t-1) CPS(t+1) ppotV ppotPS\n",
+          "    %s [OPTIONS] ppotV ppotPS\n",
           name);
   fprintf(stderr,
           "OPTIONS: \n"
           "    -l <LENGTH>:       Array length\n"
-          "    -mc <MASS>:        Kinetic mass of charm quark\n"
-          "    -oc <OFDIR>:       ofname of Vcc\n"
-          "    -os <OFDIR>:       ofname of Vspin\n"
+          "    -mbar <MBAR>:      1/4(3M_V + M_PS) (LUnit)\n"
+          "    -mdiff <MDIFF>:    (M_V - M_PS) (LUnit)\n"
+          "    -mc <MC>:          charm quark mass (LUnit)\n"
+          "    -ov0 <OFNAMEV0>:   ofname of v0\n"
+          "    -ovs <OFNAMEVS>:   ofname of vs\n"
           "    [-h, --help]:      Print help\n");
 }
 // __________________________________
@@ -37,9 +39,11 @@ void usage(char *name) {
 //     |________________________|
 
 int array_length = 0;
-DOUBLE mc = 0.0;
-static const char *vcc_name = NULL;
-static const char *vspin_name = NULL;
+DOUBLE mbar = 0;
+DOUBLE mdiff = 0;
+DOUBLE mc = 0;
+static const char *of_name_v0 = NULL;
+static const char *of_name_vs = NULL;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -57,8 +61,7 @@ int main(int argc, char *argv[]) {
   //    |  Dealing with Options  |
   //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+  while (argc > 0 && argv[0][0] == '-')  // read options (order irrelevant)
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
@@ -78,10 +81,34 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    // -mbar
+    if (strcmp(argv[0], "-mbar") == 0) {
+      mbar = atof(argv[1]);  // atof(): convert ASCII string to float
+      if (mbar == 0) {
+        usage(program_name);
+        exit(1);
+      }
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
+    // -mdiff
+    if (strcmp(argv[0], "-mdiff") == 0) {
+      mdiff = atof(argv[1]);  // atof(): convert ASCII string to float
+      if (mdiff == 0) {
+        usage(program_name);
+        exit(1);
+      }
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
     // -mc: charm quark mass
     if (strcmp(argv[0], "-mc") == 0) {
-      mc = atof(argv[1]);
-      if (!mc) {
+      mc = atof(argv[1]);  // atof(): convert ASCII string to float
+      if (mc == 0) {
         usage(program_name);
         exit(1);
       }
@@ -90,10 +117,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -oc: ofname of Vcc
-    if (strcmp(argv[0], "-oc") == 0) {
-      vcc_name = argv[1];
-      if (vcc_name == NULL) {
+    // -ov0: of_name_v0
+    if (strcmp(argv[0], "-ov0") == 0) {
+      of_name_v0 = argv[1];
+      if (of_name_v0 == NULL) {
         usage(program_name);
         exit(1);
       }
@@ -102,10 +129,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -os: ofname of Vspin
-    if (strcmp(argv[0], "-os") == 0) {
-      vspin_name = argv[1];
-      if (vspin_name == NULL) {
+    // -ovs: of_name_vs
+    if (strcmp(argv[0], "-ovs") == 0) {
+      of_name_vs = argv[1];
+      if (of_name_vs == NULL) {
         usage(program_name);
         exit(1);
       }
@@ -120,32 +147,27 @@ int main(int argc, char *argv[]) {
   }
 
   // Make sure of all needed syntax
-  if (argc != 6) {
+  if (argc != 2) {
     usage(program_name);
     exit(1);
   }
 
   // Initialization
-  fprintf(stderr, "##  F_{KS} (time-dependent)! \n");
+  fprintf(stderr, "##  Central potential (time-independent)! \n");
   fprintf(stderr, "##  Array length:        %d\n", array_length);
 
-  CVARRAY cv_m(array_length), cv_p(array_length), cps_m(array_length),
-      cps_p(array_length), ppotv(array_length), ppotps(array_length),
-      ddt(array_length), fks(array_length);
-  cv_m = cv_p = cps_m = cps_p = ppotv = ppotps = ddt = fks = 0.0;
+  CVARRAY ppotv(array_length), ppotps(array_length), v0(array_length),
+      vs(array_length);
+  ppotv = ppotps = v0 = vs = 0.0;
 
-  read_bin(argv[0], array_length, cv_m);
-  read_bin(argv[1], array_length, cv_p);
-  read_bin(argv[2], array_length, cps_m);
-  read_bin(argv[3], array_length, cps_p);
-  read_bin(argv[4], array_length, ppotv);
-  read_bin(argv[5], array_length, ppotps);
+  read_bin(argv[0], array_length, ppotv);
+  read_bin(argv[1], array_length, ppotps);
 
-  ddt = (log(cv_p / cps_p) - log(cv_m / cps_m)) / 2.0;
-  fks = (ppotv - ppotps) / ddt;
+  v0 = 1 / (4.0 * mc) * (3 * ppotv + ppotps) + 1 / 4.0 * mbar - 2.0 * mc;
+  vs = 1 / mc * (ppotv - ppotps) + mdiff;
 
-  write_bin(vspin_name, array_length, ddt);
-  write_bin(vcc_name, array_length, fks);
+  write_bin(of_name_v0, array_length, v0);
+  write_bin(of_name_vs, array_length, vs);
 
   return 0;
 }

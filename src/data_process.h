@@ -1,6 +1,6 @@
 /**
  * @file data_process.h
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief Dealing with data (binary and txt files).
  *        Provide 5 functions:
  *        void read_bin(): Read data from binary file;

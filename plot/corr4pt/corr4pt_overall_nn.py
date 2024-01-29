@@ -5,30 +5,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scienceplots
 
-plt.style.use("science")
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 tsize = 64
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+codeRoot = "/Volumes/X6/work/ccbar"
 
 
 def all_plot(data, filename, trange, xrange=None, yrange=None):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    fig, ax = plt.subplots()
 
     errbar_plot_style = {
         "fmt": ".",
         "markersize": 3,
-        "markeredgewidth": 0.2,
-        "linewidth": 0.2,
-        "fillstyle": "none",
+        "markeredgewidth": 0.4,
+        "linewidth": 0.25,
+        "markerfacecolor": "white",
+        # "fillstyle": "none",
     }
 
-    legend_default_style = {
+    legend_style = {
         "loc": 2,
         "bbox_to_anchor": (0.95, 1.02),
         "handletextpad": 0,
-        "frameon": False,
-        "fontsize": 7,
         "labelspacing": 0.3,
     }
 
@@ -41,16 +40,16 @@ def all_plot(data, filename, trange, xrange=None, yrange=None):
             **errbar_plot_style
         )
 
+    ax.legend(**legend_style)
+
     ax.set_xlabel(r"$r\ [{\rm fm}]$")
     if xrange is not None:
-        ax.set(xlim=(xrange[0], xrange[1]))
+        ax.set_xlim(xrange[0], xrange[1])
 
     ax.set_ylabel(r"$C(r)$")
 
     if yrange is not None:
-        ax.set(ylim=(yrange[0], yrange[1]))
-
-    ax.legend(**legend_default_style)
+        ax.set_ylim(yrange[0], yrange[1])
 
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()

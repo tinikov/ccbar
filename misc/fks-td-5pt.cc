@@ -1,6 +1,6 @@
 /**
  * @file fks-td.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief F_{KS} (time-dependent version) (5-point stencil)
  * @version 1.0
  * @date 2023-05-03

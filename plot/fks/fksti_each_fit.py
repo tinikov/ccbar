@@ -8,7 +8,7 @@ from iminuit.cost import LeastSquares
 
 a = 0.090713
 a_invrs = 2.1753
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+codeRoot = "/Volumes/X6/work/ccbar"
 
 tmin = 10
 tmax = 28

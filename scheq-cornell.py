@@ -11,8 +11,8 @@ from scipy.integrate import odeint
 n = 32
 array_length = int(n**3)
 rmin = 3
-rmax = 12
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+rmax = 14
+codeRoot = "/Volumes/X6/work/ccbar"
 
 
 # Define Cornell potential
@@ -28,7 +28,7 @@ para = {
 
 # Make data
 rawdata = np.loadtxt(
-    "{}/result/c4pt/preV/ps/txt.28".format(codeRoot), dtype=np.float64
+    "{}/result/c4pt/preV/ps/txt.29".format(codeRoot), dtype=np.float64
 )[0:array_length]
 
 mask = (rawdata[:, 0] > rmin) & (rawdata[:, 0] < rmax)
@@ -62,10 +62,8 @@ def cornell(y, r, E, A, sigma, V0):
     return dydt
 
 
-# E = 0.20360773 # T channel (4, 12)
-# E = 0.2036561  # T channel (3, 12)
-E = 0.20367876  # T channel (3, 12)
-# E = 0.203678760913  # T channel (3, 12)
+E = 0.20336045  # T channel (3, 12)
+print(E / 0.2364 * 2.1753)
 rinit = 1e-10
 y0 = [rinit * 2, rinit**2]
 r = np.linspace(rinit, 32, int(1e6))

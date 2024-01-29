@@ -1,6 +1,6 @@
 /**
  * @file data_process.cc
- * @author TC (reeft137@gmail.com)
+ * @author Tianchen Zhang 
  * @brief
  * @version 1.0
  * @date 2023-05-03

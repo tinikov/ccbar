@@ -3,15 +3,18 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import scienceplots
 from iminuit import Minuit
 from iminuit.cost import LeastSquares
 
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+plt.style.use(["science", "nature"])
+
+codeRoot = "/Volumes/X6/work/ccbar"
 
 rmin = 3
 rmax = 12
 
-t = 28
+t = 29
 t = str(t).rjust(2, "0")
 
 # Gauge
@@ -63,16 +66,26 @@ m = Minuit(least_squares, **para)  # type: ignore
 m.migrad()
 
 # Draw
-style = {
-    "fmt": "x",
-    "markersize": 1.7,
-    "markeredgewidth": 0.3,
-    "linewidth": 0.3,
+fig, ax = plt.subplots()
+
+errbar_plot_style = {
+    "fmt": ".",
+    "markersize": 3,
+    "markeredgewidth": 0.4,
+    "linewidth": 0.25,
+    "markerfacecolor": "white",
+    # "fillstyle": "none",
 }
 
-fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+legend_style = {
+    "loc": 4,
+    "handletextpad": 0,
+    "labelspacing": 0.3,
+}
 
-ax.errorbar(rawdata[:, 0], rawdata[:, 1], rawdata[:, 2], label="data", **style)
+ax.errorbar(
+    rawdata[:, 0], rawdata[:, 1], rawdata[:, 2], label="data", **errbar_plot_style
+)
 x_fit = np.arange(0.01, 28, 0.01)
 ax.plot(
     x_fit,
@@ -81,21 +94,13 @@ ax.plot(
     label="fit",
 )
 
-ax.minorticks_on()
-legend_default_style = {
-    # "handletextpad": 0,
-    "frameon": False,
-    "fontsize": 7,
-    "labelspacing": 0.1,
-}
-ax.legend(loc=4, **legend_default_style)
+ax.legend(**legend_style)
 
-ax.set_xlabel(r"$n_r$", labelpad=-1)
-ax.set(xlim=(0, 13))
+ax.set_xlabel(r"$n_r$")
+ax.set_xlim(0, 13)
 
-ax.set_ylabel(r"$\frac{\nabla^2\phi(r)}{\phi(r)}\cdot a^2$", labelpad=-0.1)
-ax.set(ylim=(-1, 0.4))
+ax.set_ylabel(r"$\frac{\nabla^2\phi(r)}{\phi(r)}\cdot a^2$")
+ax.set_ylim(-1, 0.4)
 
-fig.subplots_adjust(left=0.17, right=0.97, bottom=0.13, top=0.96)
 fig.savefig("{}/ps_fit{}.png".format(path, t), dpi=600)
 plt.close()

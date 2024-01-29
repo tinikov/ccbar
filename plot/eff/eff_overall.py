@@ -6,11 +6,11 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 import scienceplots
 
-plt.style.use("science")
+plt.style.use(["science", "nature"])
 
 tsize = 64
 cutoff = 2.1753
-codeRoot = "/Users/chen/LQCD/code/ccbar"
+codeRoot = "/Volumes/X6/work/ccbar"
 
 
 def all_plot(
@@ -22,20 +22,19 @@ def all_plot(
     xrange=None,
     yrange=None,
 ):
-    fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+    fig, ax = plt.subplots()
 
     errbar_plot_style = {
         "markersize": 3.5,
         "markeredgewidth": 0.4,
-        "linewidth": 0.3,
+        "linewidth": 0.25,
         "fillstyle": "none",
     }
 
-    legend_default_style = {
+    legend_style = {
         "loc": "best",
-        "handletextpad": 0,
-        "fontsize": 7,
-        "labelspacing": 0.4,
+        "handletextpad": 0.5,
+        "labelspacing": 0.3,
     }
 
     all_markers = ["o", "h", "v", "H", "p", "s", "^", "<", ">"]
@@ -51,16 +50,16 @@ def all_plot(
             fmt=all_markers[i]
         )
 
-    ax.legend(**legend_default_style)
+    ax.legend(**legend_style)
 
     ax.set_xlabel(r"$n_t$")
     ax.xaxis.set_major_locator(ticker.MultipleLocator(8))
     if xrange is not None:
-        ax.set(xlim=(xrange[0], xrange[1]))
+        ax.set_xlim(xrange[0], xrange[1])
 
-    ax.set_ylabel(r"$m_{\rm eff}\ [{\rm GeV}$]", labelpad=3)
+    ax.set_ylabel(r"$m_{\rm eff}\ [{\rm GeV}]$")
     if yrange is not None:
-        ax.set(ylim=(yrange[0], yrange[1]))
+        ax.set_ylim(yrange[0], yrange[1])
 
     fig.savefig("{}.png".format(filename), dpi=600)
     plt.close()

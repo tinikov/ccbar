@@ -32,15 +32,15 @@
 *.app
 
 # Custom
+/.draft
+/plot/.draft
+
 /data
 /fig
-/fig.bak
 /result
-/blog
 /bin
-/book-doc
 /book-static
-/.draft
-/plot/plot.code-workspace
-/plot/.vscode
-/plot/.draft
+*.code-workspace
+.DS_Store
+*/.DS_Store
+/ref

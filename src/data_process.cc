@@ -13,7 +13,7 @@
 
 #include "type_alias.h"
 
-void read_bin(const char *if_name, int array_length, DOUBLE *data) {
+void readBin(const char *if_name, int array_length, DOUBLE *data) {
   FILE *fp = fopen(if_name, "rb");
   if (fp == NULL) {
     perror(if_name);
@@ -23,7 +23,7 @@ void read_bin(const char *if_name, int array_length, DOUBLE *data) {
   fread(data, sizeof(DOUBLE), array_length, fp);
   fclose(fp);
 }
-void read_bin(const char *if_name, int array_length, COMPLX *data) {
+void readBin(const char *if_name, int array_length, COMPLX *data) {
   FILE *fp = fopen(if_name, "rb");
   if (fp == NULL) {
     perror(if_name);
@@ -33,7 +33,7 @@ void read_bin(const char *if_name, int array_length, COMPLX *data) {
   fread(data, sizeof(COMPLX), array_length, fp);
   fclose(fp);
 }
-void read_bin(const char *if_name, int array_length, DVARRAY &data) {
+void readBin(const char *if_name, int array_length, DVARRAY &data) {
   FILE *fp = fopen(if_name, "rb");
   if (fp == NULL) {
     perror(if_name);
@@ -43,7 +43,7 @@ void read_bin(const char *if_name, int array_length, DVARRAY &data) {
   fread(&data[0], sizeof(DOUBLE), array_length, fp);
   fclose(fp);
 }
-void read_bin(const char *if_name, int array_length, CVARRAY &data) {
+void readBin(const char *if_name, int array_length, CVARRAY &data) {
   FILE *fp = fopen(if_name, "rb");
   if (fp == NULL) {
     perror(if_name);
@@ -54,7 +54,7 @@ void read_bin(const char *if_name, int array_length, CVARRAY &data) {
   fclose(fp);
 }
 
-void write_bin(const char *of_name, int array_length, const DOUBLE *data) {
+void writeBin(const char *of_name, int array_length, const DOUBLE *data) {
   FILE *fp = fopen(of_name, "wb");
   if (fp == NULL) {
     perror(of_name);
@@ -64,7 +64,7 @@ void write_bin(const char *of_name, int array_length, const DOUBLE *data) {
   fwrite(data, sizeof(DOUBLE), array_length, fp);
   fclose(fp);
 }
-void write_bin(const char *of_name, int array_length, const COMPLX *data) {
+void writeBin(const char *of_name, int array_length, const COMPLX *data) {
   FILE *fp = fopen(of_name, "wb");
   if (fp == NULL) {
     perror(of_name);
@@ -74,7 +74,7 @@ void write_bin(const char *of_name, int array_length, const COMPLX *data) {
   fwrite(data, sizeof(COMPLX), array_length, fp);
   fclose(fp);
 }
-void write_bin(const char *of_name, int array_length, const DVARRAY &data) {
+void writeBin(const char *of_name, int array_length, const DVARRAY &data) {
   FILE *fp = fopen(of_name, "wb");
   if (fp == NULL) {
     perror(of_name);
@@ -84,7 +84,7 @@ void write_bin(const char *of_name, int array_length, const DVARRAY &data) {
   fwrite(&data[0], sizeof(DOUBLE), array_length, fp);
   fclose(fp);
 }
-void write_bin(const char *of_name, int array_length, const CVARRAY &data) {
+void writeBin(const char *of_name, int array_length, const CVARRAY &data) {
   FILE *fp = fopen(of_name, "wb");
   if (fp == NULL) {
     perror(of_name);

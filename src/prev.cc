@@ -128,13 +128,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, of_dir, prev_dlist[i]);
+      addPrefix(argv[i], of_prefix, stmp);
+      changePath(stmp, of_dir, prev_dlist[i]);
     }
   } else {
     for (int i = 0; i < N_df; i++) {
       prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], of_dir, prev_dlist[i]);
+      changePath(argv[i], of_dir, prev_dlist[i]);
     }
   }
 
@@ -164,7 +164,7 @@ void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df) {
       tmp[j] = result[j] = 0.0;
     }
 
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     for (int ix = 0; ix < n_xyz; ix++)
       for (int iy = 0; iy < n_xyz; iy++)
@@ -180,6 +180,6 @@ void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df) {
               CORR(tmp, ix, iy, iz, n_xyz);
         }
 
-    write_bin(ppotlist[i], array_length, result);
+    writeBin(ppotlist[i], array_length, result);
   }
 }

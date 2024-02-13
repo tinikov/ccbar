@@ -3,12 +3,12 @@
  * @author Tianchen Zhang 
  * @brief Dealing with data (binary and txt files).
  *        Provide 5 functions:
- *        void read_bin(): Read data from binary file;
- *        void write_bin(): Write data to binary file;
+ *        void readBin(): Read data from binary file;
+ *        void writeBin(): Write data to binary file;
  *        void bin2txt(): Convert binary file to txt file;
  *        void keep_real(): Keep the real part of the data;
  *        void keep_imag(): Keep the imaginary part of the data.
- * @version 1.0
+ * @version 1.1
  * @date 2023-05-03
  *
  */
@@ -25,10 +25,10 @@
  * @param array_length Total of double/complex numbers
  * @param data The pointer of the array that contains the data read
  */
-void read_bin(const char *if_name, int array_length, DOUBLE *data);
-void read_bin(const char *if_name, int array_length, COMPLX *data);
-void read_bin(const char *if_name, int array_length, DVARRAY &data);
-void read_bin(const char *if_name, int array_length, CVARRAY &data);
+void readBin(const char *if_name, int array_length, DOUBLE *data);
+void readBin(const char *if_name, int array_length, COMPLX *data);
+void readBin(const char *if_name, int array_length, DVARRAY &data);
+void readBin(const char *if_name, int array_length, CVARRAY &data);
 
 /**
  * @brief Write to binary file
@@ -38,10 +38,10 @@ void read_bin(const char *if_name, int array_length, CVARRAY &data);
  * @param data The pointer of the array that contains the data to be written to
  * file
  */
-void write_bin(const char *of_name, int array_length, const DOUBLE *data);
-void write_bin(const char *of_name, int array_length, const COMPLX *data);
-void write_bin(const char *of_name, int array_length, const DVARRAY &data);
-void write_bin(const char *of_name, int array_length, const CVARRAY &data);
+void writeBin(const char *of_name, int array_length, const DOUBLE *data);
+void writeBin(const char *of_name, int array_length, const COMPLX *data);
+void writeBin(const char *of_name, int array_length, const DVARRAY &data);
+void writeBin(const char *of_name, int array_length, const CVARRAY &data);
 
 /**
  * @brief Convert binary file to txt file (only for complex (2-lined) data)

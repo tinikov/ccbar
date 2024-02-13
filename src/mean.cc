@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
 
   if (is_save_txt) {
     char txtfname[2048];
-    add_prefix(of_name, "txt", txtfname);
+    addPrefix(of_name, "txt", txtfname);
     bin2txt(of_name, txtfname, array_length);
   }
 
@@ -185,7 +185,7 @@ void jackknife_mean(char *rawdlist[], const char *result, int array_length,
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
@@ -198,7 +198,7 @@ void jackknife_mean(char *rawdlist[], const char *result, int array_length,
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
@@ -218,7 +218,7 @@ void jackknife_mean(char *rawdlist[], const char *result, int array_length,
     out[i].imag(var[i]);
   }
 
-  write_bin(result, array_length, out);
+  writeBin(result, array_length, out);
 }
 
 void jackknife_mean_double(char *rawdlist[], const char *result,
@@ -229,7 +229,7 @@ void jackknife_mean_double(char *rawdlist[], const char *result,
   for (int i = 0; i < N_df; i++) {
     DVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     mean += tmp / DOUBLE(N_df);
   }
@@ -237,7 +237,7 @@ void jackknife_mean_double(char *rawdlist[], const char *result,
   for (int i = 0; i < N_df; i++) {
     DVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     var += (tmp - mean) * (tmp - mean);
   }
@@ -252,7 +252,7 @@ void jackknife_mean_double(char *rawdlist[], const char *result,
     out[i].imag(var[i]);
   }
 
-  write_bin(result, array_length, out);
+  writeBin(result, array_length, out);
 }
 
 void arithmetic_mean(char *rawdlist[], const char *result, int array_length,
@@ -263,10 +263,10 @@ void arithmetic_mean(char *rawdlist[], const char *result, int array_length,
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     mean += tmp / COMPLX(N_df, 0.0);
   }
 
-  write_bin(result, array_length, mean);
+  writeBin(result, array_length, mean);
 }

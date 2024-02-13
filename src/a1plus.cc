@@ -128,13 +128,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, of_dir, a1_dlist[i]);
+      addPrefix(argv[i], of_prefix, stmp);
+      changePath(stmp, of_dir, a1_dlist[i]);
     }
   } else {
     for (int i = 0; i < N_df; i++) {
       a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], of_dir, a1_dlist[i]);
+      changePath(argv[i], of_dir, a1_dlist[i]);
     }
   }
 
@@ -183,7 +183,7 @@ void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int N_df) {
       tmp[j] = result[j] = 0.0;
     }
 
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     for (int ix = 0; ix < n_xyz; ix++)
       for (int iy = 0; iy < n_xyz; iy++)
@@ -191,6 +191,6 @@ void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int N_df) {
           CORR(result, ix, iy, iz, n_xyz) = a1_sym(tmp, ix, iy, iz, n_xyz);
         }
 
-    write_bin(a1list[i], array_length, result);
+    writeBin(a1list[i], array_length, result);
   }
 }

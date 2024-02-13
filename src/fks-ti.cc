@@ -118,12 +118,12 @@ int main(int argc, char *argv[]) {
   CVARRAY ppotv(array_length), ppotps(array_length), fks(array_length);
   ppotv = ppotps = fks = 0.0;
 
-  read_bin(argv[0], array_length, ppotv);
-  read_bin(argv[1], array_length, ppotps);
+  readBin(argv[0], array_length, ppotv);
+  readBin(argv[1], array_length, ppotps);
 
   fks = - (ppotv - ppotps) / mdiff;
 
-  write_bin(of_name, array_length, fks);
+  writeBin(of_name, array_length, fks);
 
   return 0;
 }

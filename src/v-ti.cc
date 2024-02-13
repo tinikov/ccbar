@@ -160,14 +160,14 @@ int main(int argc, char *argv[]) {
       vs(array_length);
   ppotv = ppotps = v0 = vs = 0.0;
 
-  read_bin(argv[0], array_length, ppotv);
-  read_bin(argv[1], array_length, ppotps);
+  readBin(argv[0], array_length, ppotv);
+  readBin(argv[1], array_length, ppotps);
 
   v0 = 1 / (4.0 * mc) * (3 * ppotv + ppotps) + 1 / 4.0 * mbar - 2.0 * mc;
   vs = 1 / mc * (ppotv - ppotps) + mdiff;
 
-  write_bin(of_name_v0, array_length, v0);
-  write_bin(of_name_vs, array_length, vs);
+  writeBin(of_name_v0, array_length, v0);
+  writeBin(of_name_vs, array_length, vs);
 
   return 0;
 }

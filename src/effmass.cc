@@ -127,12 +127,12 @@ int main(int argc, char *argv[]) {
     char stmp[2048];
 
     exp_dlist[i] = (char *)malloc(2048 * sizeof(char));
-    add_prefix(argv[i], "exp", stmp);
-    change_path(stmp, of_dir, exp_dlist[i]);
+    addPrefix(argv[i], "exp", stmp);
+    changePath(stmp, of_dir, exp_dlist[i]);
 
     csh_dlist[i] = (char *)malloc(2048 * sizeof(char));
-    add_prefix(argv[i], "csh", stmp);
-    change_path(stmp, of_dir, csh_dlist[i]);
+    addPrefix(argv[i], "csh", stmp);
+    changePath(stmp, of_dir, csh_dlist[i]);
   }
 
   // Main part for calculation
@@ -143,10 +143,10 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_df; i++) {
       char txttmp[2048];
 
-      add_prefix(exp_dlist[i], "txt", txttmp);
+      addPrefix(exp_dlist[i], "txt", txttmp);
       bin2txt(exp_dlist[i], txttmp, n_t);
 
-      add_prefix(csh_dlist[i], "txt", txttmp);
+      addPrefix(csh_dlist[i], "txt", txttmp);
       bin2txt(csh_dlist[i], txttmp, n_t);
     }
   }
@@ -172,13 +172,13 @@ void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    read_bin(rawdlist[i], n_t, raw);
+    readBin(rawdlist[i], n_t, raw);
 
     for (int j = 0; j < n_t; j++) {
       effmass[j].real(log(raw[j].real() / raw[(j + 1) % n_t].real()));
     }
 
-    write_bin(explist[i], n_t, effmass);
+    writeBin(explist[i], n_t, effmass);
   }
 }
 
@@ -216,7 +216,7 @@ void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    read_bin(rawdlist[i], n_t, raw);
+    readBin(rawdlist[i], n_t, raw);
 
     for (int j = 0; j < n_t; j++) {
       int t1 = j;
@@ -225,6 +225,6 @@ void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df) {
           coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), n_t));
     }
 
-    write_bin(cshlist[i], n_t, effmass);
+    writeBin(cshlist[i], n_t, effmass);
   }
 }

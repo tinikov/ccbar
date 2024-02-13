@@ -4,9 +4,9 @@
  * @brief misc = miscellaneous
  *        Provides 2 functions:
  *        void add_prefix(): Add prefix to a file name;
- *        void change_path(): Change the directory part for a file name.
- * @version 1.0
- * @date 2023-05-03
+ *        void change_path(): Change the directory part for a file path.
+ * @version 1.1
+ * @date 2024-02-01
  *
  */
 
@@ -19,21 +19,21 @@
 #include <string.h>
 
 /**
- * @brief Add prefix to a file name (preserving the original path)
+ * @brief Add prefix to a file (preserving the original path)
  *
- * @param raw_name The original file name: "dir/FILENAME"
- * @param prefix The prefix to be added: "PREFIX"
- * @param new_name The desired file name: "dir/PREFIX.FILENAME"
+ * @param origPath The original path: "dir/filename"
+ * @param prefix The prefix to be added: "prefix"
+ * @param newPath The desired file name: "dir/prefix.filename"
  */
-void add_prefix(const char *raw_name, const char *prefix, char *new_name);
+void addPrefix(const char *origPath, const char *prefix, char *newPath);
 
 /**
  * @brief Change the directory part for a file name
  *
- * @param raw_name The original file name: "dir/FILENAME"
- * @param new_dir Target directory: "newdir"
- * @param new_name The character string generated: "newdir/FILENAME"
+ * @param origPath The original path: "dir/filename"
+ * @param tarDir Target directory: "tarDir"
+ * @param newPath The character string generated: "tarDir/filename"
  */
-void change_path(const char *raw_name, const char *new_dir, char *new_name);
+void changePath(const char *origPath, const char *tarDir, char *newPath);
 
 #endif

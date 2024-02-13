@@ -150,13 +150,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, ofdir, jre_dlist[i]);
+      addPrefix(argv[i], of_prefix, stmp);
+      changePath(stmp, ofdir, jre_dlist[i]);
     }
   } else {
     for (int i = 0; i < N_df; i++) {
       jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], ofdir, jre_dlist[i]);
+      changePath(argv[i], ofdir, jre_dlist[i]);
     }
   }
 
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
   if (is_save_txt) {
     for (int i = 0; i < N_df; i++) {
       char txttmp[2048];
-      add_prefix(jre_dlist[i], "txt", txttmp);
+      addPrefix(jre_dlist[i], "txt", txttmp);
       bin2txt(jre_dlist[i], txttmp, array_length);
     }
   }
@@ -197,7 +197,7 @@ void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     sum += tmp;
   }
@@ -206,11 +206,11 @@ void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     value = (sum - tmp) / (N_df - 1.0);
 
-    write_bin(samdlist[i], array_length, value);
+    writeBin(samdlist[i], array_length, value);
   }
 }
 
@@ -224,7 +224,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
@@ -241,7 +241,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
   for (int i = 0; i < N_df; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
@@ -263,6 +263,6 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
       result[j].imag(var[j]);
     }
 
-    write_bin(samdlist[i], array_length, result);
+    writeBin(samdlist[i], array_length, result);
   }
 }

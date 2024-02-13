@@ -113,14 +113,14 @@ int main(int argc, char *argv[]) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
 
-    read_bin(argv[i], array_length, tmp);
+    readBin(argv[i], array_length, tmp);
     data.push_back(tmp);
   }
 
   ddt = (log(data[1] / data[3]) - log(data[0] / data[2])) / 2.0;
   fks = (data[4] - data[5]) / ddt;
 
-  write_bin(of_name, array_length, fks);
+  writeBin(of_name, array_length, fks);
 
   return 0;
 }

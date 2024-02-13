@@ -129,13 +129,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, of_dir, sphr_dlist[i]);
+      addPrefix(argv[i], of_prefix, stmp);
+      changePath(stmp, of_dir, sphr_dlist[i]);
     }
   } else {
     for (int i = 0; i < N_df; i++) {
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], of_dir, sphr_dlist[i]);
+      changePath(argv[i], of_dir, sphr_dlist[i]);
     }
   }
 
@@ -165,7 +165,7 @@ void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
     {
       tmp[j] = 0.0;
     }
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     FILE *fp = fopen(sphrdlist[i], "w");
     if (fp == NULL) {

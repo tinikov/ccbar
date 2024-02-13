@@ -118,10 +118,10 @@ int main(int argc, char *argv[]) {
     nn_dlist[i] = (char *)malloc(2048 * sizeof(char));
     l2_dlist[i] = (char *)malloc(2048 * sizeof(char));
 
-    add_prefix(argv[i], "nn", nn_stmp);
-    change_path(nn_stmp, of_dir, nn_dlist[i]);
-    add_prefix(argv[i], "l2", l2_stmp);
-    change_path(l2_stmp, of_dir, l2_dlist[i]);
+    addPrefix(argv[i], "nn", nn_stmp);
+    changePath(nn_stmp, of_dir, nn_dlist[i]);
+    addPrefix(argv[i], "l2", l2_stmp);
+    changePath(l2_stmp, of_dir, l2_dlist[i]);
   }
 
   // Main part for calculation
@@ -153,14 +153,14 @@ void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int N_df) {
       tmp[j] = result[j] = 0.0;
     }
 
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     for (int j = 0; j < array_length; j++)  // Compute C_n(t) = C(t)/C(0)
     {
       result[j] = tmp[j] / tmp[0];
     }
 
-    write_bin(nnlist[i], array_length, result);
+    writeBin(nnlist[i], array_length, result);
   }
 }
 
@@ -176,7 +176,7 @@ void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df) {
       tmp[j] = result[j] = 0.0;
     }
 
-    read_bin(rawdlist[i], array_length, tmp);
+    readBin(rawdlist[i], array_length, tmp);
 
     for (int j = 0; j < array_length; j++) {
       norm_fact += norm(tmp[j]);
@@ -189,6 +189,6 @@ void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df) {
       result[j] = tmp[j] / norm_fact;
     }
 
-    write_bin(l2list[i], array_length, result);
+    writeBin(l2list[i], array_length, result);
   }
 }

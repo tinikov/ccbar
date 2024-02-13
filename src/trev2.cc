@@ -137,13 +137,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < N_df; i++) {
       char stmp[2048];
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      add_prefix(argv[i], of_prefix, stmp);
-      change_path(stmp, of_dir, tr_dlist[i]);
+      addPrefix(argv[i], of_prefix, stmp);
+      changePath(stmp, of_dir, tr_dlist[i]);
     }
   } else {
     for (int i = 0; i < N_df; i++) {
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      change_path(argv[i], of_dir, tr_dlist[i]);
+      changePath(argv[i], of_dir, tr_dlist[i]);
     }
   }
 
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
   if (is_save_txt) {
     for (int i = 0; i < N_df; i++) {
       char txttmp[2048];
-      add_prefix(tr_dlist[i], "txt", txttmp);
+      addPrefix(tr_dlist[i], "txt", txttmp);
       bin2txt(tr_dlist[i], txttmp, n_t);
     }
   }
@@ -176,11 +176,11 @@ void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df) {
     COMPLX raw[n_t], data[n_t];
     for (int j = 0; j < n_t; j++) raw[j] = data[j] = 0.0;
 
-    read_bin(rawdlist[i], n_t, raw);
+    readBin(rawdlist[i], n_t, raw);
 
     for (int j = 0; j < n_t; j++)
       data[j] = (raw[j] + raw[(n_t - j) % n_t]) * 0.5;
 
-    write_bin(trdlist[i], n_t, data);
+    writeBin(trdlist[i], n_t, data);
   }
 }

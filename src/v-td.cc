@@ -134,18 +134,18 @@ int main(int argc, char *argv[]) {
       ddt(array_length), fks(array_length);
   cv_m = cv_p = cps_m = cps_p = ppotv = ppotps = ddt = fks = 0.0;
 
-  read_bin(argv[0], array_length, cv_m);
-  read_bin(argv[1], array_length, cv_p);
-  read_bin(argv[2], array_length, cps_m);
-  read_bin(argv[3], array_length, cps_p);
-  read_bin(argv[4], array_length, ppotv);
-  read_bin(argv[5], array_length, ppotps);
+  readBin(argv[0], array_length, cv_m);
+  readBin(argv[1], array_length, cv_p);
+  readBin(argv[2], array_length, cps_m);
+  readBin(argv[3], array_length, cps_p);
+  readBin(argv[4], array_length, ppotv);
+  readBin(argv[5], array_length, ppotps);
 
   ddt = (log(cv_p / cps_p) - log(cv_m / cps_m)) / 2.0;
   fks = (ppotv - ppotps) / ddt;
 
-  write_bin(vspin_name, array_length, ddt);
-  write_bin(vcc_name, array_length, fks);
+  writeBin(vspin_name, array_length, ddt);
+  writeBin(vcc_name, array_length, fks);
 
   return 0;
 }

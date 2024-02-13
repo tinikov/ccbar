@@ -1,6 +1,6 @@
 /**
  * @file type_alias.h
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief
  * @version 1.0
  * @date 2023-05-03

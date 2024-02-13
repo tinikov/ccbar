@@ -143,52 +143,52 @@ int main(int argc, char *argv[]) {
 //     |________________________|
 
 void naive_norm(char *rawDataList[], char *nnlist[], int xyzSize, int fileCountTotal) {
-  int array_length = int(pow(xyzSize, 3));
+  int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX tmp[array_length], result[array_length];
+    COMPLX tmp[arrayLength], result[arrayLength];
 
-    for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    for (int j = 0; j < array_length; j++)  // Compute C_n(t) = C(t)/C(0)
+    for (int j = 0; j < arrayLength; j++)  // Compute C_n(t) = C(t)/C(0)
     {
       result[j] = tmp[j] / tmp[0];
     }
 
-    writeBin(nnlist[i], array_length, result);
+    writeBin(nnlist[i], arrayLength, result);
   }
 }
 
 void l2_norm(char *rawDataList[], char *l2list[], int xyzSize, int fileCountTotal) {
-  int array_length = int(pow(xyzSize, 3));
+  int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX tmp[array_length], result[array_length];
+    COMPLX tmp[arrayLength], result[arrayLength];
     DOUBLE norm_fact = 0.0;
 
-    for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    for (int j = 0; j < array_length; j++) {
+    for (int j = 0; j < arrayLength; j++) {
       norm_fact += norm(tmp[j]);
     }
 
     norm_fact = sqrt(norm_fact);
 
-    for (int j = 0; j < array_length; j++)  // C_n(t) = C(t)/\sqrt(\sum_{C^2})
+    for (int j = 0; j < arrayLength; j++)  // C_n(t) = C(t)/\sqrt(\sum_{C^2})
     {
       result[j] = tmp[j] / norm_fact;
     }
 
-    writeBin(l2list[i], array_length, result);
+    writeBin(l2list[i], arrayLength, result);
   }
 }

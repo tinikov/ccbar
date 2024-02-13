@@ -1,20 +1,14 @@
 /**
  * @file fks-ti.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief F_{KS} (time-independent version)
- * @version 1.0
- * @date 2023-10-11
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "F_{KS} (time-independent version)\n");
@@ -29,45 +23,30 @@ void usage(char *name) {
           "    -o <OFNAME>:       ofname of F_KS\n"
           "    [-h, --help]:      Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
 
-int array_length = 0;
-DOUBLE mdiff = 0;
-static const char *of_name = NULL;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int arrayLength = 0;
+  DOUBLE mdiff = 0;
+  static const char *ofname = NULL;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  // read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
       exit(0);
     }
 
-    // -l: array_length
+    // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!array_length) {
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!arrayLength) {
         usage(programName);
         exit(1);
       }
@@ -88,10 +67,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -o: of_name
+    // -o: ofname
     if (strcmp(argv[0], "-o") == 0) {
-      of_name = argv[1];
-      if (of_name == NULL) {
+      ofname = argv[1];
+      if (ofname == NULL) {
         usage(programName);
         exit(1);
       }
@@ -111,19 +90,15 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Initialization
-  fprintf(stderr, "##  F_{KS} (time-independent)! \n");
-  fprintf(stderr, "##  Array length:        %d\n", array_length);
-
-  CVARRAY ppotv(array_length), ppotps(array_length), fks(array_length);
+  CVARRAY ppotv(arrayLength), ppotps(arrayLength), fks(arrayLength);
   ppotv = ppotps = fks = 0.0;
 
-  readBin(argv[0], array_length, ppotv);
-  readBin(argv[1], array_length, ppotps);
+  readBin(argv[0], arrayLength, ppotv);
+  readBin(argv[1], arrayLength, ppotps);
 
-  fks = - (ppotv - ppotps) / mdiff;
+  fks = -(ppotv - ppotps) / mdiff;
 
-  writeBin(of_name, array_length, fks);
+  writeBin(ofname, arrayLength, fks);
 
   return 0;
 }

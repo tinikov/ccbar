@@ -142,16 +142,16 @@ inline COMPLX a1Sym(COMPLX *data, int x, int y, int z, int xyzSize) {
 
 void a1plus(char *rawDataList[], char *a1list[], int xyzSize,
             int fileCountTotal) {
-  int array_length = int(pow(xyzSize, 3));
+  int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX tmp[array_length], result[array_length];
-    for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
+    COMPLX tmp[arrayLength], result[arrayLength];
+    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
     for (int ix = 0; ix < xyzSize; ix++)
       for (int iy = 0; iy < xyzSize; iy++)
@@ -159,6 +159,6 @@ void a1plus(char *rawDataList[], char *a1list[], int xyzSize,
           CORR(result, ix, iy, iz, xyzSize) = a1Sym(tmp, ix, iy, iz, xyzSize);
         }
 
-    writeBin(a1list[i], array_length, result);
+    writeBin(a1list[i], arrayLength, result);
   }
 }

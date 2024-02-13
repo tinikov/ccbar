@@ -36,7 +36,7 @@ void usage(char *name) {
 //     |    Global Variables    |
 //     |________________________|
 
-int array_length = 0;
+int arrayLength = 0;
 DOUBLE mc = 0.0;
 static const char *vcc_name = NULL;
 static const char *vspin_name = NULL;
@@ -66,10 +66,10 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
 
-    // -l: array_length
+    // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!array_length) {
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!arrayLength) {
         usage(programName);
         exit(1);
       }
@@ -127,25 +127,25 @@ int main(int argc, char *argv[]) {
 
   // Initialization
   fprintf(stderr, "##  F_{KS} (time-dependent)! \n");
-  fprintf(stderr, "##  Array length:        %d\n", array_length);
+  fprintf(stderr, "##  Array length:        %d\n", arrayLength);
 
-  CVARRAY cv_m(array_length), cv_p(array_length), cps_m(array_length),
-      cps_p(array_length), ppotv(array_length), ppotps(array_length),
-      ddt(array_length), fks(array_length);
+  CVARRAY cv_m(arrayLength), cv_p(arrayLength), cps_m(arrayLength),
+      cps_p(arrayLength), ppotv(arrayLength), ppotps(arrayLength),
+      ddt(arrayLength), fks(arrayLength);
   cv_m = cv_p = cps_m = cps_p = ppotv = ppotps = ddt = fks = 0.0;
 
-  readBin(argv[0], array_length, cv_m);
-  readBin(argv[1], array_length, cv_p);
-  readBin(argv[2], array_length, cps_m);
-  readBin(argv[3], array_length, cps_p);
-  readBin(argv[4], array_length, ppotv);
-  readBin(argv[5], array_length, ppotps);
+  readBin(argv[0], arrayLength, cv_m);
+  readBin(argv[1], arrayLength, cv_p);
+  readBin(argv[2], arrayLength, cps_m);
+  readBin(argv[3], arrayLength, cps_p);
+  readBin(argv[4], arrayLength, ppotv);
+  readBin(argv[5], arrayLength, ppotps);
 
   ddt = (log(cv_p / cps_p) - log(cv_m / cps_m)) / 2.0;
   fks = (ppotv - ppotps) / ddt;
 
-  writeBin(vspin_name, array_length, ddt);
-  writeBin(vcc_name, array_length, fks);
+  writeBin(vspin_name, arrayLength, ddt);
+  writeBin(vcc_name, arrayLength, fks);
 
   return 0;
 }

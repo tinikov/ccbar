@@ -38,7 +38,7 @@ void usage(char *name) {
 //     |    Global Variables    |
 //     |________________________|
 
-int array_length = 0;
+int arrayLength = 0;
 DOUBLE mbar = 0;
 DOUBLE mdiff = 0;
 DOUBLE mc = 0;
@@ -69,10 +69,10 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
 
-    // -l: array_length
+    // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!array_length) {
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!arrayLength) {
         usage(programName);
         exit(1);
       }
@@ -154,20 +154,20 @@ int main(int argc, char *argv[]) {
 
   // Initialization
   fprintf(stderr, "##  Central potential (time-independent)! \n");
-  fprintf(stderr, "##  Array length:        %d\n", array_length);
+  fprintf(stderr, "##  Array length:        %d\n", arrayLength);
 
-  CVARRAY ppotv(array_length), ppotps(array_length), v0(array_length),
-      vs(array_length);
+  CVARRAY ppotv(arrayLength), ppotps(arrayLength), v0(arrayLength),
+      vs(arrayLength);
   ppotv = ppotps = v0 = vs = 0.0;
 
-  readBin(argv[0], array_length, ppotv);
-  readBin(argv[1], array_length, ppotps);
+  readBin(argv[0], arrayLength, ppotv);
+  readBin(argv[1], arrayLength, ppotps);
 
   v0 = 1 / (4.0 * mc) * (3 * ppotv + ppotps) + 1 / 4.0 * mbar - 2.0 * mc;
   vs = 1 / mc * (ppotv - ppotps) + mdiff;
 
-  writeBin(of_name_v0, array_length, v0);
-  writeBin(of_name_vs, array_length, vs);
+  writeBin(of_name_v0, arrayLength, v0);
+  writeBin(of_name_vs, arrayLength, vs);
 
   return 0;
 }

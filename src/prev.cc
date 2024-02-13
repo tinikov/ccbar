@@ -155,16 +155,16 @@ int main(int argc, char *argv[]) {
 //     |________________________|
 
 void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileCountTotal) {
-  int array_length = int(pow(xyzSize, 3));
+  int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX tmp[array_length], result[array_length];
-    for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
+    COMPLX tmp[arrayLength], result[arrayLength];
+    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
     for (int ix = 0; ix < xyzSize; ix++)
       for (int iy = 0; iy < xyzSize; iy++)
@@ -180,6 +180,6 @@ void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileC
               CORR(tmp, ix, iy, iz, xyzSize);
         }
 
-    writeBin(ppotlist[i], array_length, result);
+    writeBin(ppotlist[i], arrayLength, result);
   }
 }

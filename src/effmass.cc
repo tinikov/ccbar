@@ -1,20 +1,14 @@
 /**
  * @file effmass.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief Effective masses for charmonium
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr,
@@ -30,53 +24,36 @@ void usage(char *name) {
           "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void exp_mass(char *rawDataList[], char *explist[], int n_t, int fileCountTotal);
-void csh_mass(char *rawDataList[], char *cshlist[], int n_t, int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void expMass(char *rawDataList[], char *explist[], int tSize,
+             int fileCountTotal);
+void cshMass(char *rawDataList[], char *cshlist[], int tSize,
+             int fileCountTotal);
 
-int n_t = 0;
-static const char *ofDir = NULL;
-bool is_save_txt = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int tSize = 0;
+  static const char *ofDir = NULL;
+  bool isSaveTxt = false;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  // read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
       exit(0);
     }
 
-    // -n: n_t
+    // -n: tSize
     if (strcmp(argv[0], "-n") == 0) {
-      n_t = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!n_t) {
+      tSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!tSize) {
         usage(programName);
         exit(1);
       }
@@ -99,7 +76,7 @@ int main(int argc, char *argv[]) {
 
     // -t: save txt
     if (strcmp(argv[0], "-t") == 0) {
-      is_save_txt = true;
+      isSaveTxt = true;
       argc--;
       argv++;
       continue;
@@ -116,79 +93,73 @@ int main(int argc, char *argv[]) {
     usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  Effective mass! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", fileCountTotal);
-  fprintf(stderr, "##  Temporal size:       %d\n", n_t);
 
-  // Create an array to store ofnames
-  char *exp_dlist[fileCountTotal], *csh_dlist[fileCountTotal];
-
+  // Create arrays to store ofnames
+  char *expNameArr[fileCountTotal], *cshNameArr[fileCountTotal];
   for (int i = 0; i < fileCountTotal; i++) {
     char stmp[2048];
 
-    exp_dlist[i] = (char *)malloc(2048 * sizeof(char));
+    expNameArr[i] = (char *)malloc(2048 * sizeof(char));
     addPrefix(argv[i], "exp", stmp);
-    changePath(stmp, ofDir, exp_dlist[i]);
+    changePath(stmp, ofDir, expNameArr[i]);
 
-    csh_dlist[i] = (char *)malloc(2048 * sizeof(char));
+    cshNameArr[i] = (char *)malloc(2048 * sizeof(char));
     addPrefix(argv[i], "csh", stmp);
-    changePath(stmp, ofDir, csh_dlist[i]);
+    changePath(stmp, ofDir, cshNameArr[i]);
   }
 
   // Main part for calculation
-  exp_mass(argv, exp_dlist, n_t, fileCountTotal);
-  csh_mass(argv, csh_dlist, n_t, fileCountTotal);
+  expMass(argv, expNameArr, tSize, fileCountTotal);
+  cshMass(argv, cshNameArr, tSize, fileCountTotal);
 
-  if (is_save_txt) {
+  if (isSaveTxt) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
 
-      addPrefix(exp_dlist[i], "txt", txttmp);
-      bin2txt(exp_dlist[i], txttmp, n_t);
+      addPrefix(expNameArr[i], "txt", txttmp);
+      bin2txt(expNameArr[i], txttmp, tSize);
 
-      addPrefix(csh_dlist[i], "txt", txttmp);
-      bin2txt(csh_dlist[i], txttmp, n_t);
+      addPrefix(cshNameArr[i], "txt", txttmp);
+      bin2txt(cshNameArr[i], txttmp, tSize);
     }
   }
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
-    free(exp_dlist[i]);
-    free(csh_dlist[i]);
+    free(expNameArr[i]);
+    free(cshNameArr[i]);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
-void exp_mass(char *rawDataList[], char *explist[], int n_t, int fileCountTotal) {
+// Custom function definition
+void expMass(char *rawDataList[], char *explist[], int tSize,
+             int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX raw[n_t], effmass[n_t];
-    for (int j = 0; j < n_t; j++) {
+    COMPLX raw[tSize], effmass[tSize];
+    for (int j = 0; j < tSize; j++) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    readBin(rawDataList[i], n_t, raw);
+    readBin(rawDataList[i], tSize, raw);
 
-    for (int j = 0; j < n_t; j++) {
-      effmass[j].real(log(raw[j].real() / raw[(j + 1) % n_t].real()));
+    for (int j = 0; j < tSize; j++) {
+      effmass[j].real(log(raw[j].real() / raw[(j + 1) % tSize].real()));
     }
 
-    writeBin(explist[i], n_t, effmass);
+    writeBin(explist[i], tSize, effmass);
   }
 }
 
-DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t) {
+DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize) {
 #define JMAX 100
 #define M0 0.001
 #define M1 10.0
 #define MACC 1.0e-12
 #define coshtype(m) \
-  (corr1 / corr2 - cosh((m) * (n_t / 2.0 - t1)) / cosh((m) * (n_t / 2.0 - t2)))
+  (corr1 / corr2 -  \
+   cosh((m) * (tSize / 2.0 - t1)) / cosh((m) * (tSize / 2.0 - t2)))
 
   DOUBLE dm, f, fmid, mmid, mass;
 
@@ -209,22 +180,23 @@ DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t) {
   return 0.0;
 }
 
-void csh_mass(char *rawDataList[], char *cshlist[], int n_t, int fileCountTotal) {
+void cshMass(char *rawDataList[], char *cshlist[], int tSize,
+             int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX raw[n_t], effmass[n_t];
-    for (int j = 0; j < n_t; j++) {
+    COMPLX raw[tSize], effmass[tSize];
+    for (int j = 0; j < tSize; j++) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    readBin(rawDataList[i], n_t, raw);
+    readBin(rawDataList[i], tSize, raw);
 
-    for (int j = 0; j < n_t; j++) {
+    for (int j = 0; j < tSize; j++) {
       int t1 = j;
-      int t2 = (j + 1) % n_t;
+      int t2 = (j + 1) % tSize;
       effmass[j].real(
-          coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), n_t));
+          coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), tSize));
     }
 
-    writeBin(cshlist[i], n_t, effmass);
+    writeBin(cshlist[i], tSize, effmass);
   }
 }

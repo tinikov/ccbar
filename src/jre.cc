@@ -37,22 +37,22 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void jackknife_resample(char *rawDataList[], char *samdlist[], int array_length,
+void jackknife_resample(char *rawDataList[], char *samdlist[], int arrayLength,
                         int fileCountTotal);
 void jackknife_resample_var(char *rawDataList[], char *samdlist[],
-                            int array_length, int fileCountTotal);
+                            int arrayLength, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int array_length = 0;
+int arrayLength = 0;
 static const char *ofdir = NULL;
 static const char *ofPrefix = NULL;
 bool isAddPrefix = false;
 bool is_cal_var = false;
-bool is_save_txt = false;
+bool isSaveTxt = false;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -79,10 +79,10 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
 
-    // -l: array_length
+    // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!array_length) {
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!arrayLength) {
         usage(programName);
         exit(1);
       }
@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
 
     // -t: save txt
     if (strcmp(argv[0], "-t") == 0) {
-      is_save_txt = true;
+      isSaveTxt = true;
       argc--;
       argv++;
       continue;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
   }
   fprintf(stderr, "##  Jackknife resampling! \n");
   fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Array length:         %d\n", array_length);
+  fprintf(stderr, "##  Array length:         %d\n", arrayLength);
 
   // Create an array to store ofnames
   char *jre_dlist[fileCountTotal];
@@ -162,16 +162,16 @@ int main(int argc, char *argv[]) {
 
   // Main part for calculation
   if (is_cal_var) {
-    jackknife_resample_var(argv, jre_dlist, array_length, fileCountTotal);
+    jackknife_resample_var(argv, jre_dlist, arrayLength, fileCountTotal);
   } else {
-    jackknife_resample(argv, jre_dlist, array_length, fileCountTotal);
+    jackknife_resample(argv, jre_dlist, arrayLength, fileCountTotal);
   }
 
-  if (is_save_txt) {
+  if (isSaveTxt) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
       addPrefix(jre_dlist[i], "txt", txttmp);
-      bin2txt(jre_dlist[i], txttmp, array_length);
+      bin2txt(jre_dlist[i], txttmp, arrayLength);
     }
   }
 
@@ -188,48 +188,48 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void jackknife_resample(char *rawDataList[], char *samdlist[], int array_length,
+void jackknife_resample(char *rawDataList[], char *samdlist[], int arrayLength,
                         int fileCountTotal) {
-  CVARRAY sum(array_length), value(array_length);
+  CVARRAY sum(arrayLength), value(arrayLength);
   sum = value = 0.0;
 
   // First round: Get sum of all data
   for (int i = 0; i < fileCountTotal; i++) {
-    CVARRAY tmp(array_length);
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
     sum += tmp;
   }
 
   // Second round: Generate jackknife resampled data and save files
   for (int i = 0; i < fileCountTotal; i++) {
-    CVARRAY tmp(array_length);
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
     value = (sum - tmp) / (fileCountTotal - 1.0);
 
-    writeBin(samdlist[i], array_length, value);
+    writeBin(samdlist[i], arrayLength, value);
   }
 }
 
 void jackknife_resample_var(char *rawDataList[], char *samdlist[],
-                            int array_length, int fileCountTotal) {
-  DVARRAY sum(array_length), sum_square(array_length), value(array_length),
-      var(array_length);
+                            int arrayLength, int fileCountTotal) {
+  DVARRAY sum(arrayLength), sum_square(arrayLength), value(arrayLength),
+      var(arrayLength);
   sum = sum_square = value = var = 0.0;
 
   // First round: Get sum and sum^2 of all data
   for (int i = 0; i < fileCountTotal; i++) {
-    CVARRAY tmp(array_length);
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    DVARRAY rtmp(array_length);
+    DVARRAY rtmp(arrayLength);
     rtmp = 0.0;
-    keepReal(tmp, rtmp, array_length);
-    // varryNorm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, arrayLength);
+    // varryNorm(tmp, rtmp, arrayLength);
 
     sum += rtmp;
     sum_square += rtmp * rtmp;
@@ -239,14 +239,14 @@ void jackknife_resample_var(char *rawDataList[], char *samdlist[],
   // variance
   // Also, save files to samdlist[]
   for (int i = 0; i < fileCountTotal; i++) {
-    CVARRAY tmp(array_length);
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    DVARRAY rtmp(array_length);
+    DVARRAY rtmp(arrayLength);
     rtmp = 0.0;
-    keepReal(tmp, rtmp, array_length);
-    // varryNorm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, arrayLength);
+    // varryNorm(tmp, rtmp, arrayLength);
 
     value = (sum - rtmp) / (fileCountTotal - 1.0);
     // About this variance, please refer to eq.(7.37) on P.383, Montvay LQCD
@@ -255,14 +255,14 @@ void jackknife_resample_var(char *rawDataList[], char *samdlist[],
         sqrt(((sum_square - rtmp * rtmp) / DOUBLE(fileCountTotal - 1.0) - value * value) /
              DOUBLE(fileCountTotal - 2.0));
 
-    CVARRAY result(array_length);
+    CVARRAY result(arrayLength);
     result = 0.0;
 
-    for (int j = 0; j < array_length; j++) {
+    for (int j = 0; j < arrayLength; j++) {
       result[j].real(value[j]);
       result[j].imag(var[j]);
     }
 
-    writeBin(samdlist[i], array_length, result);
+    writeBin(samdlist[i], arrayLength, result);
   }
 }

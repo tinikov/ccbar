@@ -47,7 +47,7 @@ int n_t = 0;
 static const char *ofDir = NULL;
 static const char *ofPrefix = NULL;
 bool isAddPrefix = false;
-bool is_save_txt = false;
+bool isSaveTxt = false;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
 
     // -t: save txt
     if (strcmp(argv[0], "-t") == 0) {
-      is_save_txt = true;
+      isSaveTxt = true;
       argc--;
       argv++;
       continue;
@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
   // Main part for calculation
   time_reverse_2pt(argv, tr_dlist, n_t, fileCountTotal);
 
-  if (is_save_txt) {
+  if (isSaveTxt) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
       addPrefix(tr_dlist[i], "txt", txttmp);

@@ -36,8 +36,8 @@ void usage(char *name) {
 //     |    Global Variables    |
 //     |________________________|
 
-int array_length = 0;
-static const char *of_name = NULL;
+int arrayLength = 0;
+static const char *ofname = NULL;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -64,10 +64,10 @@ int main(int argc, char *argv[]) {
       exit(0);
     }
 
-    // -l: array_length
+    // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!array_length) {
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!arrayLength) {
         usage(programName);
         exit(1);
       }
@@ -76,10 +76,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -o: of_name
+    // -o: ofname
     if (strcmp(argv[0], "-o") == 0) {
-      of_name = argv[1];
-      if (of_name == NULL) {
+      ofname = argv[1];
+      if (ofname == NULL) {
         usage(programName);
         exit(1);
       }
@@ -101,17 +101,17 @@ int main(int argc, char *argv[]) {
 
   // Initialization
   fprintf(stderr, "##  F_{KS} (time-dependent)! \n");
-  fprintf(stderr, "##  Array length:        %d\n", array_length);
+  fprintf(stderr, "##  Array length:        %d\n", arrayLength);
 
-  CVARRAY ddt(array_length), fks(array_length);
+  CVARRAY ddt(arrayLength), fks(arrayLength);
 
   std::vector<CVARRAY> data;
 
   for (int i = 0; i < 10; i++) {
-    CVARRAY tmp(array_length);
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
 
-    read_bin(argv[i], array_length, tmp);
+    read_bin(argv[i], arrayLength, tmp);
     data.push_back(tmp);
   }
 
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
         12.0;
   fks = (data[8] - data[9]) / ddt;
 
-  write_bin(of_name, array_length, fks);
+  write_bin(ofname, arrayLength, fks);
 
   return 0;
 }

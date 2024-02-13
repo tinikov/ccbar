@@ -128,15 +128,15 @@ int main(int argc, char *argv[]) {
 
 void cart2sphr(char *rawDataList[], char *sphrList[], int xyzSize,
                int fileCountTotal) {
-  int array_length = pow(xyzSize, 3);
+  int arrayLength = pow(xyzSize, 3);
 
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX tmp[array_length];
-    for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
+    COMPLX tmp[arrayLength];
+    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
       tmp[j] = 0.0;
     }
-    readBin(rawDataList[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
     FILE *fp = fopen(sphrList[i], "w");
     if (fp == NULL) {

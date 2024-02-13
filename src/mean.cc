@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -o: of_name
+    // -o: ofname
     if (strcmp(argv[0], "-o") == 0) {
       ofname = argv[1];
       if (ofname == NULL) {

@@ -14,6 +14,7 @@ mean \
 norm \
 prev \
 trev2 \
+v-td \
 v-ti \
 
 PRE = \

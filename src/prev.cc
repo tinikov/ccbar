@@ -1,21 +1,15 @@
 /**
  * @file prev.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief Pre-potential: [▽^2 C(r,t)]/C(r,t)
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "correlator.h"
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "Pre-potential: [▽^2 C(r,t)]/C(r,t)\n");
@@ -30,43 +24,25 @@ void usage(char *name) {
           "    [-p] <PREFIX>:    Prefix for output files\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void prePotential(char *rawDataList[], char *ppotList[], int xyzSize,
+                  int fileCountTotal);
 
-int xyzSize = 0;
-static const char *ofDir = NULL;
-static const char *ofPrefix = NULL;
-bool isAddPrefix = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int xyzSize = 0;
+  static const char *ofDir = NULL;
+  static const char *ofPrefix = NULL;
+  bool isAddPrefix = false;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  // Read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
@@ -111,50 +87,43 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  Pre-potential! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Spacial size:         %d\n", xyzSize);
 
   // Create an array to store ofnames
-  char *prev_dlist[fileCountTotal];
+  char *ofnameArr[fileCountTotal];
 
   if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], ofPrefix, stmp);
-      changePath(stmp, ofDir, prev_dlist[i]);
+      changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], ofDir, prev_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
 
   // Main part for calculation
-  pre_potential(argv, prev_dlist, xyzSize, fileCountTotal);
+  prePotential(argv, ofnameArr, xyzSize, fileCountTotal);
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
-    free(prev_dlist[i]);
+    free(ofnameArr[i]);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
-void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileCountTotal) {
+// Custom function definition
+void prePotential(char *rawDataList[], char *ppotList[], int xyzSize,
+                  int fileCountTotal) {
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
@@ -180,6 +149,6 @@ void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileC
               CORR(tmp, ix, iy, iz, xyzSize);
         }
 
-    writeBin(ppotlist[i], arrayLength, result);
+    writeBin(ppotList[i], arrayLength, result);
   }
 }

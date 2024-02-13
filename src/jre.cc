@@ -1,20 +1,14 @@
 /**
  * @file jre.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief Jackknife resampling for raw data
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "Jackknife resampling for raw data\n");
@@ -31,48 +25,29 @@ void usage(char *name) {
           "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void jackknife_resample(char *rawDataList[], char *samdlist[], int arrayLength,
-                        int fileCountTotal);
-void jackknife_resample_var(char *rawDataList[], char *samdlist[],
-                            int arrayLength, int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void jackknifeResample(char *rawDataList[], char *sampleList[], int arrayLength,
+                       int fileCountTotal);
+void jackknifeResampleWithVar(char *rawDataList[], char *sampleList[],
+                              int arrayLength, int fileCountTotal);
 
-int arrayLength = 0;
-static const char *ofdir = NULL;
-static const char *ofPrefix = NULL;
-bool isAddPrefix = false;
-bool is_cal_var = false;
-bool isSaveTxt = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int arrayLength = 0;
+  static const char *ofDir = NULL;
+  static const char *ofPrefix = NULL;
+  bool isAddPrefix = false;
+  bool isSaveVar = false;
+  bool isSaveTxt = false;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  // Read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
@@ -93,8 +68,8 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      ofdir = argv[1];
-      if (ofdir == NULL) {
+      ofDir = argv[1];
+      if (ofDir == NULL) {
         usage(programName);
         exit(1);
       }
@@ -114,7 +89,7 @@ int main(int argc, char *argv[]) {
 
     // -v: calculate the variance
     if (strcmp(argv[0], "-v") == 0) {
-      is_cal_var = true;
+      isSaveVar = true;
       argc--;
       argv++;
       continue;
@@ -133,63 +108,55 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 2) {
     usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  Jackknife resampling! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Array length:         %d\n", arrayLength);
 
   // Create an array to store ofnames
-  char *jre_dlist[fileCountTotal];
+  char *ofnameArr[fileCountTotal];
 
   if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], ofPrefix, stmp);
-      changePath(stmp, ofdir, jre_dlist[i]);
+      changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], ofdir, jre_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
 
   // Main part for calculation
-  if (is_cal_var) {
-    jackknife_resample_var(argv, jre_dlist, arrayLength, fileCountTotal);
+  if (isSaveVar) {
+    jackknifeResampleWithVar(argv, ofnameArr, arrayLength, fileCountTotal);
   } else {
-    jackknife_resample(argv, jre_dlist, arrayLength, fileCountTotal);
+    jackknifeResample(argv, ofnameArr, arrayLength, fileCountTotal);
   }
 
   if (isSaveTxt) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
-      addPrefix(jre_dlist[i], "txt", txttmp);
-      bin2txt(jre_dlist[i], txttmp, arrayLength);
+      addPrefix(ofnameArr[i], "txt", txttmp);
+      bin2txt(ofnameArr[i], txttmp, arrayLength);
     }
   }
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
-    free(jre_dlist[i]);
+    free(ofnameArr[i]);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
-void jackknife_resample(char *rawDataList[], char *samdlist[], int arrayLength,
-                        int fileCountTotal) {
+// Custom function definition
+void jackknifeResample(char *rawDataList[], char *sampleList[], int arrayLength,
+                       int fileCountTotal) {
   CVARRAY sum(arrayLength), value(arrayLength);
   sum = value = 0.0;
 
@@ -210,15 +177,15 @@ void jackknife_resample(char *rawDataList[], char *samdlist[], int arrayLength,
 
     value = (sum - tmp) / (fileCountTotal - 1.0);
 
-    writeBin(samdlist[i], arrayLength, value);
+    writeBin(sampleList[i], arrayLength, value);
   }
 }
 
-void jackknife_resample_var(char *rawDataList[], char *samdlist[],
-                            int arrayLength, int fileCountTotal) {
-  DVARRAY sum(arrayLength), sum_square(arrayLength), value(arrayLength),
+void jackknifeResampleWithVar(char *rawDataList[], char *sampleList[],
+                              int arrayLength, int fileCountTotal) {
+  DVARRAY sum(arrayLength), sumSquare(arrayLength), value(arrayLength),
       var(arrayLength);
-  sum = sum_square = value = var = 0.0;
+  sum = sumSquare = value = var = 0.0;
 
   // First round: Get sum and sum^2 of all data
   for (int i = 0; i < fileCountTotal; i++) {
@@ -232,12 +199,12 @@ void jackknife_resample_var(char *rawDataList[], char *samdlist[],
     // varryNorm(tmp, rtmp, arrayLength);
 
     sum += rtmp;
-    sum_square += rtmp * rtmp;
+    sumSquare += rtmp * rtmp;
   }
 
   // Second round: Generate the Jackknife sampled data and calculate the
   // variance
-  // Also, save files to samdlist[]
+  // Also, save files to sampleList[]
   for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(arrayLength);
     tmp = 0.0;
@@ -251,9 +218,9 @@ void jackknife_resample_var(char *rawDataList[], char *samdlist[],
     value = (sum - rtmp) / (fileCountTotal - 1.0);
     // About this variance, please refer to eq.(7.37) on P.383, Montvay LQCD
     // book
-    var =
-        sqrt(((sum_square - rtmp * rtmp) / DOUBLE(fileCountTotal - 1.0) - value * value) /
-             DOUBLE(fileCountTotal - 2.0));
+    var = sqrt(((sumSquare - rtmp * rtmp) / DOUBLE(fileCountTotal - 1.0) -
+                value * value) /
+               DOUBLE(fileCountTotal - 2.0));
 
     CVARRAY result(arrayLength);
     result = 0.0;
@@ -263,6 +230,6 @@ void jackknife_resample_var(char *rawDataList[], char *samdlist[],
       result[j].imag(var[j]);
     }
 
-    writeBin(samdlist[i], arrayLength, result);
+    writeBin(sampleList[i], arrayLength, result);
   }
 }

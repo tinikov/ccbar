@@ -1,20 +1,14 @@
 /**
  * @file norm.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief Normalizaion for 4-point correlators
- * @version 1.0
- * @date 2023-07-10
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "Normalizaion for 4-point correlators\n");
@@ -28,43 +22,25 @@ void usage(char *name) {
           "    -d <OFDIR>:       Directory of output files\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void naive_norm(char *rawDataList[], char *nnlist[], int xyzSize, int fileCountTotal);
-void l2_norm(char *rawDataList[], char *l2list[], int xyzSize, int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void naiveNorm(char *rawDataList[], char *nnlist[], int xyzSize,
+               int fileCountTotal);
+void l2Norm(char *rawDataList[], char *l2list[], int xyzSize,
+            int fileCountTotal);
 
-int xyzSize = 0;
-static const char *ofDir = NULL;
-bool isAddPrefix = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int xyzSize = 0;
+  static const char *ofDir = NULL;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  // Read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
@@ -100,49 +76,40 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  Normalization! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", fileCountTotal);
-  fprintf(stderr, "##  Spacial size:        %d\n", xyzSize);
 
   // Create arrays to store ofnames
-  char *nn_dlist[fileCountTotal], *l2_dlist[fileCountTotal];
-
+  char *nnNameArr[fileCountTotal], *l2NameArr[fileCountTotal];
   for (int i = 0; i < fileCountTotal; i++) {
-    char nn_stmp[2048], l2_stmp[2048];
-    nn_dlist[i] = (char *)malloc(2048 * sizeof(char));
-    l2_dlist[i] = (char *)malloc(2048 * sizeof(char));
-
-    addPrefix(argv[i], "nn", nn_stmp);
-    changePath(nn_stmp, ofDir, nn_dlist[i]);
-    addPrefix(argv[i], "l2", l2_stmp);
-    changePath(l2_stmp, ofDir, l2_dlist[i]);
+    char stmpnn[2048], stmpl2[2048];
+    nnNameArr[i] = (char *)malloc(2048 * sizeof(char));
+    l2NameArr[i] = (char *)malloc(2048 * sizeof(char));
+    addPrefix(argv[i], "nn", stmpnn);
+    changePath(stmpnn, ofDir, nnNameArr[i]);
+    addPrefix(argv[i], "l2", stmpl2);
+    changePath(stmpl2, ofDir, l2NameArr[i]);
   }
 
   // Main part for calculation
-  naive_norm(argv, nn_dlist, xyzSize, fileCountTotal);
-  l2_norm(argv, l2_dlist, xyzSize, fileCountTotal);
+  naiveNorm(argv, nnNameArr, xyzSize, fileCountTotal);
+  l2Norm(argv, l2NameArr, xyzSize, fileCountTotal);
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
-    free(nn_dlist[i]);
-    free(l2_dlist[i]);
+    free(nnNameArr[i]);
+    free(l2NameArr[i]);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
-void naive_norm(char *rawDataList[], char *nnlist[], int xyzSize, int fileCountTotal) {
+// Custom function definition
+void naiveNorm(char *rawDataList[], char *nnlist[], int xyzSize,
+               int fileCountTotal) {
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
@@ -164,12 +131,13 @@ void naive_norm(char *rawDataList[], char *nnlist[], int xyzSize, int fileCountT
   }
 }
 
-void l2_norm(char *rawDataList[], char *l2list[], int xyzSize, int fileCountTotal) {
+void l2Norm(char *rawDataList[], char *l2list[], int xyzSize,
+            int fileCountTotal) {
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[arrayLength], result[arrayLength];
-    DOUBLE norm_fact = 0.0;
+    DOUBLE normFact = 0.0;
 
     for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
@@ -179,14 +147,14 @@ void l2_norm(char *rawDataList[], char *l2list[], int xyzSize, int fileCountTota
     readBin(rawDataList[i], arrayLength, tmp);
 
     for (int j = 0; j < arrayLength; j++) {
-      norm_fact += norm(tmp[j]);
+      normFact += norm(tmp[j]);
     }
 
-    norm_fact = sqrt(norm_fact);
+    normFact = sqrt(normFact);
 
     for (int j = 0; j < arrayLength; j++)  // C_n(t) = C(t)/\sqrt(\sum_{C^2})
     {
-      result[j] = tmp[j] / norm_fact;
+      result[j] = tmp[j] / normFact;
     }
 
     writeBin(l2list[i], arrayLength, result);

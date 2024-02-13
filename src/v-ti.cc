@@ -2,19 +2,13 @@
  * @file v-ti.cc
  * @author Tianchen Zhang
  * @brief Central potential (time-independent version)
- * @version 1.0
- * @date 2023-10-11
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "Central potential (time-independent version)\n");
@@ -25,43 +19,30 @@ void usage(char *name) {
   fprintf(stderr,
           "OPTIONS: \n"
           "    -l <LENGTH>:       Array length\n"
-          "    -mbar <MBAR>:      1/4(3M_V + M_PS) (LUnit)\n"
-          "    -mdiff <MDIFF>:    (M_V - M_PS) (LUnit)\n"
+          "    -mps <M_PS>:       M_PS (LUnit)\n"
+          "    -mv <M_V>:         M_V (LUnit)\n"
           "    -mc <MC>:          charm quark mass (LUnit)\n"
           "    -ov0 <OFNAMEV0>:   ofname of v0\n"
           "    -ovs <OFNAMEVS>:   ofname of vs\n"
           "    [-h, --help]:      Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
 
-int arrayLength = 0;
-DOUBLE mbar = 0;
-DOUBLE mdiff = 0;
-DOUBLE mc = 0;
-static const char *of_name_v0 = NULL;
-static const char *of_name_vs = NULL;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int arrayLength = 0;
+  DOUBLE mPS = 0.0;
+  DOUBLE mV = 0.0;
+  DOUBLE mc = 0.0;
+  static const char *ofnameV0 = NULL;
+  static const char *ofnameVs = NULL;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 && argv[0][0] == '-')  // read options (order irrelevant)
+  // Read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-')  // Read options (order irrelevant)
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
@@ -81,10 +62,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -mbar
-    if (strcmp(argv[0], "-mbar") == 0) {
-      mbar = atof(argv[1]);  // atof(): convert ASCII string to float
-      if (mbar == 0) {
+    // -mps: PS channel charmonium mass
+    if (strcmp(argv[0], "-mps") == 0) {
+      mPS = atof(argv[1]);  // atof(): convert ASCII string to float
+      if (mPS == 0.0) {
         usage(programName);
         exit(1);
       }
@@ -93,10 +74,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -mdiff
-    if (strcmp(argv[0], "-mdiff") == 0) {
-      mdiff = atof(argv[1]);  // atof(): convert ASCII string to float
-      if (mdiff == 0) {
+    // -mv: V channel charmonium mass
+    if (strcmp(argv[0], "-mv") == 0) {
+      mV = atof(argv[1]);  // atof(): convert ASCII string to float
+      if (mV == 0.0) {
         usage(programName);
         exit(1);
       }
@@ -108,7 +89,7 @@ int main(int argc, char *argv[]) {
     // -mc: charm quark mass
     if (strcmp(argv[0], "-mc") == 0) {
       mc = atof(argv[1]);  // atof(): convert ASCII string to float
-      if (mc == 0) {
+      if (mc == 0.0) {
         usage(programName);
         exit(1);
       }
@@ -117,10 +98,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -ov0: of_name_v0
+    // -ov0: ofnameV0
     if (strcmp(argv[0], "-ov0") == 0) {
-      of_name_v0 = argv[1];
-      if (of_name_v0 == NULL) {
+      ofnameV0 = argv[1];
+      if (ofnameV0 == NULL) {
         usage(programName);
         exit(1);
       }
@@ -129,10 +110,10 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // -ovs: of_name_vs
+    // -ovs: ofnameVs
     if (strcmp(argv[0], "-ovs") == 0) {
-      of_name_vs = argv[1];
-      if (of_name_vs == NULL) {
+      ofnameVs = argv[1];
+      if (ofnameVs == NULL) {
         usage(programName);
         exit(1);
       }
@@ -152,10 +133,6 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Initialization
-  fprintf(stderr, "##  Central potential (time-independent)! \n");
-  fprintf(stderr, "##  Array length:        %d\n", arrayLength);
-
   CVARRAY ppotv(arrayLength), ppotps(arrayLength), v0(arrayLength),
       vs(arrayLength);
   ppotv = ppotps = v0 = vs = 0.0;
@@ -163,11 +140,12 @@ int main(int argc, char *argv[]) {
   readBin(argv[0], arrayLength, ppotv);
   readBin(argv[1], arrayLength, ppotps);
 
-  v0 = 1 / (4.0 * mc) * (3 * ppotv + ppotps) + 1 / 4.0 * mbar - 2.0 * mc;
-  vs = 1 / mc * (ppotv - ppotps) + mdiff;
+  v0 = 1 / (4.0 * mc) * (3.0 * ppotv + ppotps) + 1 / 4.0 * (3.0 * mV + mPS) -
+       2.0 * mc;
+  vs = 1 / mc * (ppotv - ppotps) + (mV - mPS);
 
-  writeBin(of_name_v0, arrayLength, v0);
-  writeBin(of_name_vs, arrayLength, vs);
+  writeBin(ofnameV0, arrayLength, v0);
+  writeBin(ofnameVs, arrayLength, vs);
 
   return 0;
 }

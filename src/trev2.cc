@@ -1,20 +1,14 @@
 /**
  * @file trev2.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief Time reversal for 2-point correlators
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "Time reversal for 2-point correlators\n");
@@ -30,54 +24,36 @@ void usage(char *name) {
           "    [-t]:             Also save a txt file (add \"txt.\" prefix)\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void time_reverse_2pt(char *rawDataList[], char *trdlist[], int n_t, int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void timeReverse2pt(char *rawDataList[], char *tr2ptList[], int tSize,
+                    int fileCountTotal);
 
-int n_t = 0;
-static const char *ofDir = NULL;
-static const char *ofPrefix = NULL;
-bool isAddPrefix = false;
-bool isSaveTxt = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
+  // Global variables
+  int tSize = 0;
+  static const char *ofDir = NULL;
+  static const char *ofPrefix = NULL;
+  bool isAddPrefix = false;
+  bool isSaveTxt = false;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  // Read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
       exit(0);
     }
 
-    // -n: n_t
+    // -n: tSize
     if (strcmp(argv[0], "-n") == 0) {
-      n_t = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!n_t) {
+      tSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!tSize) {
         usage(programName);
         exit(1);
       }
@@ -120,67 +96,60 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  Time reversal! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Temporal size:        %d\n", n_t);
 
   // Create an array to store ofnames
-  char *tr_dlist[fileCountTotal];
+  char *ofnameArr[fileCountTotal];
 
   if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], ofPrefix, stmp);
-      changePath(stmp, ofDir, tr_dlist[i]);
+      changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], ofDir, tr_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
 
   // Main part for calculation
-  time_reverse_2pt(argv, tr_dlist, n_t, fileCountTotal);
+  timeReverse2pt(argv, ofnameArr, tSize, fileCountTotal);
 
   if (isSaveTxt) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
-      addPrefix(tr_dlist[i], "txt", txttmp);
-      bin2txt(tr_dlist[i], txttmp, n_t);
+      addPrefix(ofnameArr[i], "txt", txttmp);
+      bin2txt(ofnameArr[i], txttmp, tSize);
     }
   }
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
-    free(tr_dlist[i]);
+    free(ofnameArr[i]);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
-void time_reverse_2pt(char *rawDataList[], char *trdlist[], int n_t, int fileCountTotal) {
+// Custom function definition
+void timeReverse2pt(char *rawDataList[], char *tr2ptList[], int tSize,
+                    int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
-    COMPLX raw[n_t], data[n_t];
-    for (int j = 0; j < n_t; j++) raw[j] = data[j] = 0.0;
+    COMPLX raw[tSize], data[tSize];
+    for (int j = 0; j < tSize; j++) raw[j] = data[j] = 0.0;
 
-    readBin(rawDataList[i], n_t, raw);
+    readBin(rawDataList[i], tSize, raw);
 
-    for (int j = 0; j < n_t; j++)
-      data[j] = (raw[j] + raw[(n_t - j) % n_t]) * 0.5;
+    for (int j = 0; j < tSize; j++)
+      data[j] = (raw[j] + raw[(tSize - j) % tSize]) * 0.5;
 
-    writeBin(trdlist[i], n_t, data);
+    writeBin(tr2ptList[i], tSize, data);
   }
 }

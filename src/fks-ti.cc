@@ -28,14 +28,14 @@ void usage(char *name) {
 int main(int argc, char *argv[]) {
   // Global variables
   int arrayLength = 0;
-  DOUBLE mdiff = 0;
+  DOUBLE mdiff = 0.0;
   static const char *ofname = NULL;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
 
-  // read options (order irrelevant)
+  // Read options (order irrelevant)
   while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
     // -m: mdiff
     if (strcmp(argv[0], "-m") == 0) {
       mdiff = atof(argv[1]);  // atof(): convert ASCII string to float
-      if (mdiff == 0) {
+      if (mdiff == 0.0) {
         usage(programName);
         exit(1);
       }

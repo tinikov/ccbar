@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
   argc--;
   argv++;
 
-  // read options (order irrelevant)
+  // Read options (order irrelevant)
   while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {

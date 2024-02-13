@@ -26,9 +26,9 @@ void usage(char *name) {
 }
 
 // Custom function declaration
-void expMass(char *rawDataList[], char *explist[], int tSize,
+void expMass(char *rawDataList[], char *expList[], int tSize,
              int fileCountTotal);
-void cshMass(char *rawDataList[], char *cshlist[], int tSize,
+void cshMass(char *rawDataList[], char *cshList[], int tSize,
              int fileCountTotal);
 
 // Main function
@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
   argc--;
   argv++;
 
-  // read options (order irrelevant)
+  // Read options (order irrelevant)
   while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Custom function definition
-void expMass(char *rawDataList[], char *explist[], int tSize,
+void expMass(char *rawDataList[], char *expList[], int tSize,
              int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[tSize], effmass[tSize];
@@ -148,11 +148,11 @@ void expMass(char *rawDataList[], char *explist[], int tSize,
       effmass[j].real(log(raw[j].real() / raw[(j + 1) % tSize].real()));
     }
 
-    writeBin(explist[i], tSize, effmass);
+    writeBin(expList[i], tSize, effmass);
   }
 }
 
-DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize) {
+DOUBLE cshMassCal(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize) {
 #define JMAX 100
 #define M0 0.001
 #define M1 10.0
@@ -180,7 +180,7 @@ DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize) {
   return 0.0;
 }
 
-void cshMass(char *rawDataList[], char *cshlist[], int tSize,
+void cshMass(char *rawDataList[], char *cshList[], int tSize,
              int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[tSize], effmass[tSize];
@@ -194,9 +194,9 @@ void cshMass(char *rawDataList[], char *cshlist[], int tSize,
       int t1 = j;
       int t2 = (j + 1) % tSize;
       effmass[j].real(
-          coshtype_mass(t1, t2, raw[t1].real(), raw[t2].real(), tSize));
+          cshMassCal(t1, t2, raw[t1].real(), raw[t2].real(), tSize));
     }
 
-    writeBin(cshlist[i], tSize, effmass);
+    writeBin(cshList[i], tSize, effmass);
   }
 }

@@ -1,6 +1,6 @@
 /**
  * @file fks-td.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief F_{KS} (time-dependent version) (5-point stencil)
  * @version 1.0
  * @date 2023-05-03
@@ -10,7 +10,6 @@
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -55,9 +54,7 @@ int main(int argc, char *argv[]) {
   //    |  Dealing with Options  |
   //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')
-  {
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);

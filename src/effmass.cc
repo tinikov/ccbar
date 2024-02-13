@@ -36,8 +36,8 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int n_t, int fileCountTotal);
-void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int fileCountTotal);
+void exp_mass(char *rawDataList[], char *explist[], int n_t, int fileCountTotal);
+void csh_mass(char *rawDataList[], char *cshlist[], int n_t, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -45,7 +45,7 @@ void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int fileCountTotal);
 //     |________________________|
 
 int n_t = 0;
-static const char *of_dir = NULL;
+static const char *ofDir = NULL;
 bool is_save_txt = false;
 // __________________________________
 //     .________|______|________.
@@ -54,8 +54,8 @@ bool is_save_txt = false;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
   //    |________________________|
 
   while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+         argv[0][0] == '-')
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-n") == 0) {
       n_t = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!n_t) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -87,9 +87,9 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      of_dir = argv[1];
-      if (of_dir == NULL) {
-        usage(program_name);
+      ofDir = argv[1];
+      if (ofDir == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -106,14 +106,14 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
   fprintf(stderr, "##  Effective mass! \n");
@@ -128,11 +128,11 @@ int main(int argc, char *argv[]) {
 
     exp_dlist[i] = (char *)malloc(2048 * sizeof(char));
     addPrefix(argv[i], "exp", stmp);
-    changePath(stmp, of_dir, exp_dlist[i]);
+    changePath(stmp, ofDir, exp_dlist[i]);
 
     csh_dlist[i] = (char *)malloc(2048 * sizeof(char));
     addPrefix(argv[i], "csh", stmp);
-    changePath(stmp, of_dir, csh_dlist[i]);
+    changePath(stmp, ofDir, csh_dlist[i]);
   }
 
   // Main part for calculation
@@ -165,14 +165,14 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int n_t, int fileCountTotal) {
+void exp_mass(char *rawDataList[], char *explist[], int n_t, int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[n_t], effmass[n_t];
     for (int j = 0; j < n_t; j++) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    readBin(rawdlist[i], n_t, raw);
+    readBin(rawDataList[i], n_t, raw);
 
     for (int j = 0; j < n_t; j++) {
       effmass[j].real(log(raw[j].real() / raw[(j + 1) % n_t].real()));
@@ -209,14 +209,14 @@ DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t) {
   return 0.0;
 }
 
-void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int fileCountTotal) {
+void csh_mass(char *rawDataList[], char *cshlist[], int n_t, int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[n_t], effmass[n_t];
     for (int j = 0; j < n_t; j++) {
       raw[j] = 0.0;
       effmass[j] = 0.0;
     }
-    readBin(rawdlist[i], n_t, raw);
+    readBin(rawDataList[i], n_t, raw);
 
     for (int j = 0; j < n_t; j++) {
       int t1 = j;

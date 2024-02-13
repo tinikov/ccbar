@@ -36,17 +36,17 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int fileCountTotal);
+void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int n_xyz = 0;
-static const char *of_dir = NULL;
-static const char *of_prefix = NULL;
-bool is_add_prefix = false;
+int xyzSize = 0;
+static const char *ofDir = NULL;
+static const char *ofPrefix = NULL;
+bool isAddPrefix = false;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -54,8 +54,8 @@ bool is_add_prefix = false;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -65,19 +65,19 @@ int main(int argc, char *argv[]) {
   //    |________________________|
 
   while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+         argv[0][0] == '-')
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
-    // -n: n_xyz
+    // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      n_xyz = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!n_xyz) {
-        usage(program_name);
+      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!xyzSize) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -87,9 +87,9 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      of_dir = argv[1];
-      if (of_dir == NULL) {
-        usage(program_name);
+      ofDir = argv[1];
+      if (ofDir == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -99,47 +99,47 @@ int main(int argc, char *argv[]) {
 
     // -p: prefix for output file
     if (strcmp(argv[0], "-p") == 0) {
-      of_prefix = argv[1];
-      is_add_prefix = true;
+      ofPrefix = argv[1];
+      isAddPrefix = true;
       argc -= 2;
       argv += 2;
       continue;
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
   fprintf(stderr, "##  Pre-potential! \n");
   fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
+  fprintf(stderr, "##  Spacial size:         %d\n", xyzSize);
 
   // Create an array to store ofnames
   char *prev_dlist[fileCountTotal];
 
-  if (is_add_prefix) {
+  if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      addPrefix(argv[i], of_prefix, stmp);
-      changePath(stmp, of_dir, prev_dlist[i]);
+      addPrefix(argv[i], ofPrefix, stmp);
+      changePath(stmp, ofDir, prev_dlist[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
       prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], of_dir, prev_dlist[i]);
+      changePath(argv[i], ofDir, prev_dlist[i]);
     }
   }
 
   // Main part for calculation
-  pre_potential(argv, prev_dlist, n_xyz, fileCountTotal);
+  pre_potential(argv, prev_dlist, xyzSize, fileCountTotal);
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
@@ -154,8 +154,8 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int fileCountTotal) {
-  int array_length = int(pow(n_xyz, 3));
+void pre_potential(char *rawDataList[], char *ppotlist[], int xyzSize, int fileCountTotal) {
+  int array_length = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
@@ -164,20 +164,20 @@ void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int fileCountT
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
-    for (int ix = 0; ix < n_xyz; ix++)
-      for (int iy = 0; iy < n_xyz; iy++)
-        for (int iz = 0; iz < n_xyz; iz++) {
-          CORR(result, ix, iy, iz, n_xyz) =
-              (CORR(tmp, ix + 1, iy, iz, n_xyz) +
-               CORR(tmp, ix - 1, iy, iz, n_xyz) +
-               CORR(tmp, ix, iy + 1, iz, n_xyz) +
-               CORR(tmp, ix, iy - 1, iz, n_xyz) +
-               CORR(tmp, ix, iy, iz + 1, n_xyz) +
-               CORR(tmp, ix, iy, iz - 1, n_xyz) -
-               6.0 * CORR(tmp, ix, iy, iz, n_xyz)) /
-              CORR(tmp, ix, iy, iz, n_xyz);
+    for (int ix = 0; ix < xyzSize; ix++)
+      for (int iy = 0; iy < xyzSize; iy++)
+        for (int iz = 0; iz < xyzSize; iz++) {
+          CORR(result, ix, iy, iz, xyzSize) =
+              (CORR(tmp, ix + 1, iy, iz, xyzSize) +
+               CORR(tmp, ix - 1, iy, iz, xyzSize) +
+               CORR(tmp, ix, iy + 1, iz, xyzSize) +
+               CORR(tmp, ix, iy - 1, iz, xyzSize) +
+               CORR(tmp, ix, iy, iz + 1, xyzSize) +
+               CORR(tmp, ix, iy, iz - 1, xyzSize) -
+               6.0 * CORR(tmp, ix, iy, iz, xyzSize)) /
+              CORR(tmp, ix, iy, iz, xyzSize);
         }
 
     writeBin(ppotlist[i], array_length, result);

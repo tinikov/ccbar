@@ -37,9 +37,9 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
+void jackknife_resample(char *rawDataList[], char *samdlist[], int array_length,
                         int fileCountTotal);
-void jackknife_resample_var(char *rawdlist[], char *samdlist[],
+void jackknife_resample_var(char *rawDataList[], char *samdlist[],
                             int array_length, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
@@ -49,8 +49,8 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
 
 int array_length = 0;
 static const char *ofdir = NULL;
-static const char *of_prefix = NULL;
-bool is_add_prefix = false;
+static const char *ofPrefix = NULL;
+bool isAddPrefix = false;
 bool is_cal_var = false;
 bool is_save_txt = false;
 // __________________________________
@@ -60,8 +60,8 @@ bool is_save_txt = false;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -71,11 +71,11 @@ int main(int argc, char *argv[]) {
   //    |________________________|
 
   while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+         argv[0][0] == '-')
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-l") == 0) {
       array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!array_length) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-d") == 0) {
       ofdir = argv[1];
       if (ofdir == NULL) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -105,8 +105,8 @@ int main(int argc, char *argv[]) {
 
     // -p: prefix for output file
     if (strcmp(argv[0], "-p") == 0) {
-      of_prefix = argv[1];
-      is_add_prefix = true;
+      ofPrefix = argv[1];
+      isAddPrefix = true;
       argc -= 2;
       argv += 2;
       continue;
@@ -129,14 +129,14 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 2) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
   fprintf(stderr, "##  Jackknife resampling! \n");
@@ -146,11 +146,11 @@ int main(int argc, char *argv[]) {
   // Create an array to store ofnames
   char *jre_dlist[fileCountTotal];
 
-  if (is_add_prefix) {
+  if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      addPrefix(argv[i], of_prefix, stmp);
+      addPrefix(argv[i], ofPrefix, stmp);
       changePath(stmp, ofdir, jre_dlist[i]);
     }
   } else {
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
+void jackknife_resample(char *rawDataList[], char *samdlist[], int array_length,
                         int fileCountTotal) {
   CVARRAY sum(array_length), value(array_length);
   sum = value = 0.0;
@@ -197,7 +197,7 @@ void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
   for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
     sum += tmp;
   }
@@ -206,7 +206,7 @@ void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
   for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
     value = (sum - tmp) / (fileCountTotal - 1.0);
 
@@ -214,7 +214,7 @@ void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
   }
 }
 
-void jackknife_resample_var(char *rawdlist[], char *samdlist[],
+void jackknife_resample_var(char *rawDataList[], char *samdlist[],
                             int array_length, int fileCountTotal) {
   DVARRAY sum(array_length), sum_square(array_length), value(array_length),
       var(array_length);
@@ -224,7 +224,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
   for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
@@ -241,7 +241,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
   for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;

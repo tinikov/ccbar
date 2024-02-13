@@ -36,7 +36,7 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int fileCountTotal);
+void time_reverse_2pt(char *rawDataList[], char *trdlist[], int n_t, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -44,9 +44,9 @@ void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int fileCountT
 //     |________________________|
 
 int n_t = 0;
-static const char *of_dir = NULL;
-static const char *of_prefix = NULL;
-bool is_add_prefix = false;
+static const char *ofDir = NULL;
+static const char *ofPrefix = NULL;
+bool isAddPrefix = false;
 bool is_save_txt = false;
 // __________________________________
 //     .________|______|________.
@@ -55,8 +55,8 @@ bool is_save_txt = false;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -66,11 +66,11 @@ int main(int argc, char *argv[]) {
   //    |________________________|
 
   while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+         argv[0][0] == '-')
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-n") == 0) {
       n_t = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!n_t) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -88,9 +88,9 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      of_dir = argv[1];
-      if (of_dir == NULL) {
-        usage(program_name);
+      ofDir = argv[1];
+      if (ofDir == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -100,8 +100,8 @@ int main(int argc, char *argv[]) {
 
     // -p: prefix for output file
     if (strcmp(argv[0], "-p") == 0) {
-      of_prefix = argv[1];
-      is_add_prefix = true;
+      ofPrefix = argv[1];
+      isAddPrefix = true;
       argc -= 2;
       argv += 2;
       continue;
@@ -116,14 +116,14 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
   fprintf(stderr, "##  Time reversal! \n");
@@ -133,17 +133,17 @@ int main(int argc, char *argv[]) {
   // Create an array to store ofnames
   char *tr_dlist[fileCountTotal];
 
-  if (is_add_prefix) {
+  if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      addPrefix(argv[i], of_prefix, stmp);
-      changePath(stmp, of_dir, tr_dlist[i]);
+      addPrefix(argv[i], ofPrefix, stmp);
+      changePath(stmp, ofDir, tr_dlist[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], of_dir, tr_dlist[i]);
+      changePath(argv[i], ofDir, tr_dlist[i]);
     }
   }
 
@@ -171,12 +171,12 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int fileCountTotal) {
+void time_reverse_2pt(char *rawDataList[], char *trdlist[], int n_t, int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[n_t], data[n_t];
     for (int j = 0; j < n_t; j++) raw[j] = data[j] = 0.0;
 
-    readBin(rawdlist[i], n_t, raw);
+    readBin(rawDataList[i], n_t, raw);
 
     for (int j = 0; j < n_t; j++)
       data[j] = (raw[j] + raw[(n_t - j) % n_t]) * 0.5;

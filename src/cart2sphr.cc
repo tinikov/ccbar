@@ -1,21 +1,15 @@
 /**
  * @file cart2sphr.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief From Cartesian coordinate to Spherical coordinate
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "correlator.h"
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "From Cartesian coordinate to Spherical coordinate\n");
@@ -30,55 +24,36 @@ void usage(char *name) {
           "    [-p] <PREFIX>:    Prefix for output files\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
-                            int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void cart2sphr(char *rawDataList[], char *sphrList[], int xyzSize,
+               int fileCountTotal);
 
-int n_xyz = 0;
-static const char *of_dir = NULL;
-static const char *of_prefix = NULL;
-bool is_add_prefix = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  // Global Variables
+  int xyzSize = 0;
+  static const char *ofDir = NULL;
+  static const char *ofPrefix = NULL;
+  bool isAddPrefix = false;
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
-  {
+  // read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
-    // -n: n_xyz
+    // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      n_xyz = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!n_xyz) {
-        usage(program_name);
+      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!xyzSize) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -88,9 +63,9 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      of_dir = argv[1];
-      if (of_dir == NULL) {
-        usage(program_name);
+      ofDir = argv[1];
+      if (ofDir == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -100,51 +75,47 @@ int main(int argc, char *argv[]) {
 
     // -p: prefix for output file
     if (strcmp(argv[0], "-p") == 0) {
-      of_prefix = argv[1];
-      is_add_prefix = true;
+      ofPrefix = argv[1];
+      isAddPrefix = true;
       argc -= 2;
       argv += 2;
       continue;
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  Cartesian to Spherical! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
-  char *sphr_dlist[fileCountTotal];
-
-  if (is_add_prefix) {
+  char *ofnameArr[fileCountTotal];
+  if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      addPrefix(argv[i], of_prefix, stmp);
-      changePath(stmp, of_dir, sphr_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      addPrefix(argv[i], ofPrefix, stmp);
+      changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], of_dir, sphr_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
 
   // Main part for calculation
-  cartesian_to_spherical(argv, sphr_dlist, n_xyz, fileCountTotal);
+  cart2sphr(argv, ofnameArr, xyzSize, fileCountTotal);
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
-    free(sphr_dlist[i]);
+    free(ofnameArr[i]);
   }
 
   return 0;
@@ -155,9 +126,9 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
-                            int fileCountTotal) {
-  int array_length = pow(n_xyz, 3);
+void cart2sphr(char *rawDataList[], char *sphrList[], int xyzSize,
+               int fileCountTotal) {
+  int array_length = pow(xyzSize, 3);
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length];
@@ -165,23 +136,23 @@ void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
     {
       tmp[j] = 0.0;
     }
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
-    FILE *fp = fopen(sphrdlist[i], "w");
+    FILE *fp = fopen(sphrList[i], "w");
     if (fp == NULL) {
-      perror(sphrdlist[i]);
+      perror(sphrList[i]);
       exit(1);
     }
 
-    for (int i = 0; i < n_xyz / 2 + 1; i++)
-      for (int j = i; j < n_xyz / 2 + 1; j++)
-        for (int k = j; k < n_xyz / 2 + 1; k++) {
+    for (int i = 0; i < xyzSize / 2 + 1; i++)
+      for (int j = i; j < xyzSize / 2 + 1; j++)
+        for (int k = j; k < xyzSize / 2 + 1; k++) {
           DOUBLE re, im, distance = 0.0;
 
           distance =
               sqrt(pow(DOUBLE(i), 2) + pow(DOUBLE(j), 2) + pow(DOUBLE(k), 2));
-          re = CORR(tmp, i, j, k, n_xyz).real();
-          im = CORR(tmp, i, j, k, n_xyz).imag();
+          re = CORR(tmp, i, j, k, xyzSize).real();
+          im = CORR(tmp, i, j, k, xyzSize).imag();
 
           fprintf(fp, "%1.16e %1.16e %1.16e\n", distance, re, im);
         }

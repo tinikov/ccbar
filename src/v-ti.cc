@@ -51,8 +51,8 @@ static const char *of_name_vs = NULL;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -65,7 +65,7 @@ int main(int argc, char *argv[]) {
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-l") == 0) {
       array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!array_length) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-mbar") == 0) {
       mbar = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mbar == 0) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-mdiff") == 0) {
       mdiff = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mdiff == 0) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-mc") == 0) {
       mc = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mc == 0) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-ov0") == 0) {
       of_name_v0 = argv[1];
       if (of_name_v0 == NULL) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-ovs") == 0) {
       of_name_vs = argv[1];
       if (of_name_vs == NULL) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -142,13 +142,13 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Make sure of all needed syntax
   if (argc != 2) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 

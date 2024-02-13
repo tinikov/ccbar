@@ -45,8 +45,8 @@ static const char *of_name = NULL;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -56,11 +56,11 @@ int main(int argc, char *argv[]) {
   //    |________________________|
 
   while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+         argv[0][0] == '-')
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-l") == 0) {
       array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!array_length) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     if (strcmp(argv[0], "-o") == 0) {
       of_name = argv[1];
       if (of_name == NULL) {
-        usage(program_name);
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -89,13 +89,13 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Make sure of all needed syntax
   if (argc != 6) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 

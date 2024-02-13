@@ -34,17 +34,17 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int fileCountTotal);
-void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int fileCountTotal);
+void naive_norm(char *rawDataList[], char *nnlist[], int xyzSize, int fileCountTotal);
+void l2_norm(char *rawDataList[], char *l2list[], int xyzSize, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
 //     |    Global Variables    |
 //     |________________________|
 
-int n_xyz = 0;
-static const char *of_dir = NULL;
-bool is_add_prefix = false;
+int xyzSize = 0;
+static const char *ofDir = NULL;
+bool isAddPrefix = false;
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -52,8 +52,8 @@ bool is_add_prefix = false;
 //     |________________________|
 
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
   // ________________________________
@@ -63,19 +63,19 @@ int main(int argc, char *argv[]) {
   //    |________________________|
 
   while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+         argv[0][0] == '-')
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
-    // -n: n_xyz
+    // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      n_xyz = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!n_xyz) {
-        usage(program_name);
+      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!xyzSize) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -85,9 +85,9 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      of_dir = argv[1];
-      if (of_dir == NULL) {
-        usage(program_name);
+      ofDir = argv[1];
+      if (ofDir == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -96,19 +96,19 @@ int main(int argc, char *argv[]) {
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
   // Initialization
   const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
   fprintf(stderr, "##  Normalization! \n");
   fprintf(stderr, "##  Total of data files: %d\n", fileCountTotal);
-  fprintf(stderr, "##  Spacial size:        %d\n", n_xyz);
+  fprintf(stderr, "##  Spacial size:        %d\n", xyzSize);
 
   // Create arrays to store ofnames
   char *nn_dlist[fileCountTotal], *l2_dlist[fileCountTotal];
@@ -119,14 +119,14 @@ int main(int argc, char *argv[]) {
     l2_dlist[i] = (char *)malloc(2048 * sizeof(char));
 
     addPrefix(argv[i], "nn", nn_stmp);
-    changePath(nn_stmp, of_dir, nn_dlist[i]);
+    changePath(nn_stmp, ofDir, nn_dlist[i]);
     addPrefix(argv[i], "l2", l2_stmp);
-    changePath(l2_stmp, of_dir, l2_dlist[i]);
+    changePath(l2_stmp, ofDir, l2_dlist[i]);
   }
 
   // Main part for calculation
-  naive_norm(argv, nn_dlist, n_xyz, fileCountTotal);
-  l2_norm(argv, l2_dlist, n_xyz, fileCountTotal);
+  naive_norm(argv, nn_dlist, xyzSize, fileCountTotal);
+  l2_norm(argv, l2_dlist, xyzSize, fileCountTotal);
 
   // Finalization for the string arrays
   for (int i = 0; i < fileCountTotal; i++) {
@@ -142,8 +142,8 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int fileCountTotal) {
-  int array_length = int(pow(n_xyz, 3));
+void naive_norm(char *rawDataList[], char *nnlist[], int xyzSize, int fileCountTotal) {
+  int array_length = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
@@ -153,7 +153,7 @@ void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int fileCountTotal)
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
     for (int j = 0; j < array_length; j++)  // Compute C_n(t) = C(t)/C(0)
     {
@@ -164,8 +164,8 @@ void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int fileCountTotal)
   }
 }
 
-void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int fileCountTotal) {
-  int array_length = int(pow(n_xyz, 3));
+void l2_norm(char *rawDataList[], char *l2list[], int xyzSize, int fileCountTotal) {
+  int array_length = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
@@ -176,7 +176,7 @@ void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int fileCountTotal) {
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
     for (int j = 0; j < array_length; j++) {
       norm_fact += norm(tmp[j]);

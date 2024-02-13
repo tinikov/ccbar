@@ -10,7 +10,7 @@
 #ifndef IS_INCLUDED_CORRELATOR_H
 #define IS_INCLUDED_CORRELATOR_H
 
-#include "type_alias.h"
+#include "alias.h"
 
 // inline DOUBLE &CORR(DOUBLE *data, int x, int y, int z, int n_xyz)
 // {

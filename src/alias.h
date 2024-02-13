@@ -1,5 +1,5 @@
 /**
- * @file type_alias.h
+ * @file alias.h
  * @author Tianchen Zhang
  * @brief
  * @version 1.0

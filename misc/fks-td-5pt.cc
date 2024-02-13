@@ -10,7 +10,7 @@
 
 #include "dataio.h"
 #include "misc.h"
-#include "type_alias.h"
+#include "alias.h"
 // __________________________________
 //     .________|______|________.
 //     |                        |

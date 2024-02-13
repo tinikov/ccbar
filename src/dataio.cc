@@ -1,6 +1,6 @@
 /**
  * @file dataio.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief
  * @version 1.1
  * @date 2024-02-13
@@ -9,44 +9,40 @@
 
 #include "dataio.h"
 
-#include <complex>
-
-#include "type_alias.h"
-
-void readBin(const char *if_name, int array_length, DOUBLE *data) {
-  FILE *fp = fopen(if_name, "rb");
+void readBin(const char *ifname, int array_length, DOUBLE *data) {
+  FILE *fp = fopen(ifname, "rb");
   if (fp == NULL) {
-    perror(if_name);
+    perror(ifname);
     exit(1);
   }
 
   fread(data, sizeof(DOUBLE), array_length, fp);
   fclose(fp);
 }
-void readBin(const char *if_name, int array_length, COMPLX *data) {
-  FILE *fp = fopen(if_name, "rb");
+void readBin(const char *ifname, int array_length, COMPLX *data) {
+  FILE *fp = fopen(ifname, "rb");
   if (fp == NULL) {
-    perror(if_name);
+    perror(ifname);
     exit(1);
   }
 
   fread(data, sizeof(COMPLX), array_length, fp);
   fclose(fp);
 }
-void readBin(const char *if_name, int array_length, DVARRAY &data) {
-  FILE *fp = fopen(if_name, "rb");
+void readBin(const char *ifname, int array_length, DVARRAY &data) {
+  FILE *fp = fopen(ifname, "rb");
   if (fp == NULL) {
-    perror(if_name);
+    perror(ifname);
     exit(1);
   }
 
   fread(&data[0], sizeof(DOUBLE), array_length, fp);
   fclose(fp);
 }
-void readBin(const char *if_name, int array_length, CVARRAY &data) {
-  FILE *fp = fopen(if_name, "rb");
+void readBin(const char *ifname, int array_length, CVARRAY &data) {
+  FILE *fp = fopen(ifname, "rb");
   if (fp == NULL) {
-    perror(if_name);
+    perror(ifname);
     exit(1);
   }
 

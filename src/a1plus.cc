@@ -1,21 +1,15 @@
 /**
  * @file a1plus.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief A1+ projection for 4-point correlators
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "correlator.h"
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "A1+ projection for 4-point correlators\n");
@@ -30,54 +24,36 @@ void usage(char *name) {
           "    [-p] <PREFIX>:    Prefix for output files\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int fileCountTotal);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void a1plus(char *rawDataList[], char *a1list[], int xyzSize,
+            int fileCountTotal);
 
-int n_xyz = 0;
-static const char *of_dir = NULL;
-static const char *of_prefix = NULL;
-bool is_add_prefix = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  // Global variables
+  int xyzSize = 0;
+  static const char *ofDir = NULL;
+  static const char *ofPrefix = NULL;
+  bool isAddPrefix = false;
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
-  {
+  // read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
-    // -n: n_xyz
+    // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      n_xyz = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!n_xyz) {
-        usage(program_name);
+      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!xyzSize) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -87,9 +63,9 @@ int main(int argc, char *argv[]) {
 
     // -d: directory for output file
     if (strcmp(argv[0], "-d") == 0) {
-      of_dir = argv[1];
-      if (of_dir == NULL) {
-        usage(program_name);
+      ofDir = argv[1];
+      if (ofDir == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -99,82 +75,74 @@ int main(int argc, char *argv[]) {
 
     // -p: prefix for output file
     if (strcmp(argv[0], "-p") == 0) {
-      of_prefix = argv[1];
-      is_add_prefix = true;
+      ofPrefix = argv[1];
+      isAddPrefix = true;
       argc -= 2;
       argv += 2;
       continue;
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
-  // Initialization
-  const int fileCountTotal = argc;  // # of data files
+  const int fileCountTotal = argc;
   if (fileCountTotal < 1) {
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
-  fprintf(stderr, "##  A1+ projection! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
-  fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
-  char *a1_dlist[fileCountTotal];
-
-  if (is_add_prefix) {
+  char *ofnameArr[fileCountTotal];
+  if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      addPrefix(argv[i], of_prefix, stmp);
-      changePath(stmp, of_dir, a1_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      addPrefix(argv[i], ofPrefix, stmp);
+      changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
-      changePath(argv[i], of_dir, a1_dlist[i]);
+      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
 
   // Main part for calculation
-  a1_plus(argv, a1_dlist, n_xyz, fileCountTotal);
+  a1plus(argv, ofnameArr, xyzSize, fileCountTotal);
 
-  // Finalization for the string arrays
+  // Finalization for the ofname array
   for (int i = 0; i < fileCountTotal; i++) {
-    free(a1_dlist[i]);
+    free(ofnameArr[i]);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
-inline COMPLX sphere_sym(COMPLX *data, int x, int y, int z, int n_xyz) {
-  return (CORR(data, x, y, z, n_xyz) + CORR(data, y, z, x, n_xyz) +
-          CORR(data, z, x, y, n_xyz) + CORR(data, x, z, y, n_xyz) +
-          CORR(data, z, y, x, n_xyz) + CORR(data, y, x, z, n_xyz)) /
+// Custom function definition
+inline COMPLX naiveSym(COMPLX *data, int x, int y, int z, int xyzSize) {
+  return (CORR(data, x, y, z, xyzSize) + CORR(data, y, z, x, xyzSize) +
+          CORR(data, z, x, y, xyzSize) + CORR(data, x, z, y, xyzSize) +
+          CORR(data, z, y, x, xyzSize) + CORR(data, y, x, z, xyzSize)) /
          6.0;
 }
 
-inline COMPLX a1_sym(COMPLX *data, int x, int y, int z, int n_xyz) {
-  return (sphere_sym(data, x, y, z, n_xyz) +
-          sphere_sym(data, x, y, n_xyz - z, n_xyz) +
-          sphere_sym(data, x, n_xyz - y, z, n_xyz) +
-          sphere_sym(data, x, n_xyz - y, n_xyz - z, n_xyz) +
-          sphere_sym(data, n_xyz - x, y, z, n_xyz) +
-          sphere_sym(data, n_xyz - x, y, n_xyz - z, n_xyz) +
-          sphere_sym(data, n_xyz - x, n_xyz - y, z, n_xyz) +
-          sphere_sym(data, n_xyz - x, n_xyz - y, n_xyz - z, n_xyz)) /
+inline COMPLX a1Sym(COMPLX *data, int x, int y, int z, int xyzSize) {
+  return (naiveSym(data, x, y, z, xyzSize) +
+          naiveSym(data, x, y, xyzSize - z, xyzSize) +
+          naiveSym(data, x, xyzSize - y, z, xyzSize) +
+          naiveSym(data, x, xyzSize - y, xyzSize - z, xyzSize) +
+          naiveSym(data, xyzSize - x, y, z, xyzSize) +
+          naiveSym(data, xyzSize - x, y, xyzSize - z, xyzSize) +
+          naiveSym(data, xyzSize - x, xyzSize - y, z, xyzSize) +
+          naiveSym(data, xyzSize - x, xyzSize - y, xyzSize - z, xyzSize)) /
          8.0;
 }
 
-void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int fileCountTotal) {
-  int array_length = int(pow(n_xyz, 3));
+void a1plus(char *rawDataList[], char *a1list[], int xyzSize,
+            int fileCountTotal) {
+  int array_length = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
@@ -183,12 +151,12 @@ void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int fileCountTotal) {
       tmp[j] = result[j] = 0.0;
     }
 
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], array_length, tmp);
 
-    for (int ix = 0; ix < n_xyz; ix++)
-      for (int iy = 0; iy < n_xyz; iy++)
-        for (int iz = 0; iz < n_xyz; iz++) {
-          CORR(result, ix, iy, iz, n_xyz) = a1_sym(tmp, ix, iy, iz, n_xyz);
+    for (int ix = 0; ix < xyzSize; ix++)
+      for (int iy = 0; iy < xyzSize; iy++)
+        for (int iz = 0; iz < xyzSize; iz++) {
+          CORR(result, ix, iy, iz, xyzSize) = a1Sym(tmp, ix, iy, iz, xyzSize);
         }
 
     writeBin(a1list[i], array_length, result);

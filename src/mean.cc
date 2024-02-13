@@ -36,20 +36,19 @@ void jackknifeMeanD(char *rawDataList[], const char *result, int arrayLength,
 
 // Main function
 int main(int argc, char *argv[]) {
-  // brief Global variables
+  // Global variables
   int arrayLength = 0;
   static const char *ofname = NULL;
   bool isJackknife = false;
   bool isJackknifeD = false;
   bool isSaveTxt = false;
-
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
 
-  while (argc > 0 && argv[0][0] == '-')  // read options (order irrelevant)
-  {
+  // read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-') {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
       usage(programName);
@@ -132,7 +131,7 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-// Jackknife average
+// Custom function definition
 void jackknifeMean(char *rawDataList[], const char *result, int arrayLength,
                    int fileCountTotal) {
   DVARRAY mean(arrayLength), var(arrayLength);

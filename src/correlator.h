@@ -2,8 +2,8 @@
  * @file correlator.h
  * @author Tianchen Zhang 
  * @brief
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
@@ -12,39 +12,39 @@
 
 #include "alias.h"
 
-// inline DOUBLE &CORR(DOUBLE *data, int x, int y, int z, int n_xyz)
-// {
-//   x = (x + n_xyz) % n_xyz;
-//   y = (y + n_xyz) % n_xyz;
-//   z = (z + n_xyz) % n_xyz;
-//   DOUBLE &corr_r = data[x + n_xyz * (y + n_xyz * z)];
-//   return corr_r;
-// }
-
-inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int n_xyz) {
-  x = (x + n_xyz) % n_xyz;
-  y = (y + n_xyz) % n_xyz;
-  z = (z + n_xyz) % n_xyz;
-  COMPLX &corr_r = data[x + n_xyz * (y + n_xyz * z)];
-  return corr_r;
+inline DOUBLE &CORR(DOUBLE *data, int x, int y, int z, int xyzSize)
+{
+  x = (x + xyzSize) % xyzSize;
+  y = (y + xyzSize) % xyzSize;
+  z = (z + xyzSize) % xyzSize;
+  DOUBLE &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  return corrReturn;
 }
 
-// inline DOUBLE &CORR(DVARRAY &data, int x, int y, int z, int n_xyz)
-// {
-//   x = (x + n_xyz) % n_xyz;
-//   y = (y + n_xyz) % n_xyz;
-//   z = (z + n_xyz) % n_xyz;
-//   DOUBLE &corr_r = data[x + n_xyz * (y + n_xyz * z)];
-//   return corr_r;
-// }
+inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int xyzSize) {
+  x = (x + xyzSize) % xyzSize;
+  y = (y + xyzSize) % xyzSize;
+  z = (z + xyzSize) % xyzSize;
+  COMPLX &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  return corrReturn;
+}
 
-// inline COMPLX &CORR(CVARRAY &data, int x, int y, int z, int n_xyz)
-// {
-//   x = (x + n_xyz) % n_xyz;
-//   y = (y + n_xyz) % n_xyz;
-//   z = (z + n_xyz) % n_xyz;
-//   COMPLX &corr_r = data[x + n_xyz * (y + n_xyz * z)];
-//   return corr_r;
-// }
+inline DOUBLE &CORR(DVARRAY &data, int x, int y, int z, int xyzSize)
+{
+  x = (x + xyzSize) % xyzSize;
+  y = (y + xyzSize) % xyzSize;
+  z = (z + xyzSize) % xyzSize;
+  DOUBLE &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  return corrReturn;
+}
+
+inline COMPLX &CORR(CVARRAY &data, int x, int y, int z, int xyzSize)
+{
+  x = (x + xyzSize) % xyzSize;
+  y = (y + xyzSize) % xyzSize;
+  z = (z + xyzSize) % xyzSize;
+  COMPLX &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  return corrReturn;
+}
 
 #endif

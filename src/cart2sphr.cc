@@ -37,7 +37,7 @@ void usage(char *name) {
 //     |________________________|
 
 void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
-                            int N_df);
+                            int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -113,37 +113,37 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 1) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 1) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  Cartesian to Spherical! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
   fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
-  char *sphr_dlist[N_df];
+  char *sphr_dlist[fileCountTotal];
 
   if (is_add_prefix) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], of_prefix, stmp);
       changePath(stmp, of_dir, sphr_dlist[i]);
     }
   } else {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       sphr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       changePath(argv[i], of_dir, sphr_dlist[i]);
     }
   }
 
   // Main part for calculation
-  cartesian_to_spherical(argv, sphr_dlist, n_xyz, N_df);
+  cartesian_to_spherical(argv, sphr_dlist, n_xyz, fileCountTotal);
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(sphr_dlist[i]);
   }
 
@@ -156,10 +156,10 @@ int main(int argc, char *argv[]) {
 //     |________________________|
 
 void cartesian_to_spherical(char *rawdlist[], char *sphrdlist[], int n_xyz,
-                            int N_df) {
+                            int fileCountTotal) {
   int array_length = pow(n_xyz, 3);
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length];
     for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
     {

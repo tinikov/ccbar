@@ -36,8 +36,8 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df);
-void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df);
+void exp_mass(char *rawdlist[], char *explist[], int n_t, int fileCountTotal);
+void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -111,19 +111,19 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 1) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 1) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  Effective mass! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
+  fprintf(stderr, "##  Total of data files: %d\n", fileCountTotal);
   fprintf(stderr, "##  Temporal size:       %d\n", n_t);
 
   // Create an array to store ofnames
-  char *exp_dlist[N_df], *csh_dlist[N_df];
+  char *exp_dlist[fileCountTotal], *csh_dlist[fileCountTotal];
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     char stmp[2048];
 
     exp_dlist[i] = (char *)malloc(2048 * sizeof(char));
@@ -136,11 +136,11 @@ int main(int argc, char *argv[]) {
   }
 
   // Main part for calculation
-  exp_mass(argv, exp_dlist, n_t, N_df);
-  csh_mass(argv, csh_dlist, n_t, N_df);
+  exp_mass(argv, exp_dlist, n_t, fileCountTotal);
+  csh_mass(argv, csh_dlist, n_t, fileCountTotal);
 
   if (is_save_txt) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
 
       addPrefix(exp_dlist[i], "txt", txttmp);
@@ -152,7 +152,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(exp_dlist[i]);
     free(csh_dlist[i]);
   }
@@ -165,8 +165,8 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void exp_mass(char *rawdlist[], char *explist[], int n_t, int N_df) {
-  for (int i = 0; i < N_df; i++) {
+void exp_mass(char *rawdlist[], char *explist[], int n_t, int fileCountTotal) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[n_t], effmass[n_t];
     for (int j = 0; j < n_t; j++) {
       raw[j] = 0.0;
@@ -209,8 +209,8 @@ DOUBLE coshtype_mass(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int n_t) {
   return 0.0;
 }
 
-void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int N_df) {
-  for (int i = 0; i < N_df; i++) {
+void csh_mass(char *rawdlist[], char *cshlist[], int n_t, int fileCountTotal) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[n_t], effmass[n_t];
     for (int j = 0; j < n_t; j++) {
       raw[j] = 0.0;

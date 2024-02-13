@@ -34,8 +34,8 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int N_df);
-void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df);
+void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int fileCountTotal);
+void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -101,19 +101,19 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 1) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 1) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  Normalization! \n");
-  fprintf(stderr, "##  Total of data files: %d\n", N_df);
+  fprintf(stderr, "##  Total of data files: %d\n", fileCountTotal);
   fprintf(stderr, "##  Spacial size:        %d\n", n_xyz);
 
   // Create arrays to store ofnames
-  char *nn_dlist[N_df], *l2_dlist[N_df];
+  char *nn_dlist[fileCountTotal], *l2_dlist[fileCountTotal];
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     char nn_stmp[2048], l2_stmp[2048];
     nn_dlist[i] = (char *)malloc(2048 * sizeof(char));
     l2_dlist[i] = (char *)malloc(2048 * sizeof(char));
@@ -125,11 +125,11 @@ int main(int argc, char *argv[]) {
   }
 
   // Main part for calculation
-  naive_norm(argv, nn_dlist, n_xyz, N_df);
-  l2_norm(argv, l2_dlist, n_xyz, N_df);
+  naive_norm(argv, nn_dlist, n_xyz, fileCountTotal);
+  l2_norm(argv, l2_dlist, n_xyz, fileCountTotal);
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(nn_dlist[i]);
     free(l2_dlist[i]);
   }
@@ -142,10 +142,10 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int N_df) {
+void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int fileCountTotal) {
   int array_length = int(pow(n_xyz, 3));
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
 
     for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
@@ -164,10 +164,10 @@ void naive_norm(char *rawdlist[], char *nnlist[], int n_xyz, int N_df) {
   }
 }
 
-void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int N_df) {
+void l2_norm(char *rawdlist[], char *l2list[], int n_xyz, int fileCountTotal) {
   int array_length = int(pow(n_xyz, 3));
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
     DOUBLE norm_fact = 0.0;
 

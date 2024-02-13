@@ -36,7 +36,7 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int N_df);
+void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -112,37 +112,37 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 1) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 1) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  A1+ projection! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
   fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
-  char *a1_dlist[N_df];
+  char *a1_dlist[fileCountTotal];
 
   if (is_add_prefix) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], of_prefix, stmp);
       changePath(stmp, of_dir, a1_dlist[i]);
     }
   } else {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       a1_dlist[i] = (char *)malloc(2048 * sizeof(char));
       changePath(argv[i], of_dir, a1_dlist[i]);
     }
   }
 
   // Main part for calculation
-  a1_plus(argv, a1_dlist, n_xyz, N_df);
+  a1_plus(argv, a1_dlist, n_xyz, fileCountTotal);
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(a1_dlist[i]);
   }
 
@@ -173,10 +173,10 @@ inline COMPLX a1_sym(COMPLX *data, int x, int y, int z, int n_xyz) {
          8.0;
 }
 
-void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int N_df) {
+void a1_plus(char *rawdlist[], char *a1list[], int n_xyz, int fileCountTotal) {
   int array_length = int(pow(n_xyz, 3));
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
     for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
     {

@@ -36,7 +36,7 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df);
+void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -112,37 +112,37 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 1) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 1) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  Pre-potential! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
   fprintf(stderr, "##  Spacial size:         %d\n", n_xyz);
 
   // Create an array to store ofnames
-  char *prev_dlist[N_df];
+  char *prev_dlist[fileCountTotal];
 
   if (is_add_prefix) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], of_prefix, stmp);
       changePath(stmp, of_dir, prev_dlist[i]);
     }
   } else {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       prev_dlist[i] = (char *)malloc(2048 * sizeof(char));
       changePath(argv[i], of_dir, prev_dlist[i]);
     }
   }
 
   // Main part for calculation
-  pre_potential(argv, prev_dlist, n_xyz, N_df);
+  pre_potential(argv, prev_dlist, n_xyz, fileCountTotal);
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(prev_dlist[i]);
   }
 
@@ -154,10 +154,10 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int N_df) {
+void pre_potential(char *rawdlist[], char *ppotlist[], int n_xyz, int fileCountTotal) {
   int array_length = int(pow(n_xyz, 3));
 
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[array_length], result[array_length];
     for (int j = 0; j < array_length; j++)  // Initialize the empty arrays
     {

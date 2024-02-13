@@ -38,9 +38,9 @@ void usage(char *name) {
 //     |________________________|
 
 void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
-                        int N_df);
+                        int fileCountTotal);
 void jackknife_resample_var(char *rawdlist[], char *samdlist[],
-                            int array_length, int N_df);
+                            int array_length, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -134,27 +134,27 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 2) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 2) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  Jackknife resampling! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
   fprintf(stderr, "##  Array length:         %d\n", array_length);
 
   // Create an array to store ofnames
-  char *jre_dlist[N_df];
+  char *jre_dlist[fileCountTotal];
 
   if (is_add_prefix) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], of_prefix, stmp);
       changePath(stmp, ofdir, jre_dlist[i]);
     }
   } else {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       jre_dlist[i] = (char *)malloc(2048 * sizeof(char));
       changePath(argv[i], ofdir, jre_dlist[i]);
     }
@@ -162,13 +162,13 @@ int main(int argc, char *argv[]) {
 
   // Main part for calculation
   if (is_cal_var) {
-    jackknife_resample_var(argv, jre_dlist, array_length, N_df);
+    jackknife_resample_var(argv, jre_dlist, array_length, fileCountTotal);
   } else {
-    jackknife_resample(argv, jre_dlist, array_length, N_df);
+    jackknife_resample(argv, jre_dlist, array_length, fileCountTotal);
   }
 
   if (is_save_txt) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
       addPrefix(jre_dlist[i], "txt", txttmp);
       bin2txt(jre_dlist[i], txttmp, array_length);
@@ -176,7 +176,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(jre_dlist[i]);
   }
 
@@ -189,12 +189,12 @@ int main(int argc, char *argv[]) {
 //     |________________________|
 
 void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
-                        int N_df) {
+                        int fileCountTotal) {
   CVARRAY sum(array_length), value(array_length);
   sum = value = 0.0;
 
   // First round: Get sum of all data
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
     readBin(rawdlist[i], array_length, tmp);
@@ -203,25 +203,25 @@ void jackknife_resample(char *rawdlist[], char *samdlist[], int array_length,
   }
 
   // Second round: Generate jackknife resampled data and save files
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
     readBin(rawdlist[i], array_length, tmp);
 
-    value = (sum - tmp) / (N_df - 1.0);
+    value = (sum - tmp) / (fileCountTotal - 1.0);
 
     writeBin(samdlist[i], array_length, value);
   }
 }
 
 void jackknife_resample_var(char *rawdlist[], char *samdlist[],
-                            int array_length, int N_df) {
+                            int array_length, int fileCountTotal) {
   DVARRAY sum(array_length), sum_square(array_length), value(array_length),
       var(array_length);
   sum = sum_square = value = var = 0.0;
 
   // First round: Get sum and sum^2 of all data
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
     readBin(rawdlist[i], array_length, tmp);
@@ -238,7 +238,7 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
   // Second round: Generate the Jackknife sampled data and calculate the
   // variance
   // Also, save files to samdlist[]
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     CVARRAY tmp(array_length);
     tmp = 0.0;
     readBin(rawdlist[i], array_length, tmp);
@@ -248,12 +248,12 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
     keepReal(tmp, rtmp, array_length);
     // varryNorm(tmp, rtmp, array_length);
 
-    value = (sum - rtmp) / (N_df - 1.0);
+    value = (sum - rtmp) / (fileCountTotal - 1.0);
     // About this variance, please refer to eq.(7.37) on P.383, Montvay LQCD
     // book
     var =
-        sqrt(((sum_square - rtmp * rtmp) / DOUBLE(N_df - 1.0) - value * value) /
-             DOUBLE(N_df - 2.0));
+        sqrt(((sum_square - rtmp * rtmp) / DOUBLE(fileCountTotal - 1.0) - value * value) /
+             DOUBLE(fileCountTotal - 2.0));
 
     CVARRAY result(array_length);
     result = 0.0;

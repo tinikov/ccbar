@@ -36,7 +36,7 @@ void usage(char *name) {
 //     |    Custom functions    |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df);
+void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int fileCountTotal);
 // __________________________________
 //     .________|______|________.
 //     |                        |
@@ -121,37 +121,37 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int N_df = argc;  // # of data files
-  if (N_df < 1) {
+  const int fileCountTotal = argc;  // # of data files
+  if (fileCountTotal < 1) {
     usage(program_name);
     exit(1);
   }
   fprintf(stderr, "##  Time reversal! \n");
-  fprintf(stderr, "##  Total of data files:  %d\n", N_df);
+  fprintf(stderr, "##  Total of data files:  %d\n", fileCountTotal);
   fprintf(stderr, "##  Temporal size:        %d\n", n_t);
 
   // Create an array to store ofnames
-  char *tr_dlist[N_df];
+  char *tr_dlist[fileCountTotal];
 
   if (is_add_prefix) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       addPrefix(argv[i], of_prefix, stmp);
       changePath(stmp, of_dir, tr_dlist[i]);
     }
   } else {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       tr_dlist[i] = (char *)malloc(2048 * sizeof(char));
       changePath(argv[i], of_dir, tr_dlist[i]);
     }
   }
 
   // Main part for calculation
-  time_reverse_2pt(argv, tr_dlist, n_t, N_df);
+  time_reverse_2pt(argv, tr_dlist, n_t, fileCountTotal);
 
   if (is_save_txt) {
-    for (int i = 0; i < N_df; i++) {
+    for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
       addPrefix(tr_dlist[i], "txt", txttmp);
       bin2txt(tr_dlist[i], txttmp, n_t);
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
   }
 
   // Finalization for the string arrays
-  for (int i = 0; i < N_df; i++) {
+  for (int i = 0; i < fileCountTotal; i++) {
     free(tr_dlist[i]);
   }
 
@@ -171,8 +171,8 @@ int main(int argc, char *argv[]) {
 //     |  Custom Functions DEF  |
 //     |________________________|
 
-void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int N_df) {
-  for (int i = 0; i < N_df; i++) {
+void time_reverse_2pt(char *rawdlist[], char *trdlist[], int n_t, int fileCountTotal) {
+  for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[n_t], data[n_t];
     for (int j = 0; j < n_t; j++) raw[j] = data[j] = 0.0;
 

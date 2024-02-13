@@ -1,20 +1,14 @@
 /**
  * @file mean.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief Mean for raw data (Optional: jackknife variance)
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
 #include "dataio.h"
 #include "misc.h"
-#include "alias.h"
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |     Usage function     |
-//     |________________________|
 
 void usage(char *name) {
   fprintf(stderr, "Mean for raw data (Optional: jackknife variance)\n");
@@ -31,60 +25,42 @@ void usage(char *name) {
           "    [-t]:             Also save a txt file\n"
           "    [-h, --help]:     Print help\n");
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Custom functions    |
-//     |________________________|
 
-void arithmetic_mean(char *rawdlist[], const char *result, int array_length,
-                     int N_df);
-void jackknife_mean(char *rawdlist[], const char *result, int array_length,
-                    int N_df);
-void jackknife_mean_double(char *rawdlist[], const char *result,
-                           int array_length, int N_df);
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |    Global Variables    |
-//     |________________________|
+// Custom function declaration
+void arithmeticMean(char *rawDataList[], const char *result, int arrayLength,
+                    int fileCountTotal);
+void jackknifeMean(char *rawDataList[], const char *result, int arrayLength,
+                   int fileCountTotal);
+void jackknifeMeanD(char *rawDataList[], const char *result, int arrayLength,
+                    int fileCountTotal);
 
-int array_length = 0;
-static const char *of_name = NULL;
-bool is_jackknife = false;
-bool is_jackknife_double = false;
-bool is_save_txt = false;
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |      Main Function     |
-//     |________________________|
-
+// Main function
 int main(int argc, char *argv[]) {
-  char program_name[128];
-  strncpy(program_name, basename(argv[0]), 127);
+  // brief Global variables
+  int arrayLength = 0;
+  static const char *ofname = NULL;
+  bool isJackknife = false;
+  bool isJackknifeD = false;
+  bool isSaveTxt = false;
+
+  char programName[128];
+  strncpy(programName, basename(argv[0]), 127);
   argc--;
   argv++;
-  // ________________________________
-  //    .________|______|________.
-  //    |                        |
-  //    |  Dealing with Options  |
-  //    |________________________|
 
-  while (argc > 0 &&
-         argv[0][0] == '-')  // deal with all options regardless of their order
+  while (argc > 0 && argv[0][0] == '-')  // read options (order irrelevant)
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
-      usage(program_name);
+      usage(programName);
       exit(0);
     }
 
-    // -l: array_length
+    // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      array_length = atoi(argv[1]);  // atoi(): convert ASCII string to integer
-      if (!array_length) {
-        usage(program_name);
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      if (!arrayLength) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -94,9 +70,9 @@ int main(int argc, char *argv[]) {
 
     // -o: of_name
     if (strcmp(argv[0], "-o") == 0) {
-      of_name = argv[1];
-      if (of_name == NULL) {
-        usage(program_name);
+      ofname = argv[1];
+      if (ofname == NULL) {
+        usage(programName);
         exit(1);
       }
       argc -= 2;
@@ -106,7 +82,7 @@ int main(int argc, char *argv[]) {
 
     // -j: jackknife variance
     if (strcmp(argv[0], "-j") == 0) {
-      is_jackknife = true;
+      isJackknife = true;
       argc--;
       argv++;
       continue;
@@ -114,7 +90,7 @@ int main(int argc, char *argv[]) {
 
     // -jd: jackknife variance (on DOUBLE)
     if (strcmp(argv[0], "-jd") == 0) {
-      is_jackknife_double = true;
+      isJackknifeD = true;
       argc--;
       argv++;
       continue;
@@ -122,151 +98,131 @@ int main(int argc, char *argv[]) {
 
     // -t: save txt
     if (strcmp(argv[0], "-t") == 0) {
-      is_save_txt = true;
+      isSaveTxt = true;
       argc--;
       argv++;
       continue;
     }
 
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
-    usage(program_name);
+    usage(programName);
     exit(1);
   }
 
-  const int N_df = argc;  // # of data files
-  if (N_df < 2) {
-    usage(program_name);
+  const int fileCountTotal = argc;
+  if (fileCountTotal < 2) {
+    usage(programName);
     exit(1);
   }
 
-  if (is_jackknife) {
-    // Initialization
-    fprintf(stderr, "##  Mean with JK-var! \n");
-    fprintf(stderr, "##  Total of data files:  %d\n", N_df);
-    fprintf(stderr, "##  Array length:         %d\n", array_length);
-
-    jackknife_mean(argv, of_name, array_length, N_df);
-  } else if (is_jackknife_double) {
-    // Initialization
-    fprintf(stderr, "##  Mean with JK-var! (DOUBLE)\n");
-    fprintf(stderr, "##  Total of data files:  %d\n", N_df);
-    fprintf(stderr, "##  Array length:         %d\n", array_length);
-
-    jackknife_mean_double(argv, of_name, array_length, N_df);
+  if (isJackknife) {
+    jackknifeMean(argv, ofname, arrayLength, fileCountTotal);
+  } else if (isJackknifeD) {
+    jackknifeMeanD(argv, ofname, arrayLength, fileCountTotal);
   } else {
-    // Initialization
-    fprintf(stderr, "##  Naive mean! \n");
-    fprintf(stderr, "##  Total of data files:  %d\n", N_df);
-    fprintf(stderr, "##  Array length:         %d\n", array_length);
-
-    arithmetic_mean(argv, of_name, array_length, N_df);
+    arithmeticMean(argv, ofname, arrayLength, fileCountTotal);
   }
 
-  if (is_save_txt) {
+  if (isSaveTxt) {
     char txtfname[2048];
-    addPrefix(of_name, "txt", txtfname);
-    bin2txt(of_name, txtfname, array_length);
+    addPrefix(ofname, "txt", txtfname);
+    bin2txt(ofname, txtfname, arrayLength);
   }
 
   return 0;
 }
-// __________________________________
-//     .________|______|________.
-//     |                        |
-//     |  Custom Functions DEF  |
-//     |________________________|
 
 // Jackknife average
-void jackknife_mean(char *rawdlist[], const char *result, int array_length,
-                    int N_df) {
-  DVARRAY mean(array_length), var(array_length);
+void jackknifeMean(char *rawDataList[], const char *result, int arrayLength,
+                   int fileCountTotal) {
+  DVARRAY mean(arrayLength), var(arrayLength);
   mean = var = 0.0;
 
-  for (int i = 0; i < N_df; i++) {
-    CVARRAY tmp(array_length);
+  for (int i = 0; i < fileCountTotal; i++) {
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    DVARRAY rtmp(array_length);
+    DVARRAY rtmp(arrayLength);
     rtmp = 0.0;
-    keepReal(tmp, rtmp, array_length);
-    // varryNorm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, arrayLength);
+    // varryNorm(tmp, rtmp, arrayLength);
 
-    mean += rtmp / DOUBLE(N_df);
+    mean += rtmp / DOUBLE(fileCountTotal);
   }
 
-  for (int i = 0; i < N_df; i++) {
-    CVARRAY tmp(array_length);
+  for (int i = 0; i < fileCountTotal; i++) {
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    DVARRAY rtmp(array_length);
+    DVARRAY rtmp(arrayLength);
     rtmp = 0.0;
-    keepReal(tmp, rtmp, array_length);
-    // varryNorm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, arrayLength);
+    // varryNorm(tmp, rtmp, arrayLength);
 
     var += (rtmp - mean) * (rtmp - mean);
   }
 
-  var = sqrt(var * DOUBLE(N_df - 1) / DOUBLE(N_df));
+  var = sqrt(var * DOUBLE(fileCountTotal - 1) / DOUBLE(fileCountTotal));
 
-  CVARRAY out(array_length);
+  CVARRAY out(arrayLength);
   out = 0.0;
 
-  for (int i = 0; i < array_length; i++) {
+  for (int i = 0; i < arrayLength; i++) {
     out[i].real(mean[i]);
     out[i].imag(var[i]);
   }
 
-  writeBin(result, array_length, out);
+  writeBin(result, arrayLength, out);
 }
 
-void jackknife_mean_double(char *rawdlist[], const char *result,
-                           int array_length, int N_df) {
-  DVARRAY mean(array_length), var(array_length);
+void jackknifeMeanD(char *rawDataList[], const char *result, int arrayLength,
+                    int fileCountTotal) {
+  DVARRAY mean(arrayLength), var(arrayLength);
   mean = var = 0.0;
 
-  for (int i = 0; i < N_df; i++) {
-    DVARRAY tmp(array_length);
+  for (int i = 0; i < fileCountTotal; i++) {
+    DVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    mean += tmp / DOUBLE(N_df);
+    mean += tmp / DOUBLE(fileCountTotal);
   }
 
-  for (int i = 0; i < N_df; i++) {
-    DVARRAY tmp(array_length);
+  for (int i = 0; i < fileCountTotal; i++) {
+    DVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
     var += (tmp - mean) * (tmp - mean);
   }
 
-  var = sqrt(var * DOUBLE(N_df - 1) / DOUBLE(N_df));
+  var = sqrt(var * DOUBLE(fileCountTotal - 1) / DOUBLE(fileCountTotal));
 
-  CVARRAY out(array_length);
+  CVARRAY out(arrayLength);
   out = 0.0;
 
-  for (int i = 0; i < array_length; i++) {
+  for (int i = 0; i < arrayLength; i++) {
     out[i].real(mean[i]);
     out[i].imag(var[i]);
   }
 
-  writeBin(result, array_length, out);
+  writeBin(result, arrayLength, out);
 }
 
-void arithmetic_mean(char *rawdlist[], const char *result, int array_length,
-                     int N_df) {
-  CVARRAY mean(array_length);
+void arithmeticMean(char *rawDataList[], const char *result, int arrayLength,
+                    int fileCountTotal) {
+  CVARRAY mean(arrayLength);
   mean = 0.0;
 
-  for (int i = 0; i < N_df; i++) {
-    CVARRAY tmp(array_length);
+  for (int i = 0; i < fileCountTotal; i++) {
+    CVARRAY tmp(arrayLength);
     tmp = 0.0;
-    readBin(rawdlist[i], array_length, tmp);
+    readBin(rawDataList[i], arrayLength, tmp);
 
-    mean += tmp / COMPLX(N_df, 0.0);
+    mean += tmp / COMPLX(fileCountTotal, 0.0);
   }
 
-  writeBin(result, array_length, mean);
+  writeBin(result, arrayLength, mean);
 }

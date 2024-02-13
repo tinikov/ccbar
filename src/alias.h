@@ -2,13 +2,13 @@
  * @file alias.h
  * @author Tianchen Zhang
  * @brief
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
-#ifndef IS_INCLUDED_TYPEALIAS_H
-#define IS_INCLUDED_TYPEALIAS_H
+#ifndef IS_INCLUDED_ALIAS_H
+#define IS_INCLUDED_ALIAS_H
 
 #include <complex>
 #include <valarray>

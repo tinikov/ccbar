@@ -47,35 +47,35 @@ void writeBin(const char *ofname, int arrayLength, const CVARRAY &data);
  * @brief Convert binary file to txt file (only for complex (2-lined) data)
  *
  * @param binfame File name of the binary file
- * @param txt_fname File name of the txt file
+ * @param txtfname File name of the txt file
  * @param arrayLength Total of complex numbers
  */
-void bin2txt(const char *binName, const char *txt_fname, int arrayLength);
+void bin2txt(const char *binfname, const char *txtfname, int arrayLength);
 
 /**
  * @brief Keep the real part of the data
  *
  * @param data original data (complex valarray)
- * @param realdata real part of the valarray (double valarray)
+ * @param realData real part of the valarray (double valarray)
  * @param arrayLength Total of complex numbers
  */
-void keepReal(CVARRAY &data, DVARRAY &realdata, int arrayLength);
+void keepReal(CVARRAY &data, DVARRAY &realData, int arrayLength);
 
 /**
  * @brief Keep the imaginary part of the data
  *
  * @param data original data (complex valarray)
- * @param imagdata imaginary part of the valarray (double valarray)
+ * @param imagData imaginary part of the valarray (double valarray)
  * @param arrayLength Total of complex numbers
  */
-void keepImag(CVARRAY &data, DVARRAY &imagdata, int arrayLength);
+void keepImag(CVARRAY &data, DVARRAY &imagData, int arrayLength);
 
 /**
  * @brief Calculate the norm of the complex data
  *
  * @param data original data (complex valarray)
- * @param normdata norm of the valarray (double valarray)
+ * @param normData norm of the valarray (double valarray)
  * @param arrayLength Total of complex numbers
  */
-void varryNorm(CVARRAY &data, DVARRAY &normdata, int arrayLength);
+void varryNorm(CVARRAY &data, DVARRAY &normData, int arrayLength);
 #endif

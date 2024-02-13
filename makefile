@@ -2,6 +2,7 @@ CXXFLAGS = -Wall -std=c++17 -O3
 
 SOURCE = ./src
 BIN = ./bin
+
 PROG_NAME = \
 a1plus \
 cart2sphr \

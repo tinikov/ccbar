@@ -16,7 +16,7 @@ trev2 \
 v-ti \
 
 PRE = \
-data_process.o \
+dataio.o \
 misc.o
 
 TARGETS = $(addprefix $(BIN)/,$(PROG_NAME))

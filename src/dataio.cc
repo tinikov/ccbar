@@ -1,13 +1,13 @@
 /**
- * @file data_process.cc
+ * @file dataio.cc
  * @author Tianchen Zhang 
  * @brief
- * @version 1.0
- * @date 2023-05-03
+ * @version 1.1
+ * @date 2024-02-13
  *
  */
 
-#include "data_process.h"
+#include "dataio.h"
 
 #include <complex>
 
@@ -122,19 +122,19 @@ void bin2txt(const char *bin_fname, const char *txt_fname, int array_length) {
   fclose(ofp);
 }
 
-void keep_real(CVARRAY &data, DVARRAY &realdata, int array_length) {
+void keepReal(CVARRAY &data, DVARRAY &realdata, int array_length) {
   for (int i = 0; i < array_length; i++) {
     realdata[i] = data[i].real();
   }
 }
 
-void keep_imag(CVARRAY &data, DVARRAY &imagdata, int array_length) {
+void keepImag(CVARRAY &data, DVARRAY &imagdata, int array_length) {
   for (int i = 0; i < array_length; i++) {
     imagdata[i] = data[i].imag();
   }
 }
 
-void varry_norm(CVARRAY &data, DVARRAY &normdata, int array_length) {
+void varryNorm(CVARRAY &data, DVARRAY &normdata, int array_length) {
   for (int i = 0; i < array_length; i++) {
     normdata[i] = sqrt(norm(data[i]));
   }

@@ -3,8 +3,8 @@
  * @author Tianchen Zhang 
  * @brief misc = miscellaneous
  *        Provides 2 functions:
- *        void add_prefix(): Add prefix to a file name;
- *        void change_path(): Change the directory part for a file path.
+ *        void addPrefix(): Add prefix to a file name;
+ *        void changePath(): Change the directory part for a file path.
  * @version 1.1
  * @date 2024-02-01
  *

@@ -7,7 +7,7 @@
  *
  */
 
-#include "data_process.h"
+#include "dataio.h"
 #include "misc.h"
 #include "type_alias.h"
 // __________________________________
@@ -189,8 +189,8 @@ void jackknife_mean(char *rawdlist[], const char *result, int array_length,
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
-    keep_real(tmp, rtmp, array_length);
-    // varry_norm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, array_length);
+    // varryNorm(tmp, rtmp, array_length);
 
     mean += rtmp / DOUBLE(N_df);
   }
@@ -202,8 +202,8 @@ void jackknife_mean(char *rawdlist[], const char *result, int array_length,
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
-    keep_real(tmp, rtmp, array_length);
-    // varry_norm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, array_length);
+    // varryNorm(tmp, rtmp, array_length);
 
     var += (rtmp - mean) * (rtmp - mean);
   }

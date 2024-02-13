@@ -1,15 +1,15 @@
 /**
- * @file data_process.h
+ * @file dataio.h
  * @author Tianchen Zhang 
  * @brief Dealing with data (binary and txt files).
  *        Provide 5 functions:
  *        void readBin(): Read data from binary file;
  *        void writeBin(): Write data to binary file;
  *        void bin2txt(): Convert binary file to txt file;
- *        void keep_real(): Keep the real part of the data;
- *        void keep_imag(): Keep the imaginary part of the data.
+ *        void keepReal(): Keep the real part of the data;
+ *        void keepImag(): Keep the imaginary part of the data.
  * @version 1.1
- * @date 2023-05-03
+ * @date 2024-02-13
  *
  */
 
@@ -59,7 +59,7 @@ void bin2txt(const char *bin_fname, const char *txt_fname, int array_length);
  * @param realdata real part of the valarray (double valarray)
  * @param array_length Total of complex numbers
  */
-void keep_real(CVARRAY &data, DVARRAY &realdata, int array_length);
+void keepReal(CVARRAY &data, DVARRAY &realdata, int array_length);
 
 /**
  * @brief Keep the imaginary part of the data
@@ -68,7 +68,7 @@ void keep_real(CVARRAY &data, DVARRAY &realdata, int array_length);
  * @param imagdata imaginary part of the valarray (double valarray)
  * @param array_length Total of complex numbers
  */
-void keep_imag(CVARRAY &data, DVARRAY &imagdata, int array_length);
+void keepImag(CVARRAY &data, DVARRAY &imagdata, int array_length);
 
 /**
  * @brief Calculate the norm of the complex data
@@ -77,5 +77,5 @@ void keep_imag(CVARRAY &data, DVARRAY &imagdata, int array_length);
  * @param normdata norm of the valarray (double valarray)
  * @param array_length Total of complex numbers
  */
-void varry_norm(CVARRAY &data, DVARRAY &normdata, int array_length);
+void varryNorm(CVARRAY &data, DVARRAY &normdata, int array_length);
 #endif

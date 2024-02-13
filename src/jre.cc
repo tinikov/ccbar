@@ -7,7 +7,7 @@
  *
  */
 
-#include "data_process.h"
+#include "dataio.h"
 #include "misc.h"
 #include "type_alias.h"
 // __________________________________
@@ -228,8 +228,8 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
-    keep_real(tmp, rtmp, array_length);
-    // varry_norm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, array_length);
+    // varryNorm(tmp, rtmp, array_length);
 
     sum += rtmp;
     sum_square += rtmp * rtmp;
@@ -245,8 +245,8 @@ void jackknife_resample_var(char *rawdlist[], char *samdlist[],
 
     DVARRAY rtmp(array_length);
     rtmp = 0.0;
-    keep_real(tmp, rtmp, array_length);
-    // varry_norm(tmp, rtmp, array_length);
+    keepReal(tmp, rtmp, array_length);
+    // varryNorm(tmp, rtmp, array_length);
 
     value = (sum - rtmp) / (N_df - 1.0);
     // About this variance, please refer to eq.(7.37) on P.383, Montvay LQCD

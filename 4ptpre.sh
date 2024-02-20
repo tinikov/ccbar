@@ -1,12 +1,17 @@
 #!/bin/bash
-# version: 1.0
+# version: 1.1
 
-if [ $# != 3 ]; then
-	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT]"
-	exit 1
-fi
-
+# Remove the path length limit
 ulimit -n 1024
+
+# Usage
+usage() {
+	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [BINDIR] [RDATADIR] [OFDIR] [IS_REFRESH]=Y/n"
+	exit 1
+}
+
+if [[ "$#" -ne 3 ]]; then
+fi
 
 XYZSIZE=$1
 TSIZE=$2

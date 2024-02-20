@@ -1,42 +1,25 @@
 #!/bin/bash
-# version: 1.1
+# version: 1.2
+
+# Remove the path length limit
+ulimit -n 1024
 
 # Usage
 usage() {
-	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [TSIZE] [BINDIR] [RDATADIR] [OFDIR] [PREFIX]"
+	echo -e "\033[1;33mUSAGE:\033[0m $(basename $0) [TSIZE] [BINPATH] [DATAPATH] [INPREFIX] [OFNAME]"
 	return
 }
 
-if [[ "$#" -ne 6 ]]; then
+if [[ ! -d "$2" || ! -d "$3" || "$#" -ne 5 ]]; then
 	usage
 	exit 1
 fi
 
-# Remove the limit for file path length
-ulimit -n 1024
-
 # Read options
-TSIZE=$1
-BINDIR=$(dirname $2)/$(basename $2)
-RDATADIR=$(dirname $3)/$(basename $3)
-OFDIR=$(dirname $4)/$(basename $4)
-PREFIX=$5
-IS_REFRESH=$6
+BINPATH=$(dirname $2)/$(basename $2)
+DATAPATH=$(dirname $3)/$(basename $3)
+OFNAME=$(dirname $5)/$(basename $5)
+TXTOFNAME=$(dirname $5)/txt.$(basename $5)
 
-if [[ -e "$OFDIR" && "$IS_REFRESH" = Y ]]; then
-	rm -rf $OFDIR
-fi
-
-echo -e "Jackknife averaging data from \033[1;35m$RDATADIR\033[0m"
-echo " "
-
-for type in $(ls $RDATADIR); do
-	echo "Processing \"$RDATADIR/$type\""
-	mkdir -p $OFDIR/binary
-	$BINDIR/mean -l $TSIZE -o $OFDIR/$PREFIX.$type -j -t $RDATADIR/$type/$PREFIX.*
-	mv $OFDIR/$PREFIX.$type $OFDIR/binary
-	echo " "
-done
-
-echo -e "\033[1;35mFinished!\033[0m\n"
-echo " "
+$BINPATH/mean -l $1 -o $OFNAME -j -t $DATAPATH/$4.*
+echo -e "\033[34m$DATAPATH\033[0m: Averaged to \033[33m$OFNAME\033[0m & \033[33m$TXTOFNAME\033[0m!"

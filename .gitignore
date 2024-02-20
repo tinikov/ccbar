@@ -35,13 +35,13 @@
 /.draft
 /plot/.draft
 
+/bin
 /data
 /fig
+/ref
 /result
-/bin
-/book-static
+/summary
 *.code-workspace
 .DS_Store
 */.DS_Store
-/ref
 .vscode

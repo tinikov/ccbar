@@ -5,13 +5,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from iminuit import Minuit
 from iminuit.cost import LeastSquares
+import scienceplots
+
+plt.style.use(["science", "nature"])
 
 a = 0.090713
 a_invrs = 2.1753
 codeRoot = "/Volumes/X6/work/ccbar"
 
 tmin = 10
-tmax = 28
+tmax = 29
 
 rmin = 0.01
 rmax = [0.82, 0.82]
@@ -59,7 +62,7 @@ plt.rcParams["mathtext.fontset"] = font["mathfamily"]
 
 yrange = [[1.5, 2.5], [1.1, 2.1]]
 # yrange = [[-2, 3], [-2, 3]]
-text_ysite = [2.43, 2.03]
+# text_ysite = [2.43, 2.03]
 
 for igauge in range(2):
     for i in range(tmin, tmax + 1):
@@ -84,26 +87,35 @@ for igauge in range(2):
         m.migrad()
 
         # Draw
-        style = {
+        fig, ax = plt.subplots()
+
+        errbar_plot_style = {
             "fmt": ".",
-            "markersize": 1,
-            "markeredgewidth": 0.35,
+            "markersize": 3.8,
+            "markeredgewidth": 0.4,
             "linewidth": 0.3,
+            "markerfacecolor": "white",
+            # "fillstyle": "none",
         }
 
-        fig, ax = plt.subplots(figsize=(3.375, 2.53125), dpi=50)  # picture size
+        legend_style = {
+            "loc": 3,
+            # "bbox_to_anchor": (0.95, 1.02),
+            "handletextpad": 0.3,
+            "labelspacing": 0.3,
+        }
 
         ax.errorbar(
             rawdata[:, 0] * a,
-            rawdata[:, 1] * a_invrs,
+            -rawdata[:, 1] * a_invrs,
             rawdata[:, 2] * a_invrs,
             label="data",
-            **style
+            **errbar_plot_style
         )
         x_fit = np.arange(0, 28, 0.01)
         ax.plot(
             x_fit * a,
-            gaussian2(x_fit, *m.values) * a_invrs,
+            -gaussian2(x_fit, *m.values) * a_invrs,
             linewidth=0.75,
             label="fit",
         )
@@ -115,35 +127,30 @@ for igauge in range(2):
         # )
 
         # Set grid (reserved)
-        ax.grid(which="major", color="#DDDDDD", linewidth=0.5)
-        ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
+        # ax.grid(which="major", color="#DDDDDD", linewidth=0.5)
+        # ax.grid(which="minor", color="#EEEEEE", linestyle=":", linewidth=0.5)
 
         ax.minorticks_on()
-        legend_default_style = {
-            "frameon": False,
-            "fontsize": 7,
-            "labelspacing": 0.1,
-        }
-        # ax.legend(loc=4, bbox_to_anchor=(0.88, 0.04), **legend_default_style)
-        ax.legend(loc=2, **legend_default_style)
+        ax.legend(**legend_style)
 
         ax.set_xlabel(r"$r\ [{\rm fm}]$", labelpad=-1)
-        ax.set(xlim=(0.54, 0.66))
-        # ax.set(xlim=(0, 1.2))
+        # ax.set(xlim=(0.54, 0.66))
+        ax.set(xlim=(0, 1.2))
 
         ax.set_ylabel(r"$F_{\rm KS}(r)$", labelpad=1.5)
-        ax.set(ylim=(yrange[igauge][0], yrange[igauge][1]))
-        # ax.set(ylim=(-2, 3))
+        # ax.set(ylim=(yrange[igauge][0], yrange[igauge][1]))
+        ax.set(ylim=(-3, 2))
 
-        ax.text(0.645, text_ysite[igauge], r"$t = {}$".format(str(i).rjust(2, "0")))
+        # ax.text(0.645, text_ysite[igauge], r"$t = {}$".format(str(i).rjust(2, "0")))
+        ax.text(0.7, 1.5, r"$t = {}$".format(str(i).rjust(2, "0")))
         ax.text(
-            0.55,
-            text_ysite[igauge] - 0.9,
+            0.7,
+            # text_ysite[igauge] - 0.9,
+            1.0,
             r"$m_c =$"
             + r"${}$".format(round(m.values["C"] * a_invrs * 1000))
             + r"$\ [{\rm MeV}]$",
         )
-        
-        fig.subplots_adjust(left=0.14, right=0.97, bottom=0.13, top=0.96)
+
         fig.savefig("{}/{}.png".format(path[igauge], str(i).rjust(2, "0")), dpi=600)
         plt.close()

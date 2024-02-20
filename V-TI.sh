@@ -1,61 +1,53 @@
 #!/bin/bash
 # version: 1.0
 
-if [ $# != 4 ]; then
-	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT] [MDIFF]"
+# Usage
+usage() {
+	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [MPS] [MV] [MC] [BINDIR] [RDATADIR] [OFDIR] [IS_REFRESH]=Y/n"
+	return
+}
+
+if [ $# != 9 ]; then
+	usage
 	exit 1
 fi
 
+# Remove the limit for file path length
 ulimit -n 1024
 
+# Read options
 XYZSIZE=$1
 TSIZE=$2
-X4PT=$3
-MDIFF=$4
+MC=$3
+MPS=$4
+MV=$5
+BINDIR=$(dirname $6)/$(basename $6)
+RDATADIR=$(dirname $7)/$(basename $7)
+OFDIR=$(dirname $8)/$(basename $8)
+IS_REFRESH=$9
 
-ROOT=.
-BIN_DIR=$ROOT/bin
-DATA_DIR=$ROOT/data
-LAP_DIR=$DATA_DIR/$X4PT/lap
+ARRAYLENGTH=$((XYZSIZE * XYZSIZE * XYZSIZE))
+THALF=$((TSIZE / 2))
 
-ARRAY_LENGTH=$((XYZSIZE * XYZSIZE * XYZSIZE))
-T_HALF=$((TSIZE / 2))
+if [[ -e "$OFDIR" && "$IS_REFRESH" = Y ]]; then
+	rm -rf $OFDIR
+fi
 
-echo -e "Conducting KS(TI)-method for \033[1;35m$DATA_DIR/$X4PT\033[0m"
+echo -e "Calculating potential by data from \033[1;35m$RDATADIR\033[0m"
 echo " "
 
-O_DIR=$ROOT/result/$X4PT/FKS-TI
-FKS_DIR=$DATA_DIR/$X4PT/fks-ti
-rm -rf $O_DIR $FKS_DIR
-
-# F_{KS} (time-independent)
-echo "##  F_{KS} (time-independent)! "
-echo "##  Time sites total: $T_HALF"
-echo "##  Array length:     $ARRAY_LENGTH"
-echo "#######################################"
-for ((it = 0; it < T_HALF; it = it + 1)); do
+for ((it = 0; it < THALF; it = it + 1)); do
 	T=$(printf "%02d" $it)
-	echo -e "\033[1;35m$T\033[0m now..."
-	mkdir -p $FKS_DIR/$T
-	for psgauge in $(ls $LAP_DIR/ps/$T); do
+	echo -e "Potential of t=\033[1;35m$T\033[0m"
+	mkdir -p $OFDIR/v0/$T
+	mkdir -p $OFDIR/vs/$T
+	for psgauge in $(ls $RDATADIR/ps/$T); do
 		ogauge=${psgauge/.ps./.}
 		vgauge=${psgauge/.ps./.v.}
 
-		$BIN_DIR/fks-ti -l $ARRAY_LENGTH -m $MDIFF -o $FKS_DIR/$T/$ogauge $LAP_DIR/v/$T/$vgauge $LAP_DIR/ps/$T/$psgauge >/dev/null 2>&1
+		$BINDIR/v-ti -l $ARRAYLENGTH -mps $MPS -mv $MV -mc $MC -ov0 $OFDIR/v0/$T/$ogauge -ovs $OFDIR/vs/$T/$ogauge $RDATADIR/v/$T/$vgauge $RDATADIR/ps/$T/$psgauge
 	done
 done
-echo " "
-
-# Jackknife and finalize part
-mkdir -p $O_DIR/binary
-
-for T in $(ls $FKS_DIR); do
-	echo -e "Jackknife average \033[1;35m$FKS_DIR/$T\033[0m ..."
-	$BIN_DIR/mean -j -l $ARRAY_LENGTH -o $O_DIR/binary/$T $FKS_DIR/$T/4pt.*
-	echo " "
-done
-
-$BIN_DIR/cart2sphr -n $XYZSIZE -d $O_DIR -p "txt" $O_DIR/binary/*
 echo " "
 
 echo -e "\033[1;35mFinished!\033[0m\n"

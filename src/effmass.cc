@@ -116,10 +116,10 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
 
-      addPrefix(expNameArr[i], "txt", txttmp);
+      addSuffix(expNameArr[i], "txt", txttmp);
       bin2txt(expNameArr[i], txttmp, tSize);
 
-      addPrefix(cshNameArr[i], "txt", txttmp);
+      addSuffix(cshNameArr[i], "txt", txttmp);
       bin2txt(cshNameArr[i], txttmp, tSize);
     }
   }

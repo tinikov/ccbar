@@ -19,13 +19,22 @@
 #include <string.h>
 
 /**
- * @brief Add prefix to a file (preserving the original path)
+ * @brief Add prefix to a filename (preserving the original path)
  *
  * @param origPath The original path: "dir/filename"
  * @param prefix The prefix to be added: "prefix"
  * @param newPath The desired file name: "dir/prefix.filename"
  */
 void addPrefix(const char *origPath, const char *prefix, char *newPath);
+
+/**
+ * @brief Add suffix to a file (preserving the original path)
+ *
+ * @param origPath The original path: "dir/filename"
+ * @param suffix The suffix to be added: "suffix"
+ * @param newPath The desired file name: "dir/filename.suffix"
+ */
+void addSuffix(const char *origPath, const char *suffix, char *newPath);
 
 /**
  * @brief Change the directory part for a file name

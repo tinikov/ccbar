@@ -125,7 +125,7 @@ int main(int argc, char *argv[]) {
   if (isSaveTxt) {
     for (int i = 0; i < fileCountTotal; i++) {
       char txttmp[2048];
-      addPrefix(ofnameArr[i], "txt", txttmp);
+      addSuffix(ofnameArr[i], "txt", txttmp);
       bin2txt(ofnameArr[i], txttmp, tSize);
     }
   }

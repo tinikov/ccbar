@@ -70,8 +70,8 @@ channel = ["ps", "v", "s", "av", "t"]
 
 corr_c, corr_l = [[] for _ in range(2)]  # Read data files
 for i in range(5):
-    corr_c.append(np.loadtxt("{}/result/c2pt/corr/txt.2pt.{}".format(codeRoot, channel[i])))
-    corr_l.append(np.loadtxt("{}/result/l2pt/corr/txt.2pt.{}".format(codeRoot, channel[i])))
+    corr_c.append(np.loadtxt("{}/result/c2pt/corr/2pt.{}.txt".format(codeRoot, channel[i])))
+    corr_l.append(np.loadtxt("{}/result/l2pt/corr/2pt.{}.txt".format(codeRoot, channel[i])))
 
 # Gauge
 path = [

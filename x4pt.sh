@@ -1,24 +1,28 @@
 #!/bin/bash
-# version: 1.1
+# version: 1.2
 
-gauges=(c2pt l2pt)
-channels=(av ps s t v)
+clear
+echo "
+Please select: 
+1. Standard analysis (2pt)
+2. Variational analysis (2pt)
+0. Quit
+"
+read -p "Enter selection [0-2] > "
 
-for igau in {0..1}; do
-    GAU=${gauges[$igau]}
-    for ich in {0..4}; do
+gtypes=(c4pt l4pt)
+channels=(ps v)
+
+for ifix in {0..1}; do
+    GFIX=${gtypes[$ifix]}
+    for ich in {0..1}; do
         CH=${channels[$ich]}
-        DATAPATH=data/$GAU/$CH
         # [C(n_t) + C(N_t - n_t)]/2
-        ./2pttre.sh 64 bin $DATAPATH 2pt tr
-        # Jackknife resampling
-        ./2ptjre.sh 64 bin $DATAPATH tr jre
-        # Effective masses
-        ./2pteff.sh 64 bin $DATAPATH jre
-        # Averaging (2ptcorr and effmass)
-        ./2ptjave.sh 64 bin $DATAPATH jre result/$GAU/2pt.$CH.bin
-        ./2ptjave.sh 64 bin $DATAPATH exp result/$GAU/exp.$CH.bin
-        ./2ptjave.sh 64 bin $DATAPATH csh result/$GAU/csh.$CH.bin
+        ./4pt-trev.sh 32 64 bin data/$GFIX/trev/$CH data/bin_ave/$GFIX/$CH
+        # A1+
+        ./4pt-a1plus.sh 32 64 bin data/$GFIX/a1plus/$CH data/$GFIX/trev/$CH
+        # Jackknife resample
+        ./4pt-jre.sh 32 64 bin data/$GFIX/jksam/$CH data/$GFIX/a1plus/$CH
         echo " "
     done
     echo " "

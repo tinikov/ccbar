@@ -15,6 +15,7 @@ if [[ ! -d "$3" || ! -d "$5" || "$#" -lt 5 ]]; then
 	exit 1
 fi
 
+ARRAY_LENGTH=$(($1 * $1 * $1))
 T_HALF=$(($2 / 2))
 BINPATH=$(dirname $3)/$(basename $3)
 OFPATH=$(dirname $4)/$(basename $4)
@@ -27,6 +28,6 @@ for ((it = 0; it <= T_HALF; it = it + 1)); do
 		mkdir -p $OFPATH/$t
 	fi
 
-	$BINPATH/a1plus -n $1 -d $OFPATH/$t $IFPATH/$t/4pt.*
+	$BINPATH/jre -l $ARRAY_LENGTH -d $OFPATH/$t $IFPATH/$t/4pt.*
 done
-echo -e "\033[34m$OFPATH\033[0m: A1+ projection done!"
+echo -e "\033[34m$OFPATH\033[0m: Jackknife resampling done!"

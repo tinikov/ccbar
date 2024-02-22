@@ -6,11 +6,11 @@ ulimit -n 1024
 
 # Usage
 usage() {
-	echo -e "\033[1;33mUSAGE:\033[0m $(basename $0) [TSIZE] [BINPATH] [OFNAME] [IFPATH] [IF_PREFIX=2pt]"
+	echo -e "\033[1;33mUSAGE:\033[0m $(basename $0) [TSIZE] [BINPATH] [OFNAME] [IFPATH] [IF_PREFIX]"
 	return
 }
 
-if [[ ! -d "$2" || ! -d "$4" || "$#" -lt 4 ]]; then
+if [[ ! -d "$2" || ! -d "$4" || "$#" -lt 5 ]]; then
 	usage
 	exit 1
 fi
@@ -22,12 +22,6 @@ IFPATH=$(dirname $4)/$(basename $4)
 
 if [[ ! -d $OFPATH ]]; then
 	mkdir -p $OFPATH
-fi
-
-if [[ -z "$5" ]]; then
-	IF_PREFIX="2pt"
-else
-	IF_PREFIX=$5
 fi
 
 $BINPATH/mean -l $1 -o $OFNAME -j -t $IFPATH/$IF_PREFIX.*

@@ -22,6 +22,7 @@ void usage(char *name) {
           "    -n <XYZSIZE>:     Spacial size of lattice\n"
           "    -d <OFDIR>:       Directory of output files\n"
           "    [-p] <PREFIX>:    Prefix for output files\n"
+          "    [-s] <SUFFIX>:    Suffix for output files\n"
           "    [-h, --help]:     Print help\n");
 }
 
@@ -35,7 +36,9 @@ int main(int argc, char *argv[]) {
   int xyzSize = 0;
   static const char *ofDir = NULL;
   static const char *ofPrefix = NULL;
+  static const char *ofSuffix = NULL;
   bool isAddPrefix = false;
+  bool isAddSuffix = false;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
@@ -82,6 +85,15 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
+    // -s: suffix for output file
+    if (strcmp(argv[0], "-p") == 0) {
+      ofSuffix = argv[1];
+      isAddSuffix = true;
+      argc -= 2;
+      argv += 2;
+      continue;
+    }
+
     fprintf(stderr, "Error: Unknown option '%s'\n", argv[0]);
     usage(programName);
     exit(1);
@@ -96,12 +108,22 @@ int main(int argc, char *argv[]) {
 
   // Create an array to store ofnames
   char *ofnameArr[fileCountTotal];
-  if (isAddPrefix) {
+  if (isAddPrefix || isAddSuffix) {
     for (int i = 0; i < fileCountTotal; i++) {
-      char stmp[2048];
+      char nametmp[2048];
+      strncpy(nametmp, argv[i], 1023);
       ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
-      addPrefix(argv[i], ofPrefix, stmp);
-      changePath(stmp, ofDir, ofnameArr[i]);
+      if (isAddPrefix) {
+        char stmp[2048];
+        addPrefix(nametmp, ofPrefix, stmp);
+        strncpy(nametmp, stmp, 1023);
+      }
+      if (isAddSuffix) {
+        char stmp[2048];
+        addSuffix(nametmp, ofSuffix, stmp);
+        strncpy(nametmp, stmp, 1023);
+      }
+      changePath(nametmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {

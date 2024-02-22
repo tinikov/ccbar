@@ -15,7 +15,6 @@ if [[ ! -d "$3" || ! -d "$5" || "$#" -lt 5 ]]; then
 	exit 1
 fi
 
-ARRAY_LENGTH=$(($1 * $1 * $1))
 T_HALF=$(($2 / 2))
 BINDIR=$(dirname $3)/$(basename $3)
 OFDIR=$(dirname $4)/$(basename $4)
@@ -28,6 +27,6 @@ for ((it = 0; it <= T_HALF; it = it + 1)); do
 		mkdir -p $OFDIR/$t
 	fi
 
-	$BINDIR/jre -l $ARRAY_LENGTH -d $OFDIR/$t $IFDIR/$t/4pt.*
+	$BINDIR/prev -n $1 -d $OFDIR/$t $IFDIR/$t/4pt.*
 done
-echo -e "\033[34m$OFDIR\033[0m: Jackknife resampling done!"
+echo -e "\033[34m$OFDIR\033[0m: Finished calculating [▽^2 C(r,t)]/C(r,t)!"

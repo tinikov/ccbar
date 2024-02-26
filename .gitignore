@@ -36,12 +36,9 @@
 /plot/.draft
 
 /bin
-/data
 /fig
 /ref
 /result
 /summary
-*.code-workspace
 .DS_Store
 */.DS_Store
-.vscode

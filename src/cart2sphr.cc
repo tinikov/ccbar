@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
 
     // -s: suffix for output file
-    if (strcmp(argv[0], "-p") == 0) {
+    if (strcmp(argv[0], "-s") == 0) {
       ofSuffix = argv[1];
       isAddSuffix = true;
       argc -= 2;

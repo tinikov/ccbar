@@ -15,12 +15,12 @@ for ifix in {0..1}; do
         ./2pt-jre.sh 64 bin data/$GFIX/jksamp/$CH data/$GFIX/trev/$CH
 
         # 2-point correlator
-        ./2pt-jave.sh 64 bin result/$GFIX/corr/2pt.$CH.bin data/$GFIX/jksamp/$CH "2pt"
+        ./2pt-jave.sh 64 bin result/$GFIX/corr "2pt.$CH" "bin" data/$GFIX/jksamp/$CH "2pt"
 
         # Effective masses
         ./2pt-eff.sh 64 bin data/$GFIX/effmass/$CH data/$GFIX/jksamp/$CH
-        ./2pt-jave.sh 64 bin result/$GFIX/effmass/exp.$CH.bin data/$GFIX/effmass/$CH "exp"
-        ./2pt-jave.sh 64 bin result/$GFIX/effmass/csh.$CH.bin data/$GFIX/effmass/$CH "csh"
+        ./2pt-jave.sh 64 bin result/$GFIX/effmass "exp.$CH" "bin" data/$GFIX/effmass/$CH "exp"
+        ./2pt-jave.sh 64 bin result/$GFIX/effmass "csh.$CH" "bin" data/$GFIX/effmass/$CH "csh"
         echo " "
     done
     echo " "

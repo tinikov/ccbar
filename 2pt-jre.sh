@@ -23,5 +23,5 @@ if [[ ! -d $OFDIR ]]; then
 	mkdir -p $OFDIR
 fi
 
-$BINDIR/jre -l $1 -v -t -d $OFDIR $IFDIR/2pt.* # Jackknife resampling
+$BINDIR/jre -l $1 -d $OFDIR -v -t $IFDIR/2pt.* # Jackknife resampling
 echo -e "\033[34m$OFDIR\033[0m: Jackknife resampling done!"

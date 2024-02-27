@@ -13,7 +13,8 @@ for ifix in {0..1}; do
         ./4pt-trev.sh 32 64 bin data/$GFIX/trev/$CH data/bin_ave/$GFIX/$CH
         ## A1+
         ./4pt-a1plus.sh 32 64 bin data/$GFIX/a1plus/$CH data/$GFIX/trev/$CH
-        ## Jackknife resampling
+        
+        # Jackknife resampling
         ./4pt-jre.sh 32 64 bin data/$GFIX/jksamp/$CH data/$GFIX/a1plus/$CH
 
         # 4-point correlator

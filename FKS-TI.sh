@@ -1,5 +1,8 @@
 #!/bin/bash
-# version: 1.0
+# version: 1.2
+
+# Remove the path length limit
+ulimit -n 1024
 
 if [ $# != 4 ]; then
 	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT] [MDIFF]"
@@ -28,11 +31,6 @@ O_DIR=$ROOT/result/$X4PT/FKS-TI
 FKS_DIR=$DATA_DIR/$X4PT/fks-ti
 rm -rf $O_DIR $FKS_DIR
 
-# F_{KS} (time-independent)
-echo "##  F_{KS} (time-independent)! "
-echo "##  Time sites total: $T_HALF"
-echo "##  Array length:     $ARRAY_LENGTH"
-echo "#######################################"
 for ((it = 0; it < T_HALF; it = it + 1)); do
 	T=$(printf "%02d" $it)
 	echo -e "\033[1;35m$T\033[0m now..."

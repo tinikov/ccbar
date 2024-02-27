@@ -5,7 +5,7 @@ import numpy as np
 from iminuit import Minuit
 from iminuit.cost import LeastSquares
 
-parser = argparse.ArgumentParser(prog="M-fit", description="Fit hadron masses")
+parser = argparse.ArgumentParser(prog="fit-mqq", description="Fit hadron masses")
 parser.add_argument(
     "-t", "--tsize", type=int, required=True, help="temporal size of lattice"
 )
@@ -32,12 +32,11 @@ if tmin >= tmax or tmin < 0 or tmax > n_t:
     exit(1)
 tsites = np.arange(0, n_t, 1)
 fitsites = np.arange(tmin, tmax, 1)
-
-N_df = len(args.ifname)
+fileCountTotal = len(args.ifname)
 
 
 # Define functions for fit
-def exp(n, A, M):
+def expFit(n, A, M):
     return A * np.exp(-M * n)
 
 
@@ -46,24 +45,18 @@ para = {
     "M": 1.0,
 }
 
-if N_df == 1:
-    print("\n#################################################")
-    print("##  TEST FIT (to test the fit range) (LU)")
-    print("##  Fit range:  [{}, {}]".format(tmin, tmax))
-    print("##  Fit func:   exp\n")
+if fileCountTotal == 1:
+    print("TEST FIT (for the fit range) (LU)")
+    print("Fit RANGE:  [{}, {}]".format(tmin, tmax))
 
     rawdata = np.loadtxt(args.ifname[0], dtype=np.float64)[0:n_t]
-    corr = rawdata[:, 1]
-    err = rawdata[:, 2]
-
     fitdata = rawdata[tmin:tmax]
-
     fitcorr = fitdata[:, 1]
     fiterr = fitdata[:, 2]
 
     # Fit
-    least_squares = LeastSquares(fitsites, fitcorr, fiterr, exp)
-    m = Minuit(least_squares, **para)
+    least_squares = LeastSquares(fitsites, fitcorr, fiterr, expFit)  # type: ignore
+    m = Minuit(least_squares, **para)  # type: ignore
     m.migrad()
 
     # degree of freedom: (# of data) - (# of parameters) - 1
@@ -74,7 +67,7 @@ if N_df == 1:
 else:
     print("\n#################################################")
     print("##  FITTING HADRON MASS (lattice unit)")
-    print("##  Total of data files:  {}".format(N_df))
+    print("##  Total of data files:  {}".format(fileCountTotal))
     print("##  Fit range:            [{}, {}]".format(tmin, tmax))
     print("##  Fit func:             exp")
 
@@ -93,16 +86,16 @@ else:
         fiterr = fitdata[:, 2]
 
         # Fit
-        print("##  Progress: ({}/{})".format(file_index, N_df), end="\r")
-        least_squares = LeastSquares(fitsites, fitcorr, fiterr, exp)
-        m = Minuit(least_squares, **para)
+        print("##  Progress: ({}/{})".format(file_index, fileCountTotal), end="\r")
+        least_squares = LeastSquares(fitsites, fitcorr, fiterr, expFit)  # type: ignore
+        m = Minuit(least_squares, **para)  # type: ignore
         m.migrad()
 
         A_arr.append(m.values["A"])
         M_arr.append(m.values["M"])
         chisq_arr.append(m.fval)
 
-    print("##  Progress: ({}/{})\n".format(N_df, N_df))
+    print("##  Progress: ({}/{})\n".format(fileCountTotal, fileCountTotal))
 
     # degree of freedom: (# of data) - (# of parameters) - 1
     df = tmax - tmin - 2 - 1
@@ -115,9 +108,9 @@ else:
     M_mean = np.mean(M_arr)
     chisq_mean = np.mean(chisq_arr)
 
-    A_var = np.sqrt(np.var(A_arr) * (N_df - 1) / N_df)
-    M_var = np.sqrt(np.var(M_arr) * (N_df - 1) / N_df)
-    chisq_var = np.sqrt(np.var(chisq_arr) * (N_df - 1) / N_df)
+    A_var = np.sqrt(np.var(A_arr) * (fileCountTotal - 1) / fileCountTotal)
+    M_var = np.sqrt(np.var(M_arr) * (fileCountTotal - 1) / fileCountTotal)
+    chisq_var = np.sqrt(np.var(chisq_arr) * (fileCountTotal - 1) / fileCountTotal)
 
     cutoff = args.cutoff * 1000
 

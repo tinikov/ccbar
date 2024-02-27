@@ -1,5 +1,5 @@
 #!/bin/bash
-# version: 1.0
+# version: 1.2
 
 if [ $# != 5 ]; then
 	echo -e "\033[1mUSAGE:\033[0m $(basename $0) [XYZSIZE] [TSIZE] [X4PT] [MDIFF] [NCONF]"

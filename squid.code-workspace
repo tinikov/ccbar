@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"uri": "vscode-remote://ssh-remote+ou-squid/sqfs2/cmc/0/work/G14458/u6b229"
+		}
+	],
+	"remoteAuthority": "ssh-remote+ou-squid",
+	"settings": {
+		"files.associations": {
+			"random": "cpp"
+		}
+	}
+}

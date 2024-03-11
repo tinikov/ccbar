@@ -10,7 +10,9 @@
 #include "dataio.h"
 #include "misc.h"
 
-void usage(char *name) {
+void
+usage(char* name)
+{
   fprintf(stderr, "Time reversal for 2-point correlators\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -26,15 +28,20 @@ void usage(char *name) {
 }
 
 // Custom function declaration
-void timeReverse2pt(char *rawDataList[], char *tr2ptList[], int tSize,
-                    int fileCountTotal);
+void
+timeReverse2pt(char* rawDataList[],
+               char* tr2ptList[],
+               int tSize,
+               int fileCountTotal);
 
 // Main function
-int main(int argc, char *argv[]) {
+int
+main(int argc, char* argv[])
+{
   // Global variables
   int tSize = 0;
-  static const char *ofDir = NULL;
-  static const char *ofPrefix = NULL;
+  static const char* ofDir = NULL;
+  static const char* ofPrefix = NULL;
   bool isAddPrefix = false;
   bool isSaveTxt = false;
   char programName[128];
@@ -52,7 +59,7 @@ int main(int argc, char *argv[]) {
 
     // -n: tSize
     if (strcmp(argv[0], "-n") == 0) {
-      tSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      tSize = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!tSize) {
         usage(programName);
         exit(1);
@@ -96,25 +103,25 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  const int fileCountTotal = argc;  // # of data files
+  const int fileCountTotal = argc; // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
   }
 
   // Create an array to store ofnames
-  char *ofnameArr[fileCountTotal];
+  char* ofnameArr[fileCountTotal];
 
   if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char*)malloc(2048 * sizeof(char));
       addPrefix(argv[i], ofPrefix, stmp);
       changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char*)malloc(2048 * sizeof(char));
       changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
@@ -139,11 +146,16 @@ int main(int argc, char *argv[]) {
 }
 
 // Custom function definition
-void timeReverse2pt(char *rawDataList[], char *tr2ptList[], int tSize,
-                    int fileCountTotal) {
+void
+timeReverse2pt(char* rawDataList[],
+               char* tr2ptList[],
+               int tSize,
+               int fileCountTotal)
+{
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[tSize], data[tSize];
-    for (int j = 0; j < tSize; j++) raw[j] = data[j] = 0.0;
+    for (int j = 0; j < tSize; j++)
+      raw[j] = data[j] = 0.0;
 
     readBin(rawDataList[i], tSize, raw);
 

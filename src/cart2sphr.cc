@@ -11,7 +11,9 @@
 #include "dataio.h"
 #include "misc.h"
 
-void usage(char *name) {
+void
+usage(char* name)
+{
   fprintf(stderr, "From Cartesian coordinate to Spherical coordinate\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -27,16 +29,21 @@ void usage(char *name) {
 }
 
 // Custom function declaration
-void cart2sphr(char *rawDataList[], char *sphrList[], int xyzSize,
-               int fileCountTotal);
+void
+cart2sphr(char* rawDataList[],
+          char* sphrList[],
+          int xyzSize,
+          int fileCountTotal);
 
 // Main function
-int main(int argc, char *argv[]) {
+int
+main(int argc, char* argv[])
+{
   // Global Variables
   int xyzSize = 0;
-  static const char *ofDir = NULL;
-  static const char *ofPrefix = NULL;
-  static const char *ofSuffix = NULL;
+  static const char* ofDir = NULL;
+  static const char* ofPrefix = NULL;
+  static const char* ofSuffix = NULL;
   bool isAddPrefix = false;
   bool isAddSuffix = false;
   char programName[128];
@@ -54,7 +61,7 @@ int main(int argc, char *argv[]) {
 
     // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      xyzSize = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!xyzSize) {
         usage(programName);
         exit(1);
@@ -100,19 +107,19 @@ int main(int argc, char *argv[]) {
   }
 
   // Initialization
-  const int fileCountTotal = argc;  // # of data files
+  const int fileCountTotal = argc; // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
   }
 
   // Create an array to store ofnames
-  char *ofnameArr[fileCountTotal];
+  char* ofnameArr[fileCountTotal];
   if (isAddPrefix || isAddSuffix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char nametmp[2048];
       strncpy(nametmp, argv[i], 1023);
-      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char*)malloc(2048 * sizeof(char));
       if (isAddPrefix) {
         char stmp[2048];
         addPrefix(nametmp, ofPrefix, stmp);
@@ -127,7 +134,7 @@ int main(int argc, char *argv[]) {
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char*)malloc(2048 * sizeof(char));
       changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
@@ -144,19 +151,23 @@ int main(int argc, char *argv[]) {
 }
 
 // Custom function definition
-void cart2sphr(char *rawDataList[], char *sphrList[], int xyzSize,
-               int fileCountTotal) {
+void
+cart2sphr(char* rawDataList[],
+          char* sphrList[],
+          int xyzSize,
+          int fileCountTotal)
+{
   int arrayLength = pow(xyzSize, 3);
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[arrayLength];
-    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++) // Initialize the empty arrays
     {
       tmp[j] = 0.0;
     }
     readBin(rawDataList[i], arrayLength, tmp);
 
-    FILE *fp = fopen(sphrList[i], "w");
+    FILE* fp = fopen(sphrList[i], "w");
     if (fp == NULL) {
       perror(sphrList[i]);
       exit(1);
@@ -168,7 +179,7 @@ void cart2sphr(char *rawDataList[], char *sphrList[], int xyzSize,
           DOUBLE re, im, distance = 0.0;
 
           distance =
-              sqrt(pow(DOUBLE(i), 2) + pow(DOUBLE(j), 2) + pow(DOUBLE(k), 2));
+            sqrt(pow(DOUBLE(i), 2) + pow(DOUBLE(j), 2) + pow(DOUBLE(k), 2));
           re = CORR(tmp, i, j, k, xyzSize).real();
           im = CORR(tmp, i, j, k, xyzSize).imag();
 

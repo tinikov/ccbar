@@ -1,6 +1,6 @@
 /**
  * @file misc.h
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief misc = miscellaneous
  *        Provides 2 functions:
  *        void addPrefix(): Add prefix to a file name;
@@ -25,7 +25,8 @@
  * @param prefix The prefix to be added: "prefix"
  * @param newPath The desired file name: "dir/prefix.filename"
  */
-void addPrefix(const char *origPath, const char *prefix, char *newPath);
+void
+addPrefix(const char* origPath, const char* prefix, char* newPath);
 
 /**
  * @brief Add suffix to a file (preserving the original path)
@@ -34,7 +35,8 @@ void addPrefix(const char *origPath, const char *prefix, char *newPath);
  * @param suffix The suffix to be added: "suffix"
  * @param newPath The desired file name: "dir/filename.suffix"
  */
-void addSuffix(const char *origPath, const char *suffix, char *newPath);
+void
+addSuffix(const char* origPath, const char* suffix, char* newPath);
 
 /**
  * @brief Change the directory part for a file name
@@ -43,6 +45,7 @@ void addSuffix(const char *origPath, const char *suffix, char *newPath);
  * @param tarDir Target directory: "tarDir"
  * @param newPath The character string generated: "tarDir/filename"
  */
-void changePath(const char *origPath, const char *tarDir, char *newPath);
+void
+changePath(const char* origPath, const char* tarDir, char* newPath);
 
 #endif

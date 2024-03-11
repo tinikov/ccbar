@@ -11,7 +11,9 @@
 #include "dataio.h"
 #include "misc.h"
 
-void usage(char *name) {
+void
+usage(char* name)
+{
   fprintf(stderr, "A1+ projection for 4-point correlators\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -26,15 +28,17 @@ void usage(char *name) {
 }
 
 // Custom function declaration
-void a1plus(char *rawDataList[], char *a1list[], int xyzSize,
-            int fileCountTotal);
+void
+a1plus(char* rawDataList[], char* a1list[], int xyzSize, int fileCountTotal);
 
 // Main function
-int main(int argc, char *argv[]) {
+int
+main(int argc, char* argv[])
+{
   // Global variables
   int xyzSize = 0;
-  static const char *ofDir = NULL;
-  static const char *ofPrefix = NULL;
+  static const char* ofDir = NULL;
+  static const char* ofPrefix = NULL;
   bool isAddPrefix = false;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
@@ -51,7 +55,7 @@ int main(int argc, char *argv[]) {
 
     // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      xyzSize = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!xyzSize) {
         usage(programName);
         exit(1);
@@ -94,17 +98,17 @@ int main(int argc, char *argv[]) {
   }
 
   // Create an array to store ofnames
-  char *ofnameArr[fileCountTotal];
+  char* ofnameArr[fileCountTotal];
   if (isAddPrefix) {
     for (int i = 0; i < fileCountTotal; i++) {
       char stmp[2048];
-      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char*)malloc(2048 * sizeof(char));
       addPrefix(argv[i], ofPrefix, stmp);
       changePath(stmp, ofDir, ofnameArr[i]);
     }
   } else {
     for (int i = 0; i < fileCountTotal; i++) {
-      ofnameArr[i] = (char *)malloc(2048 * sizeof(char));
+      ofnameArr[i] = (char*)malloc(2048 * sizeof(char));
       changePath(argv[i], ofDir, ofnameArr[i]);
     }
   }
@@ -121,14 +125,18 @@ int main(int argc, char *argv[]) {
 }
 
 // Custom function definition
-inline COMPLX naiveSym(COMPLX *data, int x, int y, int z, int xyzSize) {
+inline COMPLX
+naiveSym(COMPLX* data, int x, int y, int z, int xyzSize)
+{
   return (CORR(data, x, y, z, xyzSize) + CORR(data, y, z, x, xyzSize) +
           CORR(data, z, x, y, xyzSize) + CORR(data, x, z, y, xyzSize) +
           CORR(data, z, y, x, xyzSize) + CORR(data, y, x, z, xyzSize)) /
          6.0;
 }
 
-inline COMPLX a1Sym(COMPLX *data, int x, int y, int z, int xyzSize) {
+inline COMPLX
+a1Sym(COMPLX* data, int x, int y, int z, int xyzSize)
+{
   return (naiveSym(data, x, y, z, xyzSize) +
           naiveSym(data, x, y, xyzSize - z, xyzSize) +
           naiveSym(data, x, xyzSize - y, z, xyzSize) +
@@ -140,13 +148,14 @@ inline COMPLX a1Sym(COMPLX *data, int x, int y, int z, int xyzSize) {
          8.0;
 }
 
-void a1plus(char *rawDataList[], char *a1list[], int xyzSize,
-            int fileCountTotal) {
+void
+a1plus(char* rawDataList[], char* a1list[], int xyzSize, int fileCountTotal)
+{
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[arrayLength], result[arrayLength];
-    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++) // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }

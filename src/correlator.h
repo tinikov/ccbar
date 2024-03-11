@@ -1,6 +1,6 @@
 /**
  * @file correlator.h
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief
  * @version 1.1
  * @date 2024-02-13
@@ -12,38 +12,43 @@
 
 #include "alias.h"
 
-inline DOUBLE &CORR(DOUBLE *data, int x, int y, int z, int xyzSize)
+inline DOUBLE&
+CORR(DOUBLE* data, int x, int y, int z, int xyzSize)
 {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;
-  DOUBLE &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  DOUBLE& corrReturn = data[x + xyzSize * (y + xyzSize * z)];
   return corrReturn;
 }
 
-inline COMPLX &CORR(COMPLX *data, int x, int y, int z, int xyzSize) {
-  x = (x + xyzSize) % xyzSize;
-  y = (y + xyzSize) % xyzSize;
-  z = (z + xyzSize) % xyzSize;
-  COMPLX &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
-  return corrReturn;
-}
-
-inline DOUBLE &CORR(DVARRAY &data, int x, int y, int z, int xyzSize)
+inline COMPLX&
+CORR(COMPLX* data, int x, int y, int z, int xyzSize)
 {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;
-  DOUBLE &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  COMPLX& corrReturn = data[x + xyzSize * (y + xyzSize * z)];
   return corrReturn;
 }
 
-inline COMPLX &CORR(CVARRAY &data, int x, int y, int z, int xyzSize)
+inline DOUBLE&
+CORR(DVARRAY& data, int x, int y, int z, int xyzSize)
 {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;
-  COMPLX &corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  DOUBLE& corrReturn = data[x + xyzSize * (y + xyzSize * z)];
+  return corrReturn;
+}
+
+inline COMPLX&
+CORR(CVARRAY& data, int x, int y, int z, int xyzSize)
+{
+  x = (x + xyzSize) % xyzSize;
+  y = (y + xyzSize) % xyzSize;
+  z = (z + xyzSize) % xyzSize;
+  COMPLX& corrReturn = data[x + xyzSize * (y + xyzSize * z)];
   return corrReturn;
 }
 

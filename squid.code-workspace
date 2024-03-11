@@ -7,7 +7,8 @@
 	"remoteAuthority": "ssh-remote+ou-squid",
 	"settings": {
 		"files.associations": {
-			"random": "cpp"
+			"random": "cpp",
+			"new": "cpp"
 		}
 	}
 }

@@ -1,6 +1,6 @@
 /**
  * @file misc.cc
- * @author Tianchen Zhang 
+ * @author Tianchen Zhang
  * @brief
  * @version 1.1
  * @date 2024-02-13
@@ -9,7 +9,9 @@
 
 #include "misc.h"
 
-void addPrefix(const char *origPath, const char *prefix, char *newPath) {
+void
+addPrefix(const char* origPath, const char* prefix, char* newPath)
+{
   char stmp[1024], dir[1024], base[512], pre[512];
 
   strncpy(pre, prefix, 511);
@@ -21,7 +23,9 @@ void addPrefix(const char *origPath, const char *prefix, char *newPath) {
   snprintf(newPath, 2048, "%s/%s.%s", dir, pre, base);
 }
 
-void addSuffix(const char *origPath, const char *suffix, char *newPath) {
+void
+addSuffix(const char* origPath, const char* suffix, char* newPath)
+{
   char stmp[1024], dir[1024], base[512], suf[512];
 
   strncpy(suf, suffix, 511);
@@ -33,7 +37,9 @@ void addSuffix(const char *origPath, const char *suffix, char *newPath) {
   snprintf(newPath, 2048, "%s/%s.%s", dir, base, suf);
 }
 
-void changePath(const char *origPath, const char *tarDir, char *newPath) {
+void
+changePath(const char* origPath, const char* tarDir, char* newPath)
+{
   char stmp[1024], dir[1024], base[1024];
 
   strncpy(dir, tarDir, 1023);

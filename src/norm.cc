@@ -10,7 +10,9 @@
 #include "dataio.h"
 #include "misc.h"
 
-void usage(char *name) {
+void
+usage(char* name)
+{
   fprintf(stderr, "Normalizaion for 4-point correlators\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -24,16 +26,18 @@ void usage(char *name) {
 }
 
 // Custom function declaration
-void naiveNorm(char *rawDataList[], char *nnlist[], int xyzSize,
-               int fileCountTotal);
-void l2Norm(char *rawDataList[], char *l2list[], int xyzSize,
-            int fileCountTotal);
+void
+naiveNorm(char* rawDataList[], char* nnlist[], int xyzSize, int fileCountTotal);
+void
+l2Norm(char* rawDataList[], char* l2list[], int xyzSize, int fileCountTotal);
 
 // Main function
-int main(int argc, char *argv[]) {
+int
+main(int argc, char* argv[])
+{
   // Global variables
   int xyzSize = 0;
-  static const char *ofDir = NULL;
+  static const char* ofDir = NULL;
   char programName[128];
   strncpy(programName, basename(argv[0]), 127);
   argc--;
@@ -49,7 +53,7 @@ int main(int argc, char *argv[]) {
 
     // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
+      xyzSize = atoi(argv[1]); // atoi(): convert ASCII string to integer
       if (!xyzSize) {
         usage(programName);
         exit(1);
@@ -76,7 +80,7 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
-  const int fileCountTotal = argc;  // # of data files
+  const int fileCountTotal = argc; // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
@@ -86,8 +90,8 @@ int main(int argc, char *argv[]) {
   char *nnNameArr[fileCountTotal], *l2NameArr[fileCountTotal];
   for (int i = 0; i < fileCountTotal; i++) {
     char stmpnn[2048], stmpl2[2048];
-    nnNameArr[i] = (char *)malloc(2048 * sizeof(char));
-    l2NameArr[i] = (char *)malloc(2048 * sizeof(char));
+    nnNameArr[i] = (char*)malloc(2048 * sizeof(char));
+    l2NameArr[i] = (char*)malloc(2048 * sizeof(char));
     addPrefix(argv[i], "nn", stmpnn);
     changePath(stmpnn, ofDir, nnNameArr[i]);
     addPrefix(argv[i], "l2", stmpl2);
@@ -108,21 +112,22 @@ int main(int argc, char *argv[]) {
 }
 
 // Custom function definition
-void naiveNorm(char *rawDataList[], char *nnlist[], int xyzSize,
-               int fileCountTotal) {
+void
+naiveNorm(char* rawDataList[], char* nnlist[], int xyzSize, int fileCountTotal)
+{
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[arrayLength], result[arrayLength];
 
-    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++) // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
 
     readBin(rawDataList[i], arrayLength, tmp);
 
-    for (int j = 0; j < arrayLength; j++)  // Compute C_n(t) = C(t)/C(0)
+    for (int j = 0; j < arrayLength; j++) // Compute C_n(t) = C(t)/C(0)
     {
       result[j] = tmp[j] / tmp[0];
     }
@@ -131,15 +136,16 @@ void naiveNorm(char *rawDataList[], char *nnlist[], int xyzSize,
   }
 }
 
-void l2Norm(char *rawDataList[], char *l2list[], int xyzSize,
-            int fileCountTotal) {
+void
+l2Norm(char* rawDataList[], char* l2list[], int xyzSize, int fileCountTotal)
+{
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[arrayLength], result[arrayLength];
     DOUBLE normFact = 0.0;
 
-    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++) // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
@@ -152,7 +158,7 @@ void l2Norm(char *rawDataList[], char *l2list[], int xyzSize,
 
     normFact = sqrt(normFact);
 
-    for (int j = 0; j < arrayLength; j++)  // C_n(t) = C(t)/\sqrt(\sum_{C^2})
+    for (int j = 0; j < arrayLength; j++) // C_n(t) = C(t)/\sqrt(\sum_{C^2})
     {
       result[j] = tmp[j] / normFact;
     }

@@ -7,12 +7,18 @@
  *
  */
 
+#include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <complex>
+#include <valarray>
+
 #include "dataio.h"
 #include "misc.h"
 
-void
-usage(char* name)
-{
+void usage(char* name) {
   fprintf(stderr, "Mean for raw data (Optional: jackknife variance)\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -29,26 +35,15 @@ usage(char* name)
 }
 
 // Custom function declaration
-void
-arithmeticMean(char* rawDataList[],
-               const char* result,
-               int arrayLength,
-               int fileCountTotal);
-void
-jackknifeMean(char* rawDataList[],
-              const char* result,
-              int arrayLength,
-              int fileCountTotal);
-void
-jackknifeMeanD(char* rawDataList[],
-               const char* result,
-               int arrayLength,
-               int fileCountTotal);
+void arithmeticMean(char* rawDataList[], const char* result, int arrayLength,
+                    int fileCountTotal);
+void jackknifeMean(char* rawDataList[], const char* result, int arrayLength,
+                   int fileCountTotal);
+void jackknifeMeanD(char* rawDataList[], const char* result, int arrayLength,
+                    int fileCountTotal);
 
 // Main function
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Global variables
   int arrayLength = 0;
   static const char* ofname = NULL;
@@ -70,7 +65,7 @@ main(int argc, char* argv[])
 
     // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      arrayLength = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!arrayLength) {
         usage(programName);
         exit(1);
@@ -145,12 +140,8 @@ main(int argc, char* argv[])
 }
 
 // Custom function definition
-void
-jackknifeMean(char* rawDataList[],
-              const char* result,
-              int arrayLength,
-              int fileCountTotal)
-{
+void jackknifeMean(char* rawDataList[], const char* result, int arrayLength,
+                   int fileCountTotal) {
   DVARRAY mean(arrayLength), var(arrayLength);
   mean = var = 0.0;
 
@@ -193,12 +184,8 @@ jackknifeMean(char* rawDataList[],
   writeBin(result, arrayLength, out);
 }
 
-void
-jackknifeMeanD(char* rawDataList[],
-               const char* result,
-               int arrayLength,
-               int fileCountTotal)
-{
+void jackknifeMeanD(char* rawDataList[], const char* result, int arrayLength,
+                    int fileCountTotal) {
   DVARRAY mean(arrayLength), var(arrayLength);
   mean = var = 0.0;
 
@@ -231,12 +218,8 @@ jackknifeMeanD(char* rawDataList[],
   writeBin(result, arrayLength, out);
 }
 
-void
-arithmeticMean(char* rawDataList[],
-               const char* result,
-               int arrayLength,
-               int fileCountTotal)
-{
+void arithmeticMean(char* rawDataList[], const char* result, int arrayLength,
+                    int fileCountTotal) {
   CVARRAY mean(arrayLength);
   mean = 0.0;
 

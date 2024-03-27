@@ -33,6 +33,6 @@ for ((it = 0; it <= T_HALF; it = it + 1)); do
 
 	$BINDIR/mean -l $ARRAY_LENGTH -o $OFPATH -j $IFDIR/$t/$8.*
 done
-$BINDIR/cart2sphr -n $1 -d $OFDIR -s "txt" $OFDIR/$5.*
+$BINDIR/cart2sphr -n $1 -d $OFDIR -s "txt" $OFDIR/$5.*.$6
 
 echo -e "\033[34m$IFDIR\033[0m: Averaged to \033[33m$OFDIR\033[0m!"

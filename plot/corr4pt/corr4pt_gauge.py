@@ -10,7 +10,7 @@ plt.style.use(["science", "nature"])
 
 a = 0.090713
 tsize = 64
-codeRoot = "/Volumes/X6/work/ccbar"
+codeRoot = "/Users/zhangtc/ccbar"
 int_c = 2.0 * np.sqrt(np.pi)
 
 
@@ -90,16 +90,20 @@ channel = ["ps", "v"]
 l2_ps_c, l2_v_c, l2_ps_l, l2_v_l = [[] for _ in range(4)]
 for it in range(32):
     l2_ps_c.append(
-        np.loadtxt("{}/result/c4pt/corr/ps/txt.l2.{}".format(codeRoot, timelist[it]))
+        np.loadtxt(
+            "{}/result/c4pt/corr/l2.ps.{}.bin.txt".format(codeRoot, timelist[it])
+        )
     )
     l2_ps_l.append(
-        np.loadtxt("{}/result/l4pt/corr/ps/txt.l2.{}".format(codeRoot, timelist[it]))
+        np.loadtxt(
+            "{}/result/l4pt/corr/l2.ps.{}.bin.txt".format(codeRoot, timelist[it])
+        )
     )
     l2_v_c.append(
-        np.loadtxt("{}/result/c4pt/corr/v/txt.l2.{}".format(codeRoot, timelist[it]))
+        np.loadtxt("{}/result/c4pt/corr/l2.v.{}.bin.txt".format(codeRoot, timelist[it]))
     )
     l2_v_l.append(
-        np.loadtxt("{}/result/l4pt/corr/v/txt.l2.{}".format(codeRoot, timelist[it]))
+        np.loadtxt("{}/result/l4pt/corr/l2.v.{}.bin.txt".format(codeRoot, timelist[it]))
     )
 
 # PLOT
@@ -109,8 +113,8 @@ gauge_plot(
     l2_ps_l,
     29,
     filename="{}/4pt_gauge_ps".format(path),
-    xrange=[0.05, 2.5],
-    yrange=[-0.02, 0.4],
+    xrange=[0, 2.5],
+    yrange=[-0.02, 0.54],
 )
 
 gauge_plot(
@@ -119,6 +123,6 @@ gauge_plot(
     l2_v_l,
     29,
     filename="{}/4pt_gauge_v".format(path),
-    xrange=[0.05, 2.5],
+    xrange=[0, 2.5],
     yrange=[-0.02, 0.4],
 )

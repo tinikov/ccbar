@@ -7,12 +7,18 @@
  *
  */
 
+#include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <complex>
+#include <valarray>
+
 #include "dataio.h"
 #include "misc.h"
 
-void
-usage(char* name)
-{
+void usage(char* name) {
   fprintf(stderr, "F_{KS} (time-independent version)\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -27,9 +33,7 @@ usage(char* name)
 }
 
 // Main function
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Global variables
   int arrayLength = 0;
   DOUBLE mdiff = 0.0;
@@ -49,7 +53,7 @@ main(int argc, char* argv[])
 
     // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      arrayLength = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!arrayLength) {
         usage(programName);
         exit(1);
@@ -61,7 +65,7 @@ main(int argc, char* argv[])
 
     // -m: mdiff
     if (strcmp(argv[0], "-m") == 0) {
-      mdiff = atof(argv[1]); // atof(): convert ASCII string to float
+      mdiff = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mdiff == 0.0) {
         usage(programName);
         exit(1);

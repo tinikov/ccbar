@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef IS_INCLUDED_ALIAS_H
-#define IS_INCLUDED_ALIAS_H
+#ifndef CCBAR_SRC_ALIAS_H_
+#define CCBAR_SRC_ALIAS_H_
 
 #include <complex>
 #include <valarray>
@@ -18,4 +18,4 @@ using COMPLX = std::complex<double>;
 using DVARRAY = std::valarray<double>;
 using CVARRAY = std::valarray<std::complex<double> >;
 
-#endif
+#endif  // CCBAR_SRC_ALIAS_H_

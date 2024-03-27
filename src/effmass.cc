@@ -7,12 +7,18 @@
  *
  */
 
+#include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <complex>
+#include <valarray>
+
 #include "dataio.h"
 #include "misc.h"
 
-void
-usage(char* name)
-{
+void usage(char* name) {
   fprintf(stderr,
           "Effective masses for charmonium (ofname: exp.xxx and csh.xxx)\n");
   fprintf(stderr,
@@ -28,15 +34,13 @@ usage(char* name)
 }
 
 // Custom function declaration
-void
-expMass(char* rawDataList[], char* expList[], int tSize, int fileCountTotal);
-void
-cshMass(char* rawDataList[], char* cshList[], int tSize, int fileCountTotal);
+void expMass(char* rawDataList[], char* expList[], int tSize,
+             int fileCountTotal);
+void cshMass(char* rawDataList[], char* cshList[], int tSize,
+             int fileCountTotal);
 
 // Main function
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Global variables
   int tSize = 0;
   static const char* ofDir = NULL;
@@ -56,7 +60,7 @@ main(int argc, char* argv[])
 
     // -n: tSize
     if (strcmp(argv[0], "-n") == 0) {
-      tSize = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      tSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!tSize) {
         usage(programName);
         exit(1);
@@ -92,7 +96,7 @@ main(int argc, char* argv[])
   }
 
   // Initialization
-  const int fileCountTotal = argc; // # of data files
+  const int fileCountTotal = argc;  // # of data files
   if (fileCountTotal < 1) {
     usage(programName);
     exit(1);
@@ -138,9 +142,8 @@ main(int argc, char* argv[])
 }
 
 // Custom function definition
-void
-expMass(char* rawDataList[], char* expList[], int tSize, int fileCountTotal)
-{
+void expMass(char* rawDataList[], char* expList[], int tSize,
+             int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[tSize], effmass[tSize];
     for (int j = 0; j < tSize; j++) {
@@ -158,14 +161,13 @@ expMass(char* rawDataList[], char* expList[], int tSize, int fileCountTotal)
 }
 
 DOUBLE
-cshMassCal(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize)
-{
+cshMassCal(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize) {
 #define JMAX 100
 #define M0 0.001
 #define M1 10.0
 #define MACC 1.0e-12
-#define coshtype(m)                                                            \
-  (corr1 / corr2 -                                                             \
+#define coshtype(m) \
+  (corr1 / corr2 -  \
    cosh((m) * (tSize / 2.0 - t1)) / cosh((m) * (tSize / 2.0 - t2)))
 
   DOUBLE dm, f, fmid, mmid, mass;
@@ -180,18 +182,15 @@ cshMassCal(int t1, int t2, DOUBLE corr1, DOUBLE corr2, int tSize)
   for (int j = 1; j <= JMAX; j++) {
     mmid = mass + (dm *= 0.5);
     fmid = coshtype(mmid);
-    if (fmid <= 0.0)
-      mass = mmid;
-    if (fabs(dm) < MACC || fmid == 0.0)
-      return mass;
+    if (fmid <= 0.0) mass = mmid;
+    if (fabs(dm) < MACC || fmid == 0.0) return mass;
   }
   fprintf(stderr, "Too many bisections in RTBIS");
   return 0.0;
 }
 
-void
-cshMass(char* rawDataList[], char* cshList[], int tSize, int fileCountTotal)
-{
+void cshMass(char* rawDataList[], char* cshList[], int tSize,
+             int fileCountTotal) {
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX raw[tSize], effmass[tSize];
     for (int j = 0; j < tSize; j++) {
@@ -204,7 +203,7 @@ cshMass(char* rawDataList[], char* cshList[], int tSize, int fileCountTotal)
       int t1 = j;
       int t2 = (j + 1) % tSize;
       effmass[j].real(
-        cshMassCal(t1, t2, raw[t1].real(), raw[t2].real(), tSize));
+          cshMassCal(t1, t2, raw[t1].real(), raw[t2].real(), tSize));
     }
 
     writeBin(cshList[i], tSize, effmass);

@@ -7,12 +7,18 @@
  *
  */
 
+#include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <complex>
+#include <valarray>
+
 #include "dataio.h"
 #include "misc.h"
 
-void
-usage(char* name)
-{
+void usage(char* name) {
   fprintf(stderr, "Central potential (time-dependent version)\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -28,9 +34,7 @@ usage(char* name)
 }
 
 // Main function
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Global variables
   int arrayLength = 0;
   DOUBLE mc = 0.0;
@@ -51,7 +55,7 @@ main(int argc, char* argv[])
 
     // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      arrayLength = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!arrayLength) {
         usage(programName);
         exit(1);
@@ -63,7 +67,7 @@ main(int argc, char* argv[])
 
     // -mc: charm quark mass
     if (strcmp(argv[0], "-mc") == 0) {
-      mc = atof(argv[1]); // atof(): convert ASCII string to float
+      mc = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mc == 0.0) {
         usage(programName);
         exit(1);
@@ -121,8 +125,8 @@ main(int argc, char* argv[])
 
   v0 = 1 / (4.0 * mc) * (3 * data[4] + data[5]) -
        1 / 4.0 *
-         (3 * (log(data[1]) - log(data[0])) / 2.0 +
-          (log(data[3]) - log(data[2])) / 2.0) -
+           (3 * (log(data[1]) - log(data[0])) / 2.0 +
+            (log(data[3]) - log(data[2])) / 2.0) -
        2 * mc;
   vs = 1.0 / mc * (data[4] - data[5]) -
        (log(data[1] / data[3]) - log(data[0] / data[2])) / 2.0;

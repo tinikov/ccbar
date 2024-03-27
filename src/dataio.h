@@ -13,8 +13,11 @@
  *
  */
 
-#ifndef IS_INCLUDED_DATAIO_H
-#define IS_INCLUDED_DATAIO_H
+#ifndef CCBAR_SRC_DATAIO_H_
+#define CCBAR_SRC_DATAIO_H_
+
+#include <complex>
+#include <valarray>
 
 #include "alias.h"
 
@@ -25,14 +28,10 @@
  * @param arrayLength Total of double/complex numbers
  * @param data The pointer of the array that contains the data to be read
  */
-void
-readBin(const char* ifname, int arrayLength, DOUBLE* data);
-void
-readBin(const char* ifname, int arrayLength, COMPLX* data);
-void
-readBin(const char* ifname, int arrayLength, DVARRAY& data);
-void
-readBin(const char* ifname, int arrayLength, CVARRAY& data);
+void readBin(const char* ifname, int arrayLength, DOUBLE* data);
+void readBin(const char* ifname, int arrayLength, COMPLX* data);
+void readBin(const char* ifname, int arrayLength, DVARRAY& data);
+void readBin(const char* ifname, int arrayLength, CVARRAY& data);
 
 /**
  * @brief Write to binary file
@@ -42,14 +41,10 @@ readBin(const char* ifname, int arrayLength, CVARRAY& data);
  * @param data The pointer of the array that contains the data to be written to
  * file
  */
-void
-writeBin(const char* ofname, int arrayLength, const DOUBLE* data);
-void
-writeBin(const char* ofname, int arrayLength, const COMPLX* data);
-void
-writeBin(const char* ofname, int arrayLength, const DVARRAY& data);
-void
-writeBin(const char* ofname, int arrayLength, const CVARRAY& data);
+void writeBin(const char* ofname, int arrayLength, const DOUBLE* data);
+void writeBin(const char* ofname, int arrayLength, const COMPLX* data);
+void writeBin(const char* ofname, int arrayLength, const DVARRAY& data);
+void writeBin(const char* ofname, int arrayLength, const CVARRAY& data);
 
 /**
  * @brief Convert binary file to txt file (only for complex (2-lined) data)
@@ -58,8 +53,7 @@ writeBin(const char* ofname, int arrayLength, const CVARRAY& data);
  * @param txtfname File name of the txt file
  * @param arrayLength Total of complex numbers
  */
-void
-bin2txt(const char* binfname, const char* txtfname, int arrayLength);
+void bin2txt(const char* binfname, const char* txtfname, int arrayLength);
 
 /**
  * @brief Keep the real part of the data
@@ -68,8 +62,7 @@ bin2txt(const char* binfname, const char* txtfname, int arrayLength);
  * @param realData real part of the valarray (double valarray)
  * @param arrayLength Total of complex numbers
  */
-void
-keepReal(CVARRAY& data, DVARRAY& realData, int arrayLength);
+void keepReal(CVARRAY& data, DVARRAY& realData, int arrayLength);
 
 /**
  * @brief Keep the imaginary part of the data
@@ -78,8 +71,7 @@ keepReal(CVARRAY& data, DVARRAY& realData, int arrayLength);
  * @param imagData imaginary part of the valarray (double valarray)
  * @param arrayLength Total of complex numbers
  */
-void
-keepImag(CVARRAY& data, DVARRAY& imagData, int arrayLength);
+void keepImag(CVARRAY& data, DVARRAY& imagData, int arrayLength);
 
 /**
  * @brief Calculate the norm of the complex data
@@ -88,6 +80,5 @@ keepImag(CVARRAY& data, DVARRAY& imagData, int arrayLength);
  * @param normData norm of the valarray (double valarray)
  * @param arrayLength Total of complex numbers
  */
-void
-varryNorm(CVARRAY& data, DVARRAY& normData, int arrayLength);
+void varryNorm(CVARRAY& data, DVARRAY& normData, int arrayLength);
 #endif

@@ -7,12 +7,18 @@
  *
  */
 
+#include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <complex>
+#include <valarray>
+
 #include "dataio.h"
 #include "misc.h"
 
-void
-usage(char* name)
-{
+void usage(char* name) {
   fprintf(stderr, "Central potential (time-independent version)\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -30,9 +36,7 @@ usage(char* name)
 }
 
 // Main function
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Global variables
   int arrayLength = 0;
   DOUBLE mPS = 0.0;
@@ -46,7 +50,7 @@ main(int argc, char* argv[])
   argv++;
 
   // Read options (order irrelevant)
-  while (argc > 0 && argv[0][0] == '-') // Read options (order irrelevant)
+  while (argc > 0 && argv[0][0] == '-')  // Read options (order irrelevant)
   {
     // -h and --help: show usage
     if (strcmp(argv[0], "-h") == 0 || strcmp(argv[0], "--help") == 0) {
@@ -56,7 +60,7 @@ main(int argc, char* argv[])
 
     // -l: arrayLength
     if (strcmp(argv[0], "-l") == 0) {
-      arrayLength = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      arrayLength = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!arrayLength) {
         usage(programName);
         exit(1);
@@ -68,7 +72,7 @@ main(int argc, char* argv[])
 
     // -mps: PS channel charmonium mass
     if (strcmp(argv[0], "-mps") == 0) {
-      mPS = atof(argv[1]); // atof(): convert ASCII string to float
+      mPS = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mPS == 0.0) {
         usage(programName);
         exit(1);
@@ -80,7 +84,7 @@ main(int argc, char* argv[])
 
     // -mv: V channel charmonium mass
     if (strcmp(argv[0], "-mv") == 0) {
-      mV = atof(argv[1]); // atof(): convert ASCII string to float
+      mV = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mV == 0.0) {
         usage(programName);
         exit(1);
@@ -92,7 +96,7 @@ main(int argc, char* argv[])
 
     // -mc: charm quark mass
     if (strcmp(argv[0], "-mc") == 0) {
-      mc = atof(argv[1]); // atof(): convert ASCII string to float
+      mc = atof(argv[1]);  // atof(): convert ASCII string to float
       if (mc == 0.0) {
         usage(programName);
         exit(1);
@@ -138,7 +142,7 @@ main(int argc, char* argv[])
   }
 
   CVARRAY ppotv(arrayLength), ppotps(arrayLength), v0(arrayLength),
-    vs(arrayLength);
+      vs(arrayLength);
   ppotv = ppotps = v0 = vs = 0.0;
 
   readBin(argv[0], arrayLength, ppotv);

@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef IS_INCLUDED_MISC_H
-#define IS_INCLUDED_MISC_H
+#ifndef CCBAR_SRC_MISC_H_
+#define CCBAR_SRC_MISC_H_
 
 #include <libgen.h>
 #include <stdio.h>

@@ -7,14 +7,15 @@
  *
  */
 
-#ifndef IS_INCLUDED_CORRELATOR_H
-#define IS_INCLUDED_CORRELATOR_H
+#ifndef CCBAR_SRC_CORRELATOR_H_
+#define CCBAR_SRC_CORRELATOR_H_
+
+#include <complex>
+#include <valarray>
 
 #include "alias.h"
 
-inline DOUBLE&
-CORR(DOUBLE* data, int x, int y, int z, int xyzSize)
-{
+inline DOUBLE& CORR(DOUBLE* data, int x, int y, int z, int xyzSize) {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;
@@ -22,9 +23,7 @@ CORR(DOUBLE* data, int x, int y, int z, int xyzSize)
   return corrReturn;
 }
 
-inline COMPLX&
-CORR(COMPLX* data, int x, int y, int z, int xyzSize)
-{
+inline COMPLX& CORR(COMPLX* data, int x, int y, int z, int xyzSize) {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;
@@ -32,9 +31,7 @@ CORR(COMPLX* data, int x, int y, int z, int xyzSize)
   return corrReturn;
 }
 
-inline DOUBLE&
-CORR(DVARRAY& data, int x, int y, int z, int xyzSize)
-{
+inline DOUBLE& CORR(DVARRAY& data, int x, int y, int z, int xyzSize) {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;
@@ -42,9 +39,7 @@ CORR(DVARRAY& data, int x, int y, int z, int xyzSize)
   return corrReturn;
 }
 
-inline COMPLX&
-CORR(CVARRAY& data, int x, int y, int z, int xyzSize)
-{
+inline COMPLX& CORR(CVARRAY& data, int x, int y, int z, int xyzSize) {
   x = (x + xyzSize) % xyzSize;
   y = (y + xyzSize) % xyzSize;
   z = (z + xyzSize) % xyzSize;

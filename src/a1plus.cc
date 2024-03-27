@@ -7,13 +7,19 @@
  *
  */
 
+#include <libgen.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <complex>
+#include <valarray>
+
 #include "correlator.h"
 #include "dataio.h"
 #include "misc.h"
 
-void
-usage(char* name)
-{
+void usage(char* name) {
   fprintf(stderr, "A1+ projection for 4-point correlators\n");
   fprintf(stderr,
           "USAGE: \n"
@@ -28,13 +34,11 @@ usage(char* name)
 }
 
 // Custom function declaration
-void
-a1plus(char* rawDataList[], char* a1list[], int xyzSize, int fileCountTotal);
+void a1plus(char* rawDataList[], char* a1list[], int xyzSize,
+            int fileCountTotal);
 
 // Main function
-int
-main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
   // Global variables
   int xyzSize = 0;
   static const char* ofDir = NULL;
@@ -55,7 +59,7 @@ main(int argc, char* argv[])
 
     // -n: xyzSize
     if (strcmp(argv[0], "-n") == 0) {
-      xyzSize = atoi(argv[1]); // atoi(): convert ASCII string to integer
+      xyzSize = atoi(argv[1]);  // atoi(): convert ASCII string to integer
       if (!xyzSize) {
         usage(programName);
         exit(1);
@@ -125,18 +129,14 @@ main(int argc, char* argv[])
 }
 
 // Custom function definition
-inline COMPLX
-naiveSym(COMPLX* data, int x, int y, int z, int xyzSize)
-{
+inline COMPLX naiveSym(COMPLX* data, int x, int y, int z, int xyzSize) {
   return (CORR(data, x, y, z, xyzSize) + CORR(data, y, z, x, xyzSize) +
           CORR(data, z, x, y, xyzSize) + CORR(data, x, z, y, xyzSize) +
           CORR(data, z, y, x, xyzSize) + CORR(data, y, x, z, xyzSize)) /
          6.0;
 }
 
-inline COMPLX
-a1Sym(COMPLX* data, int x, int y, int z, int xyzSize)
-{
+inline COMPLX a1Sym(COMPLX* data, int x, int y, int z, int xyzSize) {
   return (naiveSym(data, x, y, z, xyzSize) +
           naiveSym(data, x, y, xyzSize - z, xyzSize) +
           naiveSym(data, x, xyzSize - y, z, xyzSize) +
@@ -148,14 +148,13 @@ a1Sym(COMPLX* data, int x, int y, int z, int xyzSize)
          8.0;
 }
 
-void
-a1plus(char* rawDataList[], char* a1list[], int xyzSize, int fileCountTotal)
-{
+void a1plus(char* rawDataList[], char* a1list[], int xyzSize,
+            int fileCountTotal) {
   int arrayLength = int(pow(xyzSize, 3));
 
   for (int i = 0; i < fileCountTotal; i++) {
     COMPLX tmp[arrayLength], result[arrayLength];
-    for (int j = 0; j < arrayLength; j++) // Initialize the empty arrays
+    for (int j = 0; j < arrayLength; j++)  // Initialize the empty arrays
     {
       tmp[j] = result[j] = 0.0;
     }
